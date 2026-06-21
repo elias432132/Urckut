@@ -47,7 +47,8 @@
         @keyframes neon-pulse {
             0%, 100% { box-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue); }
             50% { box-shadow: 0 0 20px var(--neon-blue), 0 0 40px var(--neon-blue); }
-        }        @keyframes slideIn {
+        }        
+        @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
@@ -97,6 +98,7 @@
         
         .btn-green { border-color: var(--neon-green); background: rgba(57, 255, 20, 0.1); color: var(--neon-green); box-shadow: 0 0 10px rgba(57, 255, 20, 0.3); }
         .btn-green:hover { background: var(--neon-green); color: #000; box-shadow: 0 0 20px var(--neon-green); transform: translateY(-2px); }        
+        
         .btn-pink { border-color: var(--neon-pink); background: rgba(255, 0, 127, 0.1); color: var(--neon-pink); box-shadow: 0 0 10px rgba(255, 0, 127, 0.3); }
         .btn-pink:hover { background: var(--neon-pink); color: #fff; box-shadow: 0 0 20px var(--neon-pink); transform: translateY(-2px); }
 
@@ -145,7 +147,8 @@
             box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
         }
         header {
-            background: rgba(10, 14, 23, 0.95); backdrop-filter: blur(20px); padding: 15px 30px;             display: flex; justify-content: space-between; align-items: center; 
+            background: rgba(10, 14, 23, 0.95); backdrop-filter: blur(20px); padding: 15px 30px;             
+            display: flex; justify-content: space-between; align-items: center; 
             border-bottom: 2px solid var(--glass-border); 
             position: sticky; top: 0; z-index: 100;
         }
@@ -243,7 +246,8 @@
         .reacoes button.curtido { color: var(--neon-pink); border-color: var(--neon-pink); background: rgba(255, 0, 127, 0.2); }
 
         .foto-perfil { 
-            width: 100%; border-radius: 12px; border: 3px solid var(--neon-blue);             height: 220px; object-fit: cover; box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+            width: 100%; border-radius: 12px; border: 3px solid var(--neon-blue);             
+            height: 220px; object-fit: cover; box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
         }
         .nome-usuario { 
             color: var(--neon-pink); font-size: 24px; margin: 15px 0 8px 0; 
@@ -292,7 +296,8 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            object-fit: cover;            border: 3px solid var(--bg-dark);
+            object-fit: cover;            
+            border: 3px solid var(--bg-dark);
         }
         .story-add-btn {
             position: absolute;
@@ -341,7 +346,8 @@
             width: 100%;
             max-width: 420px;
             height: 90vh;
-            max-height: 750px;            background: #000;
+            max-height: 750px;            
+            background: #000;
             border-radius: 15px;
             overflow: hidden;
             border: 2px solid var(--neon-pink);
@@ -390,7 +396,8 @@
             border: 2px solid var(--neon-pink);
         }
         .story-header-info {
-            flex: 1;            color: white;
+            flex: 1;            
+            color: white;
         }
         .story-header-info strong { font-size: 14px; display: block; }
         .story-header-info span { font-size: 11px; color: rgba(255,255,255,0.7); }
@@ -439,7 +446,8 @@
             right: 15px;
             display: flex;
             gap: 10px;
-            z-index: 10;        }
+            z-index: 10;        
+        }
         .story-footer input {
             flex: 1;
             background: rgba(255,255,255,0.1);
@@ -537,7 +545,8 @@
         }
         .reel-music {
             display: flex;
-            align-items: center;            gap: 8px;
+            align-items: center;            
+            gap: 8px;
             font-size: 12px;
             color: rgba(255,255,255,0.9);
         }
@@ -635,7 +644,8 @@
 
         .chat-container { 
             display: flex; height: 650px; 
-            border: 2px solid var(--glass-border); border-radius: 12px; overflow: hidden;        }
+            border: 2px solid var(--glass-border); border-radius: 12px; overflow: hidden;        
+        }
         .chat-lista { width: 30%; background: rgba(0,0,0,0.6); border-right: 2px solid var(--glass-border); overflow-y: auto; }
         .chat-janela { width: 70%; display: flex; flex-direction: column; background: rgba(16, 20, 31, 0.4); }
         .chat-contato { 
@@ -684,7 +694,8 @@
             top: 0;
             left: 0;
             right: 0;
-            padding: 20px;            background: rgba(0, 240, 255, 0.1);
+            padding: 20px;            
+            background: rgba(0, 240, 255, 0.1);
             border-bottom: 2px solid var(--neon-blue);
             display: flex;
             justify-content: space-between;
@@ -733,7 +744,8 @@
         }
         .menu-item i {
             font-size: 20px;
-            width: 30px;            text-align: center;
+            width: 30px;            
+            text-align: center;
         }
 
         .overlay {
@@ -782,7 +794,8 @@
             overflow: hidden;
             cursor: pointer;
             border: 2px solid var(--glass-border);
-            transition: all 0.3s;        }
+            transition: all 0.3s;        
+        }
         .galeria-item:hover {
             transform: scale(1.05);
             border-color: var(--neon-blue);
@@ -831,12 +844,11 @@
     </style>
 </head>
 <body>
-    <canvas id="universo-neon" aria-hidden="true"></canvas>    <div id="toast-container" aria-live="polite"></div>
+    <canvas id="universo-neon" aria-hidden="true"></canvas>    
+    <div id="toast-container" aria-live="polite"></div>
 
-    <!-- OVERLAY -->
     <div class="overlay" id="overlay" onclick="fecharMenuLateral()"></div>
 
-    <!-- MENU LATERAL DE CONFIGURAÇÕES -->
     <div class="menu-lateral" id="menu-lateral">
         <div class="menu-lateral-header">
             <h3><i class="fas fa-cog"></i> Configurações</h3>
@@ -880,7 +892,8 @@
             </div>
             <button class="btn-neon btn-red" style="width: 100%; margin-top: 15px;" onclick="sairDoSistema()">
                 <i class="fas fa-sign-out-alt"></i> Sair do Sistema
-            </button>        </div>
+            </button>        
+        </div>
     </div>
 
     <div id="tela-login" class="login-body">
@@ -929,7 +942,8 @@
                 
                 <section id="tela-perfil" class="AbaDinamica">
                     
-                    <div class="box" style="padding: 10px 15px;">                        <div class="stories-bar" id="stories-bar">
+                    <div class="box" style="padding: 10px 15px;">                        
+                        <div class="stories-bar" id="stories-bar">
                             <div class="story-item" onclick="abrirModalStory()">
                                 <div class="story-avatar-wrapper seu-story">
                                     <img id="meu-story-avatar" src="" alt="Seu story">
@@ -970,15 +984,15 @@
                     <div class="box" style="padding: 0; border: none;">
                         <div class="chat-container">
                             <div class="chat-lista" id="chat-lista">
-                                <!-- Carregado via API -->
-                            </div>
+                                </div>
                             <div class="chat-janela">
                                 <div style="padding: 18px; border-bottom: 2px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3);">
                                     <strong id="chat-nome-contato" style="color: var(--neon-pink); font-size: 16px;">Selecione um contato</strong>
                                 </div>
                                 <div id="chat-mensagens" style="flex: 1; padding: 18px; display: flex; flex-direction: column; overflow-y: auto;">
                                     <div style="text-align: center; color: var(--text-muted); margin-top: 50px;">
-                                        Selecione uma conversa para começar                                    </div>
+                                        Selecione uma conversa para começar                                    
+                                    </div>
                                 </div>
                                 <div style="padding: 18px; border-top: 2px solid rgba(255,255,255,0.1); display: flex; gap: 12px; background: rgba(0,0,0,0.3);">
                                     <input type="text" id="chat-input" placeholder="Digite..." style="flex: 1; background: rgba(0,0,0,0.6); border: 2px solid var(--neon-blue); color: white; padding: 12px; border-radius: 8px; outline: none;" onkeypress="if(event.key==='Enter') enviarMensagem()">
@@ -993,8 +1007,7 @@
                     <div class="box">
                         <div class="box-title">Comunidades <span>👥</span></div>
                         <div class="lista-comunidades" id="lista-comunidades">
-                            <!-- Carregado via API -->
-                        </div>
+                            </div>
                     </div>
                 </section>
 
@@ -1002,8 +1015,7 @@
                     <div class="box">
                         <div class="box-title">Marketplace Neon <span>🛒</span></div>
                         <div class="grid-marketplace" id="grid-marketplace">
-                            <!-- Carregado via API -->
-                        </div>
+                            </div>
                     </div>
                 </section>
 
@@ -1017,8 +1029,7 @@
                             </button>
                         </div>
                         <div id="lista-amigos" class="lista-comunidades">
-                            <!-- Carregado via API -->
-                        </div>
+                            </div>
                     </div>
                 </section>
 
@@ -1026,15 +1037,14 @@
                     <div class="box">
                         <div class="box-title">Galeria de Mídias <span>📸</span></div>
                         <div class="galeria-grid" id="galeria-grid">
-                            <!-- Carregado via API -->
-                        </div>                    </div>
+                            </div>                    
+                    </div>
                 </section>
 
             </div>
         </main>
     </div>
 
-    <!-- Modal Story -->
     <div class="story-modal" id="story-modal">
         <div class="story-viewer">
             <div class="story-progress-bar" id="story-progress-bar"></div>
@@ -1057,7 +1067,6 @@
         </div>
     </div>
 
-    <!-- Modal Upload Story -->
     <div class="story-modal" id="modal-upload-story">
         <div style="background: var(--glass-bg); padding: 30px; border-radius: 15px; border: 2px solid var(--neon-blue); max-width: 400px; width: 90%;">
             <h3 style="color: var(--neon-blue); margin-bottom: 20px;">Criar Story</h3>
@@ -1076,14 +1085,28 @@
 
     <script>
         // CONFIGURAÇÃO DA API
-        const API_URL = window.location.origin;        let token = localStorage.getItem('urckut_token');
+        const API_URL = window.location.origin;        
+        
+        let token = null;
         let currentUser = null;
         let currentChat = null;
         let storiesData = [];
         let reelsData = [];
 
+        // Previne erros se localStorage estiver bloqueado pelo celular
+        try {
+            token = localStorage.getItem('urckut_token');
+        } catch(e) {
+            console.warn("Navegador bloqueou armazenamento local.");
+        }
+
         // UTILITÁRIOS
         function showToast(msg, cor = 'var(--neon-blue)') {
+            // Se for mobile e der erro, joga um alerta gigante para o usuário não perder
+            if (cor === 'var(--neon-red)') {
+                alert(msg.replace('⚠️', '').trim());
+            }
+
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = 'toast';
@@ -1118,6 +1141,12 @@
         }
 
         async function apiRequest(endpoint, options = {}) {
+            // Trava se a pessoa tentar rodar offline (arquivo direto no celular)
+            if (window.location.protocol === 'file:') {
+                alert('ERRO: Você abriu este arquivo direto do celular. Para o banco de dados funcionar, você precisa fechar isso e entrar no site usando o link do Render (ex: https://urckut.onrender.com)');
+                return { error: 'Arquivo aberto em modo local.' };
+            }
+
             const headers = {
                 'Content-Type': 'application/json',
                 ...options.headers
@@ -1126,18 +1155,24 @@
             if (token) {
                 headers['Authorization'] = `Bearer ${token}`;
             }            
-            const response = await fetch(`${API_URL}${endpoint}`, {
-                ...options,
-                headers
-            });
             
-            if (response.status === 401) {
-                localStorage.removeItem('urckut_token');
-                window.location.reload();
-                return null;
+            try {
+                const response = await fetch(`${API_URL}${endpoint}`, {
+                    ...options,
+                    headers
+                });
+                
+                if (response.status === 401) {
+                    localStorage.removeItem('urckut_token');
+                    window.location.reload();
+                    return null;
+                }
+                
+                return await response.json();
+            } catch (err) {
+                console.error("Erro na requisição Fetch:", err);
+                return { error: 'O Servidor recusou a conexão. O HTML não está na pasta correta no GitHub!' };
             }
-            
-            return response.json();
         }
 
         // AUTENTICAÇÃO
@@ -1173,8 +1208,9 @@
                 
                 iniciarSistema();
             } catch (error) {
-                showToast('Erro de conexão', 'var(--neon-red)');
-            }        }
+                showToast('Erro de conexão com o servidor', 'var(--neon-red)');
+            }        
+        }
 
         async function registrarUsuario() {
             const email = document.getElementById('login-email').value;
@@ -1204,7 +1240,7 @@
                 
                 iniciarSistema();
             } catch (error) {
-                showToast('Erro ao registrar', 'var(--neon-red)');
+                showToast('Erro ao registrar no servidor', 'var(--neon-red)');
             }
         }
 
@@ -1220,10 +1256,10 @@
             document.getElementById('tela-login').style.display = 'none';
             document.getElementById('area-logada').style.display = 'block';
             
-            // Atualizar menu lateral
             document.getElementById('menu-nome').textContent = currentUser.nome;
             document.getElementById('menu-avatar').src = currentUser.avatar || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200';
             document.getElementById('meu-story-avatar').src = currentUser.avatar || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200';            
+            
             carregarDadosIniciais();
             navegarPara('tela-perfil');
             showToast('✓ Bem-vindo à matriz!', 'var(--neon-green)');
@@ -1272,12 +1308,13 @@
             document.getElementById('overlay').classList.remove('ativo');
         }
 
-        // POSTS        async function carregarPosts() {
+        // POSTS        
+        async function carregarPosts() {
             try {
                 const posts = await apiRequest('/api/posts');
                 renderizarPosts(posts || []);
             } catch (error) {
-                showToast('Erro ao carregar posts', 'var(--neon-red)');
+                console.warn('Erro ao carregar posts');
             }
         }
 
@@ -1285,7 +1322,7 @@
             const mural = document.getElementById('muralDeRecados');
             mural.innerHTML = '';
             
-            if (!posts || posts.length === 0) {
+            if (!posts || posts.length === 0 || posts.error) {
                 mural.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-muted);"><i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i><p>Nenhuma postagem ainda. Seja o primeiro!</p></div>';
                 return;
             }
@@ -1321,7 +1358,8 @@
                     </div>
                 </div>
                 <div class="post-content">${escapeHTML(post.texto)}</div>
-                ${midiaHtml}                <div class="reacoes">
+                ${midiaHtml}                
+                <div class="reacoes">
                     <button onclick="curtirPost('${post.id}')" class="${ehCurtido ? 'curtido' : ''}">
                         <i class="fas fa-thumbs-up"></i> Curtir (${post.curtidas || 0})
                     </button>
@@ -1350,8 +1388,6 @@
                 let imagemUrl = null;
                 
                 if (fileInput.files[0]) {
-                    // Aqui você precisaria implementar upload de arquivo
-                    // Por enquanto, vamos simular
                     imagemUrl = URL.createObjectURL(fileInput.files[0]);
                 }
                 
@@ -1363,7 +1399,7 @@
                     })
                 });
                 
-                if (data.error) {
+                if (data && data.error) {
                     showToast(data.error, 'var(--neon-red)');
                     return;
                 }
@@ -1400,7 +1436,7 @@
                     method: 'POST'
                 });
                 
-                if (post) {
+                if (post && !post.error) {
                     await carregarPosts();
                 }
             } catch (error) {
@@ -1419,10 +1455,12 @@
                 showToast('Erro ao compartilhar', 'var(--neon-red)');
             }
         }
+
         // STORIES
         async function carregarStories() {
             try {
                 const stories = await apiRequest('/api/stories');
+                if(!stories || stories.error) return;
                 storiesData = stories || [];
                 renderizarStoriesBar();
             } catch (error) {
@@ -1475,7 +1513,6 @@
             }
             
             try {
-                // Implementar upload real aqui
                 const imagemUrl = URL.createObjectURL(fileInput.files[0]);
                 
                 const data = await apiRequest('/api/stories', {
@@ -1486,7 +1523,7 @@
                     })
                 });
                 
-                if (data.error) {
+                if (data && data.error) {
                     showToast(data.error, 'var(--neon-red)');
                     return;
                 }
@@ -1517,7 +1554,8 @@
                     content.innerHTML = `<video src="${story.imagem}" autoplay loop></video>`;
                 } else {
                     content.innerHTML = `<img src="${story.imagem}" alt="Story">`;
-                }            }
+                }            
+            }
             
             if (story.texto) {
                 const textOverlay = document.createElement('div');
@@ -1565,8 +1603,9 @@
                 const lista = document.getElementById('lista-comunidades');
                 lista.innerHTML = '';
                 
-                if (!comunidades || comunidades.length === 0) {
-                    lista.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Nenhuma comunidade encontrada</p>';                    return;
+                if (!comunidades || comunidades.error || comunidades.length === 0) {
+                    lista.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Nenhuma comunidade encontrada</p>';                    
+                    return;
                 }
                 
                 comunidades.forEach(comunidade => {
@@ -1585,7 +1624,7 @@
                     lista.appendChild(card);
                 });
             } catch (error) {
-                showToast('Erro ao carregar comunidades', 'var(--neon-red)');
+                console.warn('Erro nas comunidades');
             }
         }
 
@@ -1595,7 +1634,7 @@
                     method: 'POST'
                 });
                 
-                if (data.error) {
+                if (data && data.error) {
                     showToast(data.error, 'var(--neon-red)');
                     return;
                 }
@@ -1615,11 +1654,12 @@
 
         // MARKETPLACE
         async function carregarMarketplace() {
-            try {                const items = await apiRequest('/api/marketplace');
+            try {                
+                const items = await apiRequest('/api/marketplace');
                 const grid = document.getElementById('grid-marketplace');
                 grid.innerHTML = '';
                 
-                if (!items || items.length === 0) {
+                if (!items || items.error || items.length === 0) {
                     grid.innerHTML = '<p style="text-align: center; color: var(--text-muted); grid-column: 1/-1;">Nenhum item à venda</p>';
                     return;
                 }
@@ -1639,7 +1679,7 @@
                     grid.appendChild(div);
                 });
             } catch (error) {
-                showToast('Erro ao carregar marketplace', 'var(--neon-red)');
+                console.warn('Erro ao carregar marketplace');
             }
         }
 
@@ -1652,25 +1692,22 @@
 
         // USUÁRIOS E AMIGOS
         async function carregarUsuarios() {
-            // Implementar endpoint de usuários se necessário
             await carregarAmigos();
         }
 
         async function carregarAmigos() {
             const lista = document.getElementById('lista-amigos');
-            // Simulação - implementar endpoint real
             lista.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Busque usuários para adicionar</p>';
         }
 
         async function buscarUsuarios(query) {
             if (!query || query.length < 2) return;
-            // Implementar busca real            showToast(`Buscando por: ${query}`, 'var(--neon-blue)');
+            showToast(`Buscando por: ${query}`, 'var(--neon-blue)');
         }
 
         // MENSAGENS
         async function carregarConversas() {
             const lista = document.getElementById('chat-lista');
-            // Simulação - implementar endpoint real
             lista.innerHTML = `
                 <div class="chat-contato ativo" onclick="selecionarContato(this, 'Pedro Santos', 'user1')">
                     <img src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=50" style="width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--neon-green);">
@@ -1692,7 +1729,6 @@
 
         function carregarMensagens(userId) {
             const janela = document.getElementById('chat-mensagens');
-            // Simulação - implementar endpoint real
             janela.innerHTML = `
                 <div class="chat-balao balao-recebido">Olá! Como vai?</div>
                 <div class="chat-balao balao-enviado">Tudo bem! E você?</div>
@@ -1713,9 +1749,9 @@
             balao.className = 'chat-balao balao-enviado';
             balao.textContent = texto;
             janela.appendChild(balao);
-            input.value = '';            janela.scrollTop = janela.scrollHeight;
+            input.value = '';            
+            janela.scrollTop = janela.scrollHeight;
             
-            // Implementar envio real via API
             setTimeout(() => {
                 const r = document.createElement('div');
                 r.className = 'chat-balao balao-recebido';
@@ -1728,18 +1764,19 @@
         // GALERIA
         async function carregarGaleria() {
             const grid = document.getElementById('galeria-grid');
-            // Implementar endpoint real
             grid.innerHTML = '<p style="text-align: center; color: var(--text-muted); grid-column: 1/-1;">Nenhuma mídia na galeria</p>';
         }
 
         // INICIALIZAÇÃO
         window.addEventListener('DOMContentLoaded', () => {
             if (token) {
-                const savedUser = localStorage.getItem('urckut_user');
-                if (savedUser) {
-                    currentUser = JSON.parse(savedUser);
-                    iniciarSistema();
-                }
+                try {
+                    const savedUser = localStorage.getItem('urckut_user');
+                    if (savedUser) {
+                        currentUser = JSON.parse(savedUser);
+                        iniciarSistema();
+                    }
+                } catch(e) {}
             }
             document.getElementById('login-email').focus();
         });
@@ -1762,7 +1799,8 @@
                     this.x = Math.random() * canvas.width; 
                     this.y = Math.random() * canvas.height;
                     this.tamanho = Math.random() * 2.5 + 0.5; 
-                    this.velocidadeX = (Math.random() - 0.5) * 0.4;                    this.velocidadeY = (Math.random() - 0.5) * 0.4;
+                    this.velocidadeX = (Math.random() - 0.5) * 0.4;                    
+                    this.velocidadeY = (Math.random() - 0.5) * 0.4;
                     const cores = ['#00f0ff', '#ff007f', '#da00ff', '#39ff14', '#ffaa00'];
                     this.cor = cores[Math.floor(Math.random() * cores.length)];
                     this.opacidade = Math.random() * 0.5 + 0.2;
@@ -1811,6 +1849,7 @@
                 animId = requestAnimationFrame(animar);
             }
             animar();
-        }    </script>
+        }    
+    </script>
 </body>
-</html>
+</html>p
