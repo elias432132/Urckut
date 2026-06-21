@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Urckut - O Sistema Operacional Social Cibernético">
     <title>Urckut - Cyber Social OS</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Rajdhani:wght@500;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* MANTIDO O SEU CSS ORIGINAL COM ALGUMAS ADIÇÕES PARA GALERIA E AMIGOS */
         :root {
             --neon-pink: #ff007f;
             --neon-blue: #00f0ff;
@@ -26,559 +26,1629 @@
 
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: var(--bg-dark); }
-        ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--neon-blue), var(--neon-purple)); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { 
+            background: linear-gradient(180deg, var(--neon-blue), var(--neon-purple)); 
+            border-radius: 10px;
+        }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: var(--text-main); overflow-x: hidden; }
 
-        h1, h2, h3, h4, .box-title, .nome-usuario, .btn-neon, .menu-navegacao button { font-family: 'Rajdhani', sans-serif; text-transform: uppercase; letter-spacing: 1px; }
+        body {
+            font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: var(--text-main);
+            overflow-x: hidden; -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4, .box-title, .nome-usuario, .btn-neon, .menu-navegacao button {
+            font-family: 'Rajdhani', sans-serif; text-transform: uppercase; letter-spacing: 1px;
+        }
 
         #universo-neon { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; }
 
+        @keyframes neon-pulse {
+            0%, 100% { box-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue); }
+            50% { box-shadow: 0 0 20px var(--neon-blue), 0 0 40px var(--neon-blue); }
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
         @keyframes rainbow-border {
             0% { border-color: var(--neon-pink); box-shadow: 0 0 20px var(--neon-pink); }
-            50% { border-color: var(--neon-blue); box-shadow: 0 0 20px var(--neon-blue); }
+            25% { border-color: var(--neon-blue); box-shadow: 0 0 20px var(--neon-blue); }
+            50% { border-color: var(--neon-purple); box-shadow: 0 0 20px var(--neon-purple); }
+            75% { border-color: var(--neon-green); box-shadow: 0 0 20px var(--neon-green); }
             100% { border-color: var(--neon-pink); box-shadow: 0 0 20px var(--neon-pink); }
         }
 
-        .btn-neon { background: transparent; color: white; border: 2px solid; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 700; transition: all 0.3s ease; }
-        .btn-blue { border-color: var(--neon-blue); background: rgba(0, 240, 255, 0.1); color: var(--neon-blue); }
-        .btn-blue:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 20px var(--neon-blue); }
-        .btn-green { border-color: var(--neon-green); background: rgba(57, 255, 20, 0.1); color: var(--neon-green); }
-        .btn-green:hover { background: var(--neon-green); color: #000; box-shadow: 0 0 20px var(--neon-green); }
-        .btn-pink { border-color: var(--neon-pink); background: rgba(255, 0, 127, 0.1); color: var(--neon-pink); }
-        .btn-pink:hover { background: var(--neon-pink); color: #fff; box-shadow: 0 0 20px var(--neon-pink); }
-        .btn-purple { border-color: var(--neon-purple); background: rgba(218, 0, 255, 0.1); color: var(--neon-purple); }
-        .btn-purple:hover { background: var(--neon-purple); color: #fff; }
+        @keyframes story-progress {
+            from { width: 0%; }
+            to { width: 100%; }
+        }
 
-        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
-        .toast { padding: 15px 25px; border-radius: 8px; color: #000; font-weight: 700; background: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); }
+        @keyframes heart-pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.4); }
+            100% { transform: scale(1); }
+        }
 
-        .login-body { display: flex; justify-content: center; align-items: center; height: 100vh; width: 100vw; position: absolute; top: 0; left: 0; z-index: 10; }
-        .login-container { background: var(--glass-bg); backdrop-filter: blur(15px); padding: 50px 40px; border-radius: 20px; text-align: center; width: 90%; max-width: 400px; border: 2px solid var(--neon-pink); animation: rainbow-border 4s infinite; }
-        .login-container h1 { font-family: 'Orbitron', sans-serif; color: var(--neon-pink); font-size: 56px; margin: 0; text-shadow: 0 0 20px rgba(255, 0, 127, 0.8); }
-        .login-container input { width: 100%; padding: 15px; margin: 10px 0; border: 2px solid rgba(0, 240, 255, 0.3); border-radius: 10px; background: rgba(0, 0, 0, 0.5); color: white; }
+        @keyframes float-up {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+        }
 
-        header { background: rgba(10, 14, 23, 0.95); backdrop-filter: blur(20px); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--glass-border); position: sticky; top: 0; z-index: 100; }
-        header h2 { margin: 0; color: var(--neon-pink); font-family: 'Orbitron', sans-serif; font-size: 32px; text-shadow: 0 0 15px rgba(255, 0, 127, 0.7); cursor: pointer; }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .btn-neon { 
+            background: transparent; color: white; border: 2px solid; padding: 10px 20px; 
+            border-radius: 6px; cursor: pointer; font-weight: 700; transition: all 0.3s ease;
+            position: relative; overflow: hidden;
+        }
+        
+        .btn-blue { border-color: var(--neon-blue); background: rgba(0, 240, 255, 0.1); color: var(--neon-blue); box-shadow: 0 0 10px rgba(0, 240, 255, 0.3); }
+        .btn-blue:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 20px var(--neon-blue); transform: translateY(-2px); }
+        
+        .btn-green { border-color: var(--neon-green); background: rgba(57, 255, 20, 0.1); color: var(--neon-green); box-shadow: 0 0 10px rgba(57, 255, 20, 0.3); }        .btn-green:hover { background: var(--neon-green); color: #000; box-shadow: 0 0 20px var(--neon-green); transform: translateY(-2px); }
+        
+        .btn-pink { border-color: var(--neon-pink); background: rgba(255, 0, 127, 0.1); color: var(--neon-pink); box-shadow: 0 0 10px rgba(255, 0, 127, 0.3); }
+        .btn-pink:hover { background: var(--neon-pink); color: #fff; box-shadow: 0 0 20px var(--neon-pink); transform: translateY(-2px); }
+
+        .btn-purple { border-color: var(--neon-purple); background: rgba(218, 0, 255, 0.1); color: var(--neon-purple); box-shadow: 0 0 10px rgba(218, 0, 255, 0.3); }
+        .btn-purple:hover { background: var(--neon-purple); color: #fff; box-shadow: 0 0 20px var(--neon-purple); transform: translateY(-2px); }
+
+        .btn-red { border-color: var(--neon-red); background: rgba(255, 51, 51, 0.1); color: var(--neon-red); box-shadow: 0 0 10px rgba(255, 51, 51, 0.3); }
+        .btn-red:hover { background: var(--neon-red); color: #fff; box-shadow: 0 0 20px var(--neon-red); transform: translateY(-2px); }
+
+        #toast-container {
+            position: fixed; top: 20px; right: 20px; z-index: 9999;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .toast {
+            padding: 15px 25px; border-radius: 8px; color: #000; font-weight: 700;
+            font-size: 14px; animation: slideIn 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+            min-width: 250px;
+        }
+
+        .login-body { 
+            display: flex; justify-content: center; align-items: center; height: 100vh; 
+            width: 100vw; position: absolute; top: 0; left: 0; z-index: 10;
+        }
+        .login-container { 
+            background: var(--glass-bg); backdrop-filter: blur(15px); padding: 50px 40px; 
+            border-radius: 20px; text-align: center; width: 90%; max-width: 400px; 
+            border: 2px solid var(--neon-pink);
+            box-shadow: 0 0 30px rgba(255, 0, 127, 0.4);
+            animation: rainbow-border 4s infinite;
+        }
+        .login-container h1 { 
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-pink); font-size: 56px; margin: 0; 
+            text-shadow: 0 0 20px rgba(255, 0, 127, 0.8);
+            letter-spacing: 3px;
+        }
+        .login-container p { color: var(--neon-blue); font-size: 16px; margin-bottom: 35px; }
+        .login-container input { 
+            width: 100%; padding: 15px; margin: 10px 0; 
+            border: 2px solid rgba(0, 240, 255, 0.3); border-radius: 10px; 
+            font-size: 15px; background: rgba(0, 0, 0, 0.5); color: white; transition: all 0.3s;
+        }
+        .login-container input:focus { 
+            outline: none; border-color: var(--neon-blue); 
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+        }
+        header {
+            background: rgba(10, 14, 23, 0.95); backdrop-filter: blur(20px); padding: 15px 30px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            border-bottom: 2px solid var(--glass-border); 
+            position: sticky; top: 0; z-index: 100;
+        }
+        header h2 { 
+            margin: 0; color: var(--neon-pink); cursor: pointer; font-size: 32px; 
+            text-shadow: 0 0 15px rgba(255, 0, 127, 0.7);
+            font-family: 'Orbitron', sans-serif; letter-spacing: 2px;
+        }
         .menu-navegacao { display: flex; gap: 8px; flex-wrap: wrap; }
-        .menu-navegacao button { background: none; border: none; color: var(--text-muted); font-size: 14px; cursor: pointer; font-weight: 600; padding: 10px 14px; border-radius: 8px; }
-        .menu-navegacao button:hover, .menu-navegacao button.ativo { color: var(--neon-blue); background: rgba(0, 240, 255, 0.1); text-shadow: 0 0 10px var(--neon-blue); }
+        .menu-navegacao button { 
+            background: none; border: none; color: var(--text-muted); font-size: 14px; 
+            cursor: pointer; font-weight: 600; padding: 10px 14px; border-radius: 8px; 
+            transition: all 0.3s ease; white-space: nowrap;
+        }
+        .menu-navegacao button:hover, .menu-navegacao button.ativo { 
+            color: var(--neon-blue); background: rgba(0, 240, 255, 0.1);
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
 
-        .container { max-width: 1000px; margin: 25px auto; padding: 0 20px; }
+        .nav-direita { display: flex; gap: 15px; align-items: center; }
+        .search-bar { 
+            background: rgba(0, 0, 0, 0.5); border: 2px solid rgba(255, 255, 255, 0.1); 
+            color: white; padding: 10px 20px; border-radius: 30px; width: 200px; 
+            outline: none; transition: all 0.3s;
+        }
+        .search-bar:focus { border-color: var(--neon-blue); box-shadow: 0 0 20px rgba(0, 240, 255, 0.4); }
         
-        .box { background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 15px; padding: 20px; margin-bottom: 20px; }
-        .box-title { color: var(--neon-blue); font-size: 18px; border-bottom: 2px solid rgba(0, 240, 255, 0.2); padding-bottom: 10px; margin-bottom: 15px; }
+        .container { display: flex; max-width: 1400px; margin: 25px auto; gap: 20px; padding: 0 20px; }
+        .col-esquerda { width: 22%; } .col-centro { width: 78%; }
+        
+        .box { 
+            background: var(--glass-bg); backdrop-filter: blur(15px); 
+            border: 1px solid var(--glass-border); border-radius: 15px; 
+            padding: 20px; margin-bottom: 20px; transition: all 0.3s ease;
+        }
+        .box:hover { transform: translateY(-3px); box-shadow: 0 10px 40px rgba(0, 240, 255, 0.15); }
+        
+        .box-title { 
+            color: var(--neon-blue); font-size: 16px; 
+            border-bottom: 2px solid rgba(0, 240, 255, 0.2); 
+            padding-bottom: 10px; margin-bottom: 15px; 
+            display: flex; justify-content: space-between; align-items: center;
+        }
 
-        .area-postagem textarea { width: 100%; height: 80px; background: rgba(0, 0, 0, 0.3); border: 2px solid rgba(0, 240, 255, 0.2); border-radius: 10px; padding: 12px; color: white; outline: none; resize: none; }
-        .area-postagem textarea:focus { border-color: var(--neon-blue); }
-        .ferramentas-post { display: flex; gap: 10px; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .area-postagem textarea { 
+            width: 100%; height: 80px; background: rgba(0, 0, 0, 0.3); 
+            border: 2px solid rgba(0, 240, 255, 0.2); border-radius: 10px;            padding: 12px; resize: none; color: white; font-family: inherit; 
+            font-size: 14px; outline: none; transition: all 0.3s;
+        }
+        .area-postagem textarea:focus { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0, 240, 255, 0.3); }
         
-        .post-feed { border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding: 18px 0; }
-        .post-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-        .post-header img { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--neon-blue); object-fit: cover; }
-        .post-header-info strong { color: var(--neon-blue); font-size: 15px; display: block; }
-        .post-header-info span { font-size: 11px; color: var(--text-muted); }
-        .post-content img { max-width: 100%; border-radius: 10px; margin-top: 10px; }
-        
-        .reacoes { display: flex; gap: 10px; margin-top: 12px; font-size: 13px; }
-        .reacoes button { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); padding: 6px 12px; border-radius: 20px; cursor: pointer; }
+        .ferramentas-post { 
+            display: flex; gap: 10px; margin-top: 12px; padding-top: 12px; 
+            border-top: 1px solid rgba(255,255,255,0.1); flex-wrap: wrap; 
+        }
+        .ferramentas-post button { 
+            background: rgba(0, 240, 255, 0.1); border: 1px solid rgba(0, 240, 255, 0.3); 
+            color: var(--neon-blue); cursor: pointer; font-size: 13px; 
+            padding: 8px 12px; border-radius: 6px; transition: all 0.3s;
+        }
+        .ferramentas-post button:hover { background: var(--neon-blue); color: #000; }
+
+        .post-feed { 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08); 
+            padding: 18px 0; 
+            animation: fadeInUp 0.5s ease;
+        }
+        .post-header {
+            display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+        }
+        .post-header img {
+            width: 45px; height: 45px; border-radius: 50%; 
+            border: 2px solid var(--neon-blue);
+            object-fit: cover;
+        }
+        .post-header-info strong {
+            color: var(--neon-blue); font-size: 15px; display: block;
+        }
+        .post-header-info span {
+            font-size: 11px; color: var(--text-muted);
+        }
+        .post-content {
+            font-size: 14px; margin-bottom: 12px; line-height: 1.5;
+        }
+        .reacoes { display: flex; gap: 10px; margin-top: 12px; font-size: 13px; flex-wrap: wrap; }
+        .reacoes button { 
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); 
+            color: var(--text-muted); cursor: pointer; padding: 6px 12px; 
+            border-radius: 20px; transition: all 0.3s;
+        }
+        .reacoes button:hover { color: var(--neon-pink); border-color: var(--neon-pink); }
         .reacoes button.curtido { color: var(--neon-pink); border-color: var(--neon-pink); background: rgba(255, 0, 127, 0.2); }
 
-        /* LISTA DE AMIGOS E USUÁRIOS */
-        .user-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
-        .user-card { display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.5); padding: 15px; border: 1px solid var(--neon-purple); border-radius: 10px; }
-        .user-card img { width: 60px; height: 60px; border-radius: 50%; }
-        
-        /* GALERIA */
-        .grid-galeria { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
-        .item-galeria { border: 2px solid var(--neon-blue); border-radius: 10px; overflow: hidden; height: 200px; }
-        .item-galeria img { width: 100%; height: 100%; object-fit: cover; }
+        .foto-perfil { 
+            width: 100%; border-radius: 12px; border: 3px solid var(--neon-blue); 
+            height: 220px; object-fit: cover; box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);        }
+        .nome-usuario { 
+            color: var(--neon-pink); font-size: 24px; margin: 15px 0 8px 0; 
+            text-shadow: 0 0 12px rgba(255,0,127,0.5); cursor: pointer;
+        }
 
-        /* CHAT */
-        .chat-container { display: flex; height: 600px; border: 2px solid var(--glass-border); border-radius: 12px; }
-        .chat-lista { width: 30%; background: rgba(0,0,0,0.6); border-right: 2px solid var(--glass-border); overflow-y: auto; }
-        .chat-janela { width: 70%; display: flex; flex-direction: column; background: rgba(16, 20, 31, 0.4); }
-        .chat-contato { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; display: flex; gap: 10px; align-items: center; }
-        .chat-contato:hover, .chat-contato.ativo { background: rgba(0, 240, 255, 0.15); border-left: 4px solid var(--neon-blue); }
-        .chat-balao { max-width: 80%; padding: 10px 15px; border-radius: 15px; margin: 10px; font-size: 14px; }
-        .balao-recebido { background: rgba(255, 0, 127, 0.2); border: 1px solid var(--neon-pink); align-self: flex-start; }
-        .balao-enviado { background: rgba(0, 240, 255, 0.2); border: 1px solid var(--neon-blue); align-self: flex-end; }
-        
-        /* MARKETPLACE E COMUNIDADES MANTIDOS */
+        .stories-bar {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding: 15px 5px;
+            margin-bottom: 15px;
+            scrollbar-width: none;
+        }
+        .stories-bar::-webkit-scrollbar { display: none; }
+
+        .story-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            min-width: 75px;
+            transition: transform 0.3s;
+        }
+        .story-item:hover { transform: translateY(-5px); }
+
+        .story-avatar-wrapper {
+            position: relative;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            padding: 3px;
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-purple), var(--neon-blue), var(--neon-green));
+            background-size: 300% 300%;
+            animation: rainbow-border 3s linear infinite;
+        }
+        .story-avatar-wrapper.visto {
+            background: rgba(255, 255, 255, 0.2);
+            animation: none;
+        }
+        .story-avatar-wrapper.seu-story {
+            background: rgba(0, 240, 255, 0.3);
+        }
+        .story-avatar-wrapper img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--bg-dark);        }
+        .story-add-btn {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 24px;
+            height: 24px;
+            background: var(--neon-blue);
+            border: 2px solid var(--bg-dark);
+            border-radius: 50%;
+            color: #000;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+        .story-nome {
+            font-size: 11px;
+            color: var(--text-main);
+            max-width: 75px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .story-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9998;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+        .story-modal.ativo { display: flex; }
+
+        .story-viewer {
+            position: relative;
+            width: 100%;
+            max-width: 420px;
+            height: 90vh;
+            max-height: 750px;
+            background: #000;            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid var(--neon-pink);
+            box-shadow: 0 0 50px rgba(255, 0, 127, 0.5);
+        }
+
+        .story-progress-bar {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            gap: 4px;
+            z-index: 10;
+        }
+        .story-progress-segment {
+            flex: 1;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .story-progress-fill {
+            height: 100%;
+            background: var(--neon-blue);
+            width: 0%;
+            box-shadow: 0 0 5px var(--neon-blue);
+        }
+        .story-progress-fill.ativo { animation: story-progress 5s linear forwards; }
+        .story-progress-fill.completo { width: 100%; }
+
+        .story-header {
+            position: absolute;
+            top: 25px;
+            left: 15px;
+            right: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 10;
+        }
+        .story-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--neon-pink);
+        }
+        .story-header-info {
+            flex: 1;
+            color: white;        }
+        .story-header-info strong { font-size: 14px; display: block; }
+        .story-header-info span { font-size: 11px; color: rgba(255,255,255,0.7); }
+        .story-close {
+            background: rgba(0,0,0,0.5);
+            border: none;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+        .story-close:hover { background: var(--neon-red); transform: rotate(90deg); }
+
+        .story-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+        }
+        .story-content img, .story-content video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .story-nav {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 40%;
+            cursor: pointer;
+            z-index: 5;
+        }
+        .story-nav.prev { left: 0; }
+        .story-nav.next { right: 0; }
+
+        .story-footer {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            right: 15px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }        .story-footer input {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 25px;
+            outline: none;
+            font-size: 13px;
+        }
+        .story-footer input:focus { border-color: var(--neon-pink); }
+        .story-footer button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 22px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .story-footer button:hover { transform: scale(1.2); }
+
+        .reels-container {
+            height: calc(100vh - 180px);
+            max-height: 750px;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            border-radius: 15px;
+            scrollbar-width: none;
+        }
+        .reels-container::-webkit-scrollbar { display: none; }
+
+        .reel-item {
+            height: 100%;
+            scroll-snap-align: start;
+            position: relative;
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 10px;
+            border: 2px solid var(--glass-border);
+        }
+
+        .reel-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #000;
+        }
+
+        .reel-overlay {            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 40%, transparent 70%, rgba(0,0,0,0.3) 100%);
+            pointer-events: none;
+        }
+
+        .reel-info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 80px;
+            color: white;
+            z-index: 2;
+        }
+        .reel-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .reel-user img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--neon-pink);
+        }
+        .reel-user strong {
+            font-size: 15px;
+            color: white;
+        }
+        .reel-user button {
+            background: var(--neon-pink);
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--neon-pink);
+        }
+        .reel-desc {
+            font-size: 14px;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        .reel-music {
+            display: flex;
+            align-items: center;
+            gap: 8px;            font-size: 12px;
+            color: rgba(255,255,255,0.9);
+        }
+        .reel-music-icon {
+            animation: spin 3s linear infinite;
+        }
+
+        .reel-actions {
+            position: absolute;
+            right: 15px;
+            bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 2;
+        }
+        .reel-action-btn {
+            background: rgba(0,0,0,0.5);
+            border: none;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            transition: all 0.3s;
+            backdrop-filter: blur(5px);
+        }
+        .reel-action-btn:hover {
+            transform: scale(1.1);
+            background: rgba(255, 0, 127, 0.3);
+        }
+        .reel-action-btn span {
+            font-size: 11px;
+            margin-top: 2px;
+        }
+        .reel-action-btn.curtido {
+            color: var(--neon-pink);
+            background: rgba(255, 0, 127, 0.3);
+            box-shadow: 0 0 15px var(--neon-pink);
+        }
+        .reel-action-btn.curtido .heart-icon {
+            animation: heart-pop 0.4s ease;
+        }
+
+        .reel-play-btn {            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.6);
+            border: 2px solid var(--neon-blue);
+            color: var(--neon-blue);
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            font-size: 28px;
+            cursor: pointer;
+            z-index: 3;
+            display: none;
+            box-shadow: 0 0 20px var(--neon-blue);
+        }
+        .reel-item.pausado .reel-play-btn { display: flex; align-items: center; justify-content: center; }
+
+        .reel-double-tap-heart {
+            position: absolute;
+            font-size: 80px;
+            color: var(--neon-pink);
+            pointer-events: none;
+            animation: float-up 1s ease forwards;
+            z-index: 5;
+            text-shadow: 0 0 20px var(--neon-pink);
+        }
+
         .grid-marketplace { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; }
-        .item-mercado { background: rgba(0,0,0,0.5); border: 2px solid var(--neon-purple); border-radius: 12px; padding: 12px; text-align: center; }
+        .item-mercado { 
+            background: rgba(0,0,0,0.5); border: 2px solid var(--neon-purple); 
+            border-radius: 12px; padding: 12px; text-align: center; transition: all 0.3s;
+        }
+        .item-mercado:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(218, 0, 255, 0.4); }
         .item-mercado img { width: 100%; height: 140px; object-fit: cover; border-radius: 8px; }
         .preco-neon { color: var(--neon-green); font-size: 22px; font-weight: bold; margin: 12px 0; }
-        .comunidade-card { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 15px; border: 2px solid rgba(255,255,255,0.1); border-radius: 10px; margin-bottom: 15px; }
 
+        .lista-comunidades { display: flex; flex-direction: column; gap: 15px; }
+        .comunidade-card { 
+            display: flex; justify-content: space-between; align-items: center; 
+            background: rgba(0,0,0,0.4); padding: 15px; 
+            border: 2px solid rgba(255,255,255,0.1); border-radius: 10px; 
+            flex-wrap: wrap; gap: 12px; transition: all 0.3s;
+        }
+        .comunidade-card:hover { border-color: var(--neon-green); transform: translateX(5px); }
+
+        .chat-container { 
+            display: flex; height: 650px; 
+            border: 2px solid var(--glass-border); border-radius: 12px; overflow: hidden;
+        }        .chat-lista { width: 30%; background: rgba(0,0,0,0.6); border-right: 2px solid var(--glass-border); overflow-y: auto; }
+        .chat-janela { width: 70%; display: flex; flex-direction: column; background: rgba(16, 20, 31, 0.4); }
+        .chat-contato { 
+            padding: 18px; border-bottom: 1px solid rgba(255,255,255,0.05); 
+            cursor: pointer; display: flex; gap: 12px; align-items: center; transition: all 0.3s;
+        }
+        .chat-contato:hover, .chat-contato.ativo { 
+            background: rgba(0, 240, 255, 0.15); border-left: 4px solid var(--neon-blue);
+        }
+        .chat-balao { max-width: 85%; padding: 12px 18px; border-radius: 18px; margin: 12px; font-size: 14px; }
+        .balao-recebido { background: rgba(255, 0, 127, 0.2); border: 2px solid var(--neon-pink); align-self: flex-start; }
+        .balao-enviado { background: rgba(0, 240, 255, 0.2); border: 2px solid var(--neon-blue); align-self: flex-end; }
+
+        .config-row { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 15px 0; border-bottom: 1px dashed rgba(255,255,255,0.1); 
+            flex-wrap: wrap; gap: 12px;
+        }
+
+        .badge {
+            background: var(--neon-red); color: white; border-radius: 50%;
+            padding: 3px 8px; font-size: 11px; font-weight: bold;
+            margin-left: 6px; box-shadow: 0 0 10px var(--neon-red);
+        }
+
+        /* MENU LATERAL DE CONFIGURAÇÕES */
+        .menu-lateral {
+            position: fixed;
+            top: 0;
+            right: -350px;
+            width: 320px;
+            height: 100vh;
+            background: rgba(10, 14, 23, 0.98);
+            backdrop-filter: blur(20px);
+            border-left: 2px solid var(--neon-blue);
+            z-index: 1000;
+            transition: right 0.3s ease;
+            padding: 80px 20px 20px;
+            overflow-y: auto;
+            box-shadow: -10px 0 30px rgba(0, 240, 255, 0.2);
+        }
+        .menu-lateral.ativo { right: 0; }
+        
+        .menu-lateral-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: rgba(0, 240, 255, 0.1);            border-bottom: 2px solid var(--neon-blue);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .menu-lateral-header h3 {
+            color: var(--neon-blue);
+            margin: 0;
+            font-size: 20px;
+        }
+        .menu-lateral-close {
+            background: none;
+            border: none;
+            color: var(--neon-pink);
+            font-size: 24px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        .menu-lateral-close:hover {
+            background: rgba(255, 0, 127, 0.2);
+            transform: rotate(90deg);
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: rgba(0, 240, 255, 0.05);
+            border: 1px solid rgba(0, 240, 255, 0.1);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--text-main);
+            text-decoration: none;
+        }
+        .menu-item:hover {
+            background: rgba(0, 240, 255, 0.15);
+            border-color: var(--neon-blue);
+            transform: translateX(-5px);
+            color: var(--neon-blue);
+        }
+        .menu-item i {
+            font-size: 20px;
+            width: 30px;
+            text-align: center;        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+            display: none;
+            backdrop-filter: blur(3px);
+        }
+        .overlay.ativo { display: block; }
+
+        .btn-config {
+            background: rgba(0, 240, 255, 0.1);
+            border: 2px solid var(--neon-blue);
+            color: var(--neon-blue);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-config:hover {
+            background: var(--neon-blue);
+            color: #000;
+            box-shadow: 0 0 20px var(--neon-blue);
+            transform: rotate(90deg);
+        }
+
+        @media (max-width: 900px) {
+            header { flex-direction: column; gap: 15px; padding: 15px; }
+            .menu-navegacao { width: 100%; overflow-x: auto; justify-content: flex-start; }
+            .nav-direita { width: 100%; justify-content: space-between; }
+            .search-bar { width: 100%; max-width: 200px; }
+            
+            .container { flex-direction: column; padding: 10px; margin: 10px auto; }
+            .col-esquerda, .col-centro { width: 100%; }
+            
+            .chat-container { flex-direction: column; height: 700px; }
+            .chat-lista { width: 100%; height: 200px; border-right: none; border-bottom: 2px solid var(--glass-border); }
+            .chat-janela { width: 100%; flex: 1; }
+
+            .reels-container { height: 85vh; max-height: none; }            .story-viewer { max-width: 100%; height: 100vh; max-height: none; border-radius: 0; border: none; }
+            
+            .menu-lateral { width: 100%; right: -100%; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
     </style>
 </head>
 <body>
     <canvas id="universo-neon" aria-hidden="true"></canvas>
-    <div id="toast-container"></div>
+    <div id="toast-container" aria-live="polite"></div>
+
+    <div class="overlay" id="overlay" onclick="fecharMenuLateral()"></div>
+
+    <div class="menu-lateral" id="menu-lateral">
+        <div class="menu-lateral-header">
+            <h3><i class="fas fa-cog"></i> Configurações</h3>
+            <button class="menu-lateral-close" onclick="fecharMenuLateral()"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <a class="menu-item" onclick="navegarPara('tela-perfil'); fecharMenuLateral();">
+            <i class="fas fa-user" style="color: var(--neon-blue);"></i>
+            <span>Meu Perfil</span>
+        </a>
+        <a class="menu-item" onclick="navegarPara('tela-reels'); fecharMenuLateral();">
+            <i class="fas fa-film" style="color: var(--neon-pink);"></i>
+            <span>Reels / TikTok</span>
+        </a>
+        <a class="menu-item" onclick="navegarPara('tela-mensagens'); fecharMenuLateral();">
+            <i class="fas fa-envelope" style="color: var(--neon-green);"></i>
+            <span>Inbox</span>
+        </a>
+        <a class="menu-item" onclick="navegarPara('tela-comunidades'); fecharMenuLateral();">
+            <i class="fas fa-globe" style="color: var(--neon-purple);"></i>
+            <span>Comunidades</span>
+        </a>
+        <a class="menu-item" onclick="navegarPara('tela-marketplace'); fecharMenuLateral();">
+            <i class="fas fa-shopping-bag" style="color: var(--neon-orange);"></i>
+            <span>Loja Neon</span>
+        </a>
+        <a class="menu-item" onclick="navegarPara('tela-configuracoes'); fecharMenuLateral();">
+            <i class="fas fa-lock" style="color: var(--neon-yellow);"></i>
+            <span>Privacidade</span>        </a>
+        
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 2px dashed rgba(0,240,255,0.2);">
+            <div style="text-align: center; padding: 20px;">
+                <img id="menu-avatar" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--neon-pink); margin-bottom: 10px;">
+                <h4 id="menu-nome" style="color: var(--neon-pink); margin: 10px 0 5px;">Neon Hacker</h4>
+                <p style="color: var(--text-muted); font-size: 12px;">Nível: <span style="color: var(--neon-orange);" id="menu-nivel">⭐ Elite</span></p>
+            </div>
+            <button class="btn-neon btn-red" style="width: 100%; margin-top: 15px;" onclick="sairDoSistema()">
+                <i class="fas fa-sign-out-alt"></i> Sair do Sistema
+            </button>
+        </div>
+    </div>
 
     <div id="tela-login" class="login-body">
         <div class="login-container">
             <h1>URCKUT</h1>
             <p>The Cybernetic Social Operating System</p>
-            <input type="text" id="login-nome" placeholder="Seu Nickname (apenas para registro)" style="display: none;">
-            <input type="email" id="login-email" placeholder="Endereço de Rede">
-            <input type="password" id="login-senha" placeholder="Chave de Acesso">
-            
-            <button id="btn-acessar" class="btn-neon btn-pink" style="width: 100%; margin-top: 20px;" onclick="logar()">
+            <input type="email" id="login-email" placeholder="Endereço de Rede" autocomplete="email">
+            <input type="password" id="login-senha" placeholder="Chave de Acesso" autocomplete="current-password">
+            <button class="btn-neon btn-pink" style="width: 100%; margin-top: 20px; padding: 15px; font-size: 16px;" onclick="entrarNoSistema()">
                 <i class="fas fa-sign-in-alt"></i> Acessar Matriz
             </button>
-            <button id="btn-registrar" class="btn-neon btn-blue" style="width: 100%; margin-top: 10px;" onclick="mostrarRegistro()">
+            <button class="btn-neon btn-blue" style="width: 100%; margin-top: 10px; padding: 10px; font-size: 14px;" onclick="criarNovaIdentidade()">
                 Criar Nova Identidade
-            </button>
-            <button id="btn-fazer-registro" class="btn-neon btn-green" style="width: 100%; margin-top: 20px; display: none;" onclick="registrar()">
-                Finalizar Cadastro
-            </button>
-            <button id="btn-voltar-login" class="btn-neon btn-purple" style="width: 100%; margin-top: 10px; display: none;" onclick="mostrarLogin()">
-                Voltar
             </button>
         </div>
     </div>
 
     <div id="area-logada" style="display: none;">
+        
         <header>
             <h2 onclick="navegarPara('tela-perfil')">URCKUT</h2>
             <nav class="menu-navegacao">
                 <button onclick="navegarPara('tela-perfil')" class="ativo" id="btn-perfil">FEED</button>
-                <button onclick="navegarPara('tela-amigos')" id="btn-amigos">REDE / AMIGOS</button>
-                <button onclick="navegarPara('tela-galeria')" id="btn-galeria">GALERIA 📷</button>
-                <button onclick="navegarPara('tela-mensagens')" id="btn-mensagens">INBOX 💬</button>
+                <button onclick="navegarPara('tela-reels')" id="btn-reels">REELS 🎬</button>
+                <button onclick="navegarPara('tela-mensagens')" id="btn-mensagens">MENSAGENS 💬</button>
                 <button onclick="navegarPara('tela-comunidades')" id="btn-comunidades">COMUNIDADES</button>
-                <button onclick="navegarPara('tela-marketplace')" id="btn-marketplace">MERCADO</button>
-                <button onclick="sair()" id="btn-sair" style="color: var(--neon-red)">SAIR</button>
+                <button onclick="navegarPara('tela-marketplace')" id="btn-marketplace">MARKETPLACE 🛒</button>
             </nav>
+            <div class="nav-direita">
+                <input type="text" class="search-bar" placeholder="Pesquisar...">
+                <button class="btn-config" onclick="abrirMenuLateral()" title="Configurações">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
         </header>
 
         <main class="container">
-            <section id="tela-perfil" class="AbaDinamica">
-                <div class="box">
-                    <div class="box-title">TERMINAL DE TRANSMISSÃO <span>📡</span></div>
-                    <div class="area-postagem">
-                        <textarea id="caixaTexto" placeholder="O que você está injetando na rede mundial hoje?"></textarea>
-                        <input type="text" id="linkImagem" placeholder="Link de uma imagem (Opcional)" style="width: 100%; padding: 10px; margin-top: 10px; background: rgba(0,0,0,0.5); color: white; border: 1px solid var(--neon-blue); border-radius: 5px;">
-                        <div class="ferramentas-post">
-                            <button class="btn-neon btn-blue" onclick="postar()" style="margin-left: auto;">
-                                <i class="fas fa-paper-plane"></i> Publicar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div id="muralDeRecados"></div>
-            </section>
-
-            <section id="tela-amigos" class="AbaDinamica" style="display: none;">
-                <div class="box">
-                    <div class="box-title">Cidadãos da Rede <span>👥</span></div>
-                    <div id="lista-usuarios" class="user-grid"></div>
-                </div>
-            </section>
-
-            <section id="tela-galeria" class="AbaDinamica" style="display: none;">
-                <div class="box">
-                    <div class="box-title">Upload para a Matriz <span>📷</span></div>
-                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                        <input type="text" id="urlGaleria" placeholder="URL da Imagem ou GIF" style="flex: 1; padding: 10px; background: rgba(0,0,0,0.5); color: white; border: 1px solid var(--neon-pink); border-radius: 5px;">
-                        <button class="btn-neon btn-pink" onclick="adicionarGaleria()">Salvar na Galeria</button>
-                    </div>
-                    <div id="grid-fotos" class="grid-galeria"></div>
-                </div>
-            </section>
-
-            <section id="tela-mensagens" class="AbaDinamica" style="display: none;">
-                <div class="box" style="padding: 0; border: none;">
-                    <div class="chat-container">
-                        <div class="chat-lista" id="lista-contatos-chat">
-                            </div>
-                        <div class="chat-janela">
-                            <div style="padding: 15px; border-bottom: 2px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3);">
-                                <strong id="chat-nome-contato" style="color: var(--neon-pink); font-size: 16px;">Selecione um contato</strong>
-                            </div>
-                            <div id="chat-mensagens" style="flex: 1; padding: 15px; display: flex; flex-direction: column; overflow-y: auto;">
+            <div class="col-centro">
+                
+                <section id="tela-perfil" class="AbaDinamica">
+                    
+                    <div class="box" style="padding: 10px 15px;">
+                        <div class="stories-bar" id="stories-bar">
+                            <div class="story-item" onclick="criarMeuStory()">
+                                <div class="story-avatar-wrapper seu-story">
+                                    <img id="meu-story-avatar" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200" alt="Seu story">
+                                    <div class="story-add-btn">+</div>
                                 </div>
-                            <div style="padding: 15px; border-top: 2px solid rgba(255,255,255,0.1); display: flex; gap: 10px; background: rgba(0,0,0,0.3);">
-                                <input type="text" id="chat-input" placeholder="Digite uma mensagem..." style="flex: 1; background: rgba(0,0,0,0.6); border: 2px solid var(--neon-blue); color: white; padding: 12px; border-radius: 8px; outline: none;" onkeypress="if(event.key==='Enter') enviarMensagemReal()">
-                                <button class="btn-neon btn-blue" onclick="enviarMensagemReal()"><i class="fas fa-paper-plane"></i></button>
+                                <span class="story-nome">Seu story</span>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
 
-            <section id="tela-comunidades" class="AbaDinamica" style="display: none;">
-                <div class="box">
-                    <div class="box-title">Comunidades <span>🌍</span></div>
-                    <div id="lista-comunidades-reais"></div>
-                </div>
-            </section>
+                    <div class="box">
+                        <div class="box-title">TERMINAL DE TRANSMISSÃO <span>📡</span></div>
+                        <div class="area-postagem">
+                            <textarea id="caixaTexto" placeholder="O que você está injetando na rede mundial hoje?"></textarea>
+                            <div class="ferramentas-post">
+                                <button onclick="showToast('📷 Upload em breve!', 'var(--neon-orange)')"><i class="fas fa-camera"></i> Foto</button>
+                                <button onclick="showToast('🎥 Grave um reel!', 'var(--neon-purple)'); navegarPara('tela-reels')"><i class="fas fa-video"></i> Reel</button>
+                                <button onclick="showToast('📊 Enquetes em breve!', 'var(--neon-orange)')"><i class="fas fa-poll"></i> Enquete</button>
+                                <button class="btn-neon btn-blue" onclick="postarRecado()" style="margin-left: auto;">
+                                    <i class="fas fa-paper-plane"></i> Publicar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
 
-            <section id="tela-marketplace" class="AbaDinamica" style="display: none;">
-                <div class="box">
-                    <div class="box-title">Marketplace Neon <span>🛒</span></div>
-                    <div id="grid-mercado-real" class="grid-marketplace"></div>
-                </div>
-            </section>
+                    <div id="muralDeRecados"></div>
+                </section>
+
+                <section id="tela-reels" class="AbaDinamica" style="display: none;">
+                    <div class="box" style="padding: 0; border: none; background: transparent;">
+                        <div class="reels-container" id="reels-container"></div>
+                    </div>
+                </section>
+
+                <section id="tela-mensagens" class="AbaDinamica" style="display: none;">
+                    <div class="box" style="padding: 0; border: none;">
+                        <div class="chat-container">
+                            <div class="chat-lista">
+                                <div class="chat-contato ativo" onclick="selecionarContato(this, 'Pedro Santos')">
+                                    <img src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=50" style="width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--neon-green);">
+                                    <div>
+                                        <strong style="color: white; font-size: 15px;">Pedro Santos</strong>
+                                        <div style="color: var(--neon-green); font-size: 12px;">● Online</div>
+                                    </div>                                </div>
+                                <div class="chat-contato" onclick="selecionarContato(this, 'Alice_99')">
+                                    <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=50" style="width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--neon-purple);">
+                                    <div>
+                                        <strong style="color: white; font-size: 15px;">Alice_99</strong>
+                                        <div style="color: var(--text-muted); font-size: 12px;">Acessou recentemente</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chat-janela">
+                                <div style="padding: 18px; border-bottom: 2px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3);">
+                                    <strong id="chat-nome-contato" style="color: var(--neon-pink); font-size: 16px;">Pedro Santos</strong>
+                                </div>
+                                <div id="chat-mensagens" style="flex: 1; padding: 18px; display: flex; flex-direction: column; overflow-y: auto;">
+                                    <div class="chat-balao balao-recebido">Conexão estabelecida com a rede Urckut.</div>
+                                    <div class="chat-balao balao-enviado">Terminal operacional online.</div>
+                                </div>
+                                <div style="padding: 18px; border-top: 2px solid rgba(255,255,255,0.1); display: flex; gap: 12px; background: rgba(0,0,0,0.3);">
+                                    <input type="text" id="chat-input" placeholder="Injetar dados criptografados..." style="flex: 1; background: rgba(0,0,0,0.6); border: 2px solid var(--neon-blue); color: white; padding: 12px; border-radius: 8px; outline: none;" onkeypress="if(event.key==='Enter') enviarMensagem()">
+                                    <button class="btn-neon btn-blue" onclick="enviarMensagem()"><i class="fas fa-paper-plane"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="tela-comunidades" class="AbaDinamica" style="display: none;">
+                    <div class="box">
+                        <div class="box-title">Comunidades <span>👥</span></div>
+                        <div class="lista-comunidades" id="lista-comunidades">
+                            </div>
+                    </div>
+                </section>
+
+                <section id="tela-marketplace" class="AbaDinamica" style="display: none;">
+                    <div class="box">
+                        <div class="box-title">Marketplace Neon <span>🛒</span></div>
+                        <div class="grid-marketplace" id="grid-marketplace">
+                            </div>
+                    </div>
+                </section>
+
+                <section id="tela-configuracoes" class="AbaDinamica" style="display: none;">
+                    <div class="box">
+                        <div class="box-title">Configurações <span>⚙️</span></div>
+                        <div class="config-row">
+                            <div>
+                                <strong style="color: white;">Perfil Privado</strong>
+                                <p style="font-size: 12px; color: var(--text-muted); margin: 5px 0 0 0;">Só amigos veem seus posts.</p>
+                            </div>
+                            <button class="btn-neon btn-blue" onclick="toggleConfig(this)">Ativar</button>
+                        </div>
+                        <div class="config-row">
+                            <div><strong style="color: var(--neon-red);">Lista de Bloqueados</strong></div>
+                            <button class="btn-neon btn-red" onclick="showToast('🚫 Lista vazia', 'var(--neon-orange)')">Ver Lista</button>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
 
         </main>
     </div>
 
+    <div class="story-modal" id="story-modal">
+        <div class="story-viewer">
+            <div class="story-progress-bar" id="story-progress-bar"></div>
+            <div class="story-header">                <img id="story-user-avatar" src="" alt="">
+                <div class="story-header-info">
+                    <strong id="story-user-name"></strong>
+                    <span id="story-tempo">há alguns instantes</span>
+                </div>
+                <button class="story-close" onclick="fecharStory()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="story-content" id="story-content"></div>
+            <div class="story-nav prev" onclick="storyAnterior()"></div>
+            <div class="story-nav next" onclick="storyProximo()"></div>
+            <div class="story-footer">
+                <input type="text" placeholder="Responder ao story..." id="story-resposta">
+                <button onclick="enviarRespostaStory()"><i class="fas fa-heart"></i></button>
+                <button onclick="enviarRespostaStory()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        const API_URL = '/api'; 
+        // CONEXÃO DE DADOS COM O SERVER.JS
         let currentUser = null;
-        let token = localStorage.getItem('urckut_token');
-        let chatUsuarioAtualId = null;
-        let chatInterval = null;
+        let posts = [];
+        let storiesUsuarios = [];
 
-        // VERIFICA SE JÁ ESTÁ LOGADO
-        window.onload = () => {
+        // Função utilitária centralizada para chamadas à API
+        async function apiFetch(endpoint, method = 'GET', body = null) {
+            const token = localStorage.getItem('urckut_token');
+            const headers = { 'Content-Type': 'application/json' };
             if (token) {
-                const userString = localStorage.getItem('urckut_user');
-                if (userString) {
-                    currentUser = JSON.parse(userString);
-                    entrarInterface();
-                } else {
-                    sair();
-                }
+                headers['Authorization'] = `Bearer ${token}`;
             }
-        };
+            const config = { method, headers };
+            if (body) config.body = JSON.stringify(body);
 
-        // UI & NAVEGAÇÃO
+            const res = await fetch(endpoint, config);
+            if (!res.ok) {
+                const erro = await res.json().catch(() => ({}));
+                throw new Error(erro.error || `Erro HTTP: ${res.status}`);
+            }
+            return res.json();
+        }
+
         function showToast(msg, cor = 'var(--neon-blue)') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = 'toast';
             toast.style.background = cor;
-            toast.innerHTML = msg;
+            toast.style.boxShadow = `0 0 20px ${cor}`;
+            toast.innerHTML = `<i class="fas fa-info-circle"></i> ${msg}`;
             container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                toast.style.transition = 'all 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // SISTEMA DE AUTENTICAÇÃO ONLINE
+        async function entrarNoSistema() {
+            const email = document.getElementById('login-email').value;
+            const senha = document.getElementById('login-senha').value;
+            if (!email || !senha) { showToast('⚠️ Preencha todos os campos!', 'var(--neon-red)'); return; }
+
+            try {
+                const data = await apiFetch('/api/auth/login', 'POST', { email, senha });
+                localStorage.setItem('urckut_token', data.token);
+                currentUser = data.user;
+                inicializarPainelLogado();
+                showToast('✓ Acesso autorizado à Matriz!', 'var(--neon-green)');
+            } catch (err) {
+                showToast(`⚠️ ${err.message}`, 'var(--neon-red)');
+            }
+        }
+
+        async function criarNovaIdentidade() {
+            const nome = prompt('Injete o seu Nome Operador de Rede:');
+            if (!nome) return;
+            const email = prompt('Injete o seu Endereço de Rede (Email):');
+            if (!email) return;
+            const senha = prompt('Configure sua Chave de Segurança (Mínimo 6 caracteres):');
+            if (!senha) return;
+
+            try {
+                const data = await apiFetch('/api/auth/register', 'POST', { nome, email, senha });
+                localStorage.setItem('urckut_token', data.token);
+                currentUser = data.user;
+                inicializarPainelLogado();
+                showToast('✓ Nova Identidade gerada e sincronizada na rede!', 'var(--neon-green)');
+            } catch (err) {
+                showToast(`⚠️ ${err.message}`, 'var(--neon-red)');
+            }
+        }
+
+        async function verificarSessaoAtiva() {
+            const token = localStorage.getItem('urckut_token');
+            if (token) {
+                try {
+                    currentUser = await apiFetch('/api/user/me');
+                    inicializarPainelLogado();
+                } catch (err) {
+                    localStorage.removeItem('urckut_token');
+                }
+            }
+        }
+
+        function inicializarPainelLogado() {
+            document.getElementById('tela-login').style.display = 'none';
+            document.getElementById('area-logada').style.display = 'block';
+            
+            // Atualiza Perfil do Usuário nas barras e menus
+            if (currentUser) {
+                document.getElementById('menu-nome').textContent = currentUser.nome;
+                document.getElementById('menu-nivel').textContent = `⭐ ${currentUser.nivel || 'User'}`;
+                if (currentUser.avatar) {
+                    document.getElementById('menu-avatar').src = currentUser.avatar;
+                    document.getElementById('meu-story-avatar').src = currentUser.avatar;
+                }
+            }
+
+            navegarPara('tela-perfil');
+            carregarPosts();
+            carregarStories();
+            carregarComunidades();
+            carregarMarketplace();
+            inicializarReels();
+        }
+
+        function sairDoSistema() {
+            if (confirm('Deseja desconectar e fechar terminal?')) {
+                localStorage.removeItem('urckut_token');
+                currentUser = null;
+                document.getElementById('area-logada').style.display = 'none';
+                document.getElementById('tela-login').style.display = 'flex';
+                fecharMenuLateral();
+            }
         }
 
         function navegarPara(idTela) {
-            document.querySelectorAll('.AbaDinamica').forEach(aba => aba.style.display = 'none');
+            const abas = document.getElementsByClassName('AbaDinamica');
+            for(let i = 0; i < abas.length; i++) {
+                abas[i].style.display = 'none';
+            }
             document.querySelectorAll('.menu-navegacao button').forEach(btn => btn.classList.remove('ativo'));
-            
             document.getElementById(idTela).style.display = 'block';
+            
             const btnId = 'btn-' + idTela.replace('tela-', '');
             const btn = document.getElementById(btnId);
             if(btn) btn.classList.add('ativo');
-
-            // Carrega os dados baseado na tela atual
-            if (idTela === 'tela-perfil') carregarPosts();
-            if (idTela === 'tela-amigos') carregarUsuarios();
-            if (idTela === 'tela-galeria') carregarGaleria();
-            if (idTela === 'tela-comunidades') carregarComunidades();
-            if (idTela === 'tela-marketplace') carregarMarketplace();
-            if (idTela === 'tela-mensagens') carregarContatosChat();
-
-            // Limpa loop de mensagens caso saia da tela
-            if (idTela !== 'tela-mensagens') {
-                clearInterval(chatInterval);
-                chatUsuarioAtualId = null;
+            
+            window.scrollTo(0, 0);
+            if (idTela !== 'tela-reels') {
+                document.querySelectorAll('.reel-video').forEach(v => v.pause());
             }
         }
 
-        function entrarInterface() {
-            document.getElementById('tela-login').style.display = 'none';
-            document.getElementById('area-logada').style.display = 'block';
-            navegarPara('tela-perfil');
-            showToast('Conectado à Matriz!', 'var(--neon-green)');
+        // MENU LATERAL
+        function abrirMenuLateral() {
+            document.getElementById('menu-lateral').classList.add('ativo');
+            document.getElementById('overlay').classList.add('ativo');
         }
 
-        // AUTENTICAÇÃO REAL
-        function mostrarRegistro() {
-            document.getElementById('login-nome').style.display = 'block';
-            document.getElementById('btn-acessar').style.display = 'none';
-            document.getElementById('btn-registrar').style.display = 'none';
-            document.getElementById('btn-fazer-registro').style.display = 'block';
-            document.getElementById('btn-voltar-login').style.display = 'block';
+        function fecharMenuLateral() {
+            document.getElementById('menu-lateral').classList.remove('ativo');
+            document.getElementById('overlay').classList.remove('ativo');
         }
 
-        function mostrarLogin() {
-            document.getElementById('login-nome').style.display = 'none';
-            document.getElementById('btn-acessar').style.display = 'block';
-            document.getElementById('btn-registrar').style.display = 'block';
-            document.getElementById('btn-fazer-registro').style.display = 'none';
-            document.getElementById('btn-voltar-login').style.display = 'none';
-        }
-
-        async function logar() {
-            const email = document.getElementById('login-email').value;
-            const senha = document.getElementById('login-senha').value;
-            if (!email || !senha) return showToast('Preencha tudo!', 'var(--neon-red)');
-
-            try {
-                const res = await fetch(`${API_URL}/auth/login`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, senha })
-                });
-                const data = await res.json();
-                if (data.error) return showToast(data.error, 'var(--neon-red)');
-                
-                salvarSessao(data.token, data.user);
-            } catch (e) { showToast('Erro de conexão.', 'var(--neon-red)'); }
-        }
-
-        async function registrar() {
-            const nome = document.getElementById('login-nome').value;
-            const email = document.getElementById('login-email').value;
-            const senha = document.getElementById('login-senha').value;
-            if (!email || !senha || !nome) return showToast('Preencha tudo!', 'var(--neon-red)');
-
-            try {
-                const res = await fetch(`${API_URL}/auth/register`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, senha, nome })
-                });
-                const data = await res.json();
-                if (data.error) return showToast(data.error, 'var(--neon-red)');
-                
-                salvarSessao(data.token, data.user);
-            } catch (e) { showToast('Erro de conexão.', 'var(--neon-red)'); }
-        }
-
-        function salvarSessao(t, u) {
-            token = t;
-            currentUser = u;
-            if (!currentUser.amigos) currentUser.amigos = [];
-            localStorage.setItem('urckut_token', token);
-            localStorage.setItem('urckut_user', JSON.stringify(currentUser));
-            entrarInterface();
-        }
-
-        function sair() {
-            localStorage.removeItem('urckut_token');
-            localStorage.removeItem('urckut_user');
-            token = null; currentUser = null;
-            clearInterval(chatInterval);
-            document.getElementById('area-logada').style.display = 'none';
-            document.getElementById('tela-login').style.display = 'flex';
-        }
-
-        // FETCH HELPER
-        async function api(endpoint, method = 'GET', body = null) {
-            const options = { method, headers: { 'Authorization': `Bearer ${token}` } };
-            if (body) {
-                options.headers['Content-Type'] = 'application/json';
-                options.body = JSON.stringify(body);
-            }
-            const res = await fetch(`${API_URL}${endpoint}`, options);
-            return await res.json();
-        }
-
-        // POSTS REAIS
+        // SISTEMA DE POSTS REAL-TIME
         async function carregarPosts() {
-            const posts = await api('/posts');
+            try {
+                posts = await apiFetch('/api/posts');
+                renderizarPosts();
+            } catch (err) {
+                console.error('Erro ao buscar feed:', err);
+            }
+        }
+
+        function renderizarPosts() {
             const mural = document.getElementById('muralDeRecados');
             mural.innerHTML = '';
-            
-            posts.forEach(post => {
-                const ehCurtido = post.curtidoPor.includes(currentUser.id);
-                let html = `
-                    <div class="post-feed">
-                        <div class="post-header">
-                            <img src="${post.avatar}">
-                            <div class="post-header-info">
-                                <strong>${post.usuario}</strong>
-                                <span>Público 🌍</span>
-                            </div>
-                        </div>
-                        <div class="post-content">
-                            ${post.texto}
-                            ${post.imagem ? `<br><img src="${post.imagem}">` : ''}
-                        </div>
-                        <div class="reacoes">
-                            <button onclick="curtirPost('${post.id}')" class="${ehCurtido ? 'curtido' : ''}">
-                                <i class="fas fa-heart"></i> ${post.curtidas}
-                            </button>
-                        </div>
-                    </div>`;
-                mural.insertAdjacentHTML('beforeend', html);
-            });
-        }
-
-        async function postar() {
-            const texto = document.getElementById('caixaTexto').value;
-            const imagem = document.getElementById('linkImagem').value;
-            if (!texto && !imagem) return showToast('Escreva algo ou envie imagem!', 'var(--neon-red)');
-            
-            await api('/posts', 'POST', { texto, imagem });
-            document.getElementById('caixaTexto').value = '';
-            document.getElementById('linkImagem').value = '';
-            carregarPosts();
-            showToast('Postado!', 'var(--neon-green)');
-        }
-
-        async function curtirPost(id) {
-            await api(`/posts/${id}/curtir`, 'POST');
-            carregarPosts();
-        }
-
-        // AMIGOS (REDE) REAIS
-        async function carregarUsuarios() {
-            const users = await api('/users');
-            const grid = document.getElementById('lista-usuarios');
-            grid.innerHTML = '';
-            
-            users.forEach(u => {
-                if (u.id === currentUser.id) return; // Nao mostra vc mesmo
-                const eAmigo = currentUser.amigos.includes(u.id);
-                const btnClass = eAmigo ? 'btn-red' : 'btn-green';
-                const btnText = eAmigo ? 'Remover Amigo' : 'Adicionar Amigo';
-                
-                grid.insertAdjacentHTML('beforeend', `
-                    <div class="user-card">
-                        <img src="${u.avatar}">
-                        <div>
-                            <strong style="color:var(--neon-blue); display:block; margin-bottom:5px;">${u.nome}</strong>
-                            <button class="btn-neon ${btnClass}" style="padding: 5px 10px; font-size:12px;" onclick="toggleAmigo('${u.id}')">${btnText}</button>
-                        </div>
-                    </div>
-                `);
-            });
-        }
-
-        async function toggleAmigo(id) {
-            const res = await api(`/users/${id}/amigo`, 'POST');
-            currentUser.amigos = res.amigos;
-            localStorage.setItem('urckut_user', JSON.stringify(currentUser));
-            carregarUsuarios();
-            showToast('Rede atualizada!', 'var(--neon-purple)');
-        }
-
-        // GALERIA REAL
-        async function carregarGaleria() {
-            const fotos = await api('/galeria');
-            const grid = document.getElementById('grid-fotos');
-            grid.innerHTML = '';
-            fotos.forEach(f => {
-                grid.insertAdjacentHTML('beforeend', `
-                    <div class="item-galeria">
-                        <img src="${f.url}" alt="Foto">
-                    </div>
-                `);
-            });
-        }
-
-        async function adicionarGaleria() {
-            const url = document.getElementById('urlGaleria').value;
-            if(!url) return;
-            await api('/galeria', 'POST', { url });
-            document.getElementById('urlGaleria').value = '';
-            carregarGaleria();
-            showToast('Salvo na Galeria!', 'var(--neon-green)');
-        }
-
-        // CHAT REAL (ONLINE POLLING)
-        async function carregarContatosChat() {
-            const users = await api('/users');
-            const lista = document.getElementById('lista-contatos-chat');
-            lista.innerHTML = '';
-            
-            // Filtra só quem é amigo
-            const amigos = users.filter(u => currentUser.amigos.includes(u.id));
-            if(amigos.length === 0) {
-                lista.innerHTML = '<p style="padding:15px; color:var(--text-muted);">Adicione amigos na aba "Rede" para conversar.</p>';
+            if (posts.length === 0) {
+                mural.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-muted);"><i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i><p>Nenhuma transmissão interceptada na rede.</p></div>';
                 return;
             }
+            posts.forEach(post => {
+                const article = document.createElement('article');
+                article.className = 'post-feed';
+                const tempo = formatarTempo(post.data);
+                const ehCurtido = post.curtidoPor && post.curtidoPor.includes(currentUser?.id);
 
-            amigos.forEach(a => {
-                const ativoClass = (a.id === chatUsuarioAtualId) ? 'ativo' : '';
-                lista.insertAdjacentHTML('beforeend', `
-                    <div class="chat-contato ${ativoClass}" onclick="abrirChatReal('${a.id}', '${a.nome}')">
-                        <img src="${a.avatar}" style="width:40px; height:40px; border-radius:50%; border: 1px solid var(--neon-blue);">
-                        <strong>${a.nome}</strong>
+                article.innerHTML = `
+                    <div class="post-header">
+                        <img src="${post.avatar}" alt="${post.usuario}">
+                        <div class="post-header-info">
+                            <strong>${escapeHTML(post.usuario)}</strong>
+                            <span>${tempo} • Rede Pública 🌍</span>
+                        </div>
                     </div>
-                `);
+                    <div class="post-content">${escapeHTML(post.texto)}</div>
+                    <div class="reacoes">
+                        <button onclick="curtirPost('${post.id}')" class="${ehCurtido ? 'curtido' : ''}">
+                            <i class="fas fa-thumbs-up"></i> Curtir (${post.curtidas || 0})
+                        </button>
+                        <button onclick="showToast('💬 Módulo de comentários em construção.', 'var(--neon-orange)')">
+                            <i class="fas fa-comment"></i> Comentar (${post.comentarios || 0})
+                        </button>
+                        <button onclick="compartilharPost('${post.id}')">
+                            <i class="fas fa-share"></i> Compartilhar (${post.compartilhamentos || 0})
+                        </button>
+                    </div>
+                `;
+                mural.appendChild(article);
             });
         }
 
-        function abrirChatReal(userId, nome) {
-            chatUsuarioAtualId = userId;
+        async function postarRecado() {
+            const texto = document.getElementById("caixaTexto").value;
+            if (texto.trim() === "") { showToast('⚠️ Terminal rejeitou entrada vazia!', 'var(--neon-red)'); return; }
+            try {
+                await apiFetch('/api/posts', 'POST', { texto });
+                document.getElementById("caixaTexto").value = "";
+                showToast('✓ Post transmitido com sucesso!', 'var(--neon-green)');
+                carregarPosts();
+            } catch (err) {
+                showToast(`⚠️ ${err.message}`, 'var(--neon-red)');
+            }
+        }
+
+        async function curtirPost(postId) {
+            try {
+                await apiFetch(`/api/posts/${postId}/curtir`, 'POST');
+                carregarPosts();
+            } catch (err) {
+                showToast('⚠️ Erro ao registrar curtida.', 'var(--neon-red)');
+            }
+        }
+
+        async function compartilharPost(postId) {
+            try {
+                await apiFetch(`/api/posts/${postId}/compartilhar`, 'POST');
+                showToast('🔁 Sincronizado no seu feed!', 'var(--neon-green)');
+                carregarPosts();
+            } catch (err) {
+                showToast('⚠️ Erro ao compartilhar.', 'var(--neon-red)');
+            }
+        }
+
+        function formatarTempo(dataISO) {
+            const diff = Math.floor((new Date() - new Date(dataISO)) / 1000);
+            if (diff < 60) return 'Agora';
+            if (diff < 3600) return `Há ${Math.floor(diff / 60)}m`;
+            if (diff < 86400) return `Há ${Math.floor(diff / 3600)}h`;
+            return `Há ${Math.floor(diff / 86400)} dias`;
+        }
+
+        // STORIES CONECTADOS (Mapeados da estrutura do backend)
+        async function carregarStories() {
+            try {
+                const rawStories = await apiFetch('/api/stories');
+                
+                // Agrupa a lista plana em pacotes por usuário para manter o componente visual funcionando
+                const grupos = {};
+                rawStories.forEach(s => {
+                    if (!grupos[s.usuario]) {
+                        grupos[s.usuario] = {
+                            usuario: s.usuario,
+                            avatar: s.avatar,
+                            stories: []
+                        };
+                    }
+                    grupos[s.usuario].stories.push({
+                        tipo: 'imagem',
+                        url: s.imagem,
+                        texto: s.texto
+                    });
+                });
+                storiesUsuarios = Object.values(grupos);
+                renderizarStoriesBar();
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function renderizarStoriesBar() {
+            const bar = document.getElementById('stories-bar');
+            bar.innerHTML = `
+                <div class="story-item" onclick="criarMeuStory()">
+                    <div class="story-avatar-wrapper seu-story">
+                        <img id="meu-story-avatar" src="${currentUser?.avatar || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200'}" alt="Seu story">
+                        <div class="story-add-btn">+</div>
+                    </div>
+                    <span class="story-nome">Injetar Story</span>
+                </div>
+            `;
+            storiesUsuarios.forEach((user, idx) => {
+                const item = document.createElement('div');
+                item.className = 'story-item';
+                item.onclick = () => abrirStory(idx, 0);
+                item.innerHTML = `
+                    <div class="story-avatar-wrapper">
+                        <img src="${user.avatar}" alt="${user.usuario}">
+                    </div>
+                    <span class="story-nome">${user.usuario}</span>
+                `;
+                bar.appendChild(item);
+            });
+        }
+
+        async function criarMeuStory() {
+            const texto = prompt('📸 Digite a mensagem do seu Story:');
+            if (!texto) return;
+            const imagem = prompt('🔗 URL de imagem customizada (Deixe em branco para imagem randômica cyberpunk):');
+            
+            try {
+                await apiFetch('/api/stories', 'POST', { texto, imagem: imagem || undefined });
+                showToast('📸 Story adicionado à rede global!', 'var(--neon-green)');
+                carregarStories();
+            } catch (err) {
+                showToast(`⚠️ ${err.message}`, 'var(--neon-red)');
+            }
+        }
+
+        let storyAtual = { usuario: 0, story: 0 };
+        let storyTimer = null;
+
+        function abrirStory(userIdx, storyIdx) {
+            storyAtual = { usuario: userIdx, story: storyIdx };
+            const user = storiesUsuarios[userIdx];
+            const story = user.stories[storyIdx];
+            
+            document.getElementById('story-user-avatar').src = user.avatar;
+            document.getElementById('story-user-name').textContent = user.usuario;
+            
+            const content = document.getElementById('story-content');
+            content.innerHTML = `<img src="${story.url}" alt="Story"><div style="position:absolute;bottom:80px;left:20px;right:20px;color:white;font-size:18px;text-shadow:0 2px 10px rgba(0,0,0,0.8);text-align:center;font-weight:bold;">${escapeHTML(story.texto)}</div>`;
+            
+            const progressBar = document.getElementById('story-progress-bar');
+            progressBar.innerHTML = '';
+            user.stories.forEach((_, i) => {
+                const segment = document.createElement('div');
+                segment.className = 'story-progress-segment';
+                const fill = document.createElement('div');
+                fill.className = 'story-progress-fill';
+                if (i < storyIdx) fill.classList.add('completo');
+                if (i === storyIdx) fill.classList.add('ativo');
+                segment.appendChild(fill);
+                progressBar.appendChild(segment);
+            });
+            
+            document.getElementById('story-modal').classList.add('ativo');
+            clearTimeout(storyTimer);
+            storyTimer = setTimeout(() => storyProximo(), 5000);
+        }
+
+        function storyProximo() {
+            const user = storiesUsuarios[storyAtual.usuario];
+            if (storyAtual.story < user.stories.length - 1) {
+                abrirStory(storyAtual.usuario, storyAtual.story + 1);
+            } else if (storyAtual.usuario < storiesUsuarios.length - 1) {
+                abrirStory(storyAtual.usuario + 1, 0);
+            } else {
+                fecharStory();
+            }
+        }
+
+        function storyAnterior() {
+            if (storyAtual.story > 0) {
+                abrirStory(storyAtual.usuario, storyAtual.story - 1);
+            } else if (storyAtual.usuario > 0) {
+                const prevUser = storiesUsuarios[storyAtual.usuario - 1];
+                abrirStory(storyAtual.usuario - 1, prevUser.stories.length - 1);
+            }
+        }
+
+        function fecharStory() {
+            document.getElementById('story-modal').classList.remove('ativo');
+            clearTimeout(storyTimer);
+        }
+
+        function enviarRespostaStory() {
+            showToast('✓ Resposta enviada!', 'var(--neon-pink)');
+            document.getElementById('story-resposta').value = '';
+        }
+
+        // COMUNIDADES DINDÂMICAS (ALIMENTADAS PELO BACKEND)
+        async function carregarComunidades() {
+            try {
+                const comunidades = await apiFetch('/api/comunidades');
+                const lista = document.getElementById('lista-comunidades');
+                lista.innerHTML = '';
+
+                comunidades.forEach(comunidade => {
+                    const participando = comunidade.participantes && comunidade.participantes.includes(currentUser?.id);
+                    const card = document.createElement('div');
+                    card.className = 'comunidade-card';
+                    card.innerHTML = `
+                        <div style="display: flex; gap: 15px; align-items: center;">
+                            <img src="${comunidade.imagem}" style="width: 65px; height: 65px; border-radius: 10px; object-fit: cover; border: 2px solid var(--neon-pink);">
+                            <div>
+                                <h3 style="margin:0; color:var(--neon-pink); font-size: 17px;">${escapeHTML(comunidade.nome)}</h3>
+                                <p style="font-size:12px; color:var(--text-muted); margin:5px 0;">${comunidade.membros.toLocaleString()} membros</p>
+                            </div>
+                        </div>
+                        <button class="btn-neon ${participando ? 'btn-purple' : 'btn-green'}" onclick="toggleParticipacao('${comunidade.id}')">
+                            ${participando ? '✓ Participando' : 'Participar'}
+                        </button>
+                    `;
+                    lista.appendChild(card);
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function toggleParticipacao(id) {
+            try {
+                await apiFetch(`/api/comunidades/${id}/participar`, 'POST');
+                carphanis = carregarComunidades();
+                showToast('✓ Cadastro em comunidade atualizado!', 'var(--neon-green)');
+            } catch (err) {
+                showToast('⚠️ Erro ao ingressar na comunidade.', 'var(--neon-red)');
+            }
+        }
+
+        // MARKETPLACE CONECTADO (ALIMENTADO PELO BACKEND)
+        async function carregarMarketplace() {
+            try {
+                const itens = await apiFetch('/api/marketplace');
+                const grid = document.getElementById('grid-marketplace');
+                grid.innerHTML = '';
+
+                itens.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'item-mercado';
+                    card.innerHTML = `
+                        <img src="${item.imagem}">
+                        <h4 style="margin: 12px 0 8px 0; color: white;">${escapeHTML(item.titulo)}</h4>
+                        <div class="preco-neon">R$ ${item.preco.toLocaleString()}</div>
+                        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Vendedor: ${item.vendedor}</p>
+                        <button class="btn-neon btn-purple" style="width: 100%;" onclick="showToast('🛒 Oferta enviada ao vendedor!', 'var(--neon-green)')">Fazer Oferta</button>
+                    `;
+                    grid.appendChild(card);
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // VIDEO REELS / TIKTOK (Mantido local com links assets padrão)
+        const reelsData = [
+            {
+                video: 'https://assets.mixkit.co/videos/4329/4329-720.mp4',
+                usuario: 'Neon_Dancer',
+                avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100',                descricao: 'Quando o beat dropa no cyberclub 🎵✨ #cyberpunk #neon #dance',
+                musica: '♫ Synthwave Dreams - CyberArtist',
+                curtidas: '45.2K',
+                comentarios: '1.2K',
+                compartilhamentos: '892'
+            },
+            {
+                video: 'https://assets.mixkit.co/videos/34722/34722-720.mp4',
+                usuario: 'Glitch_Art',
+                avatar: 'https://images.unsplash.com/photo-1566753323558-f4e0952af115?w=100',
+                descricao: 'Tutorial de glitch art em 30s 🎨 #tutorial #art',
+                musica: '♫ Digital Noise - PixelMaster',
+                curtidas: '128K',
+                comentarios: '5.4K',
+                compartilhamentos: '12K'
+            }
+        ];
+
+        function inicializarReels() {
+            const container = document.getElementById('reels-container');
+            container.innerHTML = '';
+            reelsData.forEach((reel) => {
+                const item = document.createElement('div');
+                item.className = 'reel-item';
+                item.innerHTML = `
+                    <video class="reel-video" src="${reel.video}" loop muted playsinline></video>
+                    <div class="reel-overlay"></div>
+                    <button class="reel-play-btn"><i class="fas fa-play"></i></button>
+                    <div class="reel-info">
+                        <div class="reel-user">
+                            <img src="${reel.avatar}" alt="${reel.usuario}">
+                            <strong>@${reel.usuario}</strong>
+                            <button onclick="seguirUsuario(this)">Seguir</button>
+                        </div>
+                        <div class="reel-desc">${reel.descricao}</div>
+                        <div class="reel-music">
+                            <span class="reel-music-icon"><i class="fas fa-compact-disc"></i></span>
+                            ${reel.musica}
+                        </div>
+                    </div>
+                    <div class="reel-actions">
+                        <button class="reel-action-btn" onclick="curtirReel(this)">
+                            <span class="heart-icon"><i class="fas fa-heart"></i></span>
+                            <span>${reel.curtidas}</span>
+                        </button>
+                        <button class="reel-action-btn" onclick="showToast('💬 Comentários em breve.', 'var(--neon-orange)')">
+                            <i class="fas fa-comment"></i>
+                            <span>${reel.comentarios}</span>
+                        </button>                        <button class="reel-action-btn" onclick="showToast('📤 Compartilhado!', 'var(--neon-green)')">
+                            <i class="fas fa-share"></i>
+                            <span>${reel.compartilhamentos}</span>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(item);
+                setupReelInteractions(item);
+            });
+            setupReelsObserver();
+        }
+
+        function setupReelInteractions(item) {
+            const video = item.querySelector('.reel-video');
+            let lastTap = 0;
+            item.addEventListener('click', (e) => {
+                if (e.target.closest('.reel-action-btn') || e.target.closest('.reel-user button')) return;
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTap;
+                
+                if (tapLength < 300 && tapLength > 0) {
+                    curtirReel(item.querySelector('.reel-action-btn'));
+                    const heart = document.createElement('div');
+                    heart.className = 'reel-double-tap-heart';
+                    heart.innerHTML = '<i class="fas fa-heart"></i>';
+                    heart.style.left = (e.clientX - item.getBoundingClientRect().left - 40) + 'px';
+                    heart.style.top = (e.clientY - item.getBoundingClientRect().top - 40) + 'px';
+                    item.appendChild(heart);
+                    setTimeout(() => heart.remove(), 1000);
+                } else {
+                    setTimeout(() => {
+                        const newTap = new Date().getTime();
+                        if (newTap - currentTime >= 290) {
+                            if (video.paused) { video.play(); item.classList.remove('pausado'); }
+                            else { video.pause(); item.classList.add('pausado'); }
+                        }
+                    }, 300);
+                }
+                lastTap = currentTime;
+            });
+        }
+
+        function setupReelsObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const video = entry.target.querySelector('.reel-video');
+                    if (entry.isIntersecting) {
+                        video.play().catch(() => {});
+                        entry.target.classList.remove('pausado');
+                    } else {
+                        video.pause();
+                    }
+                });
+            }, { threshold: 0.7 });
+            document.querySelectorAll('.reel-item').forEach(item => observer.observe(item));
+        }
+
+        function curtirReel(btn) {
+            btn.classList.toggle('curtido');
+            if (btn.classList.contains('curtido')) showToast('❤️ Você curtiu o Reel!', 'var(--neon-pink)');
+        }
+
+        function seguirUsuario(btn) {
+            btn.textContent = btn.textContent === 'Seguir' ? 'Seguindo' : 'Seguir';
+            btn.style.background = btn.textContent === 'Seguindo' ? 'rgba(255,255,255,0.2)' : 'var(--neon-pink)';
+        }
+
+        // CHAT OPERACIONAL
+        function selecionarContato(elemento, nome) {
+            document.querySelectorAll('.chat-contato').forEach(c => c.classList.remove('ativo'));
+            elemento.classList.add('ativo');
             document.getElementById('chat-nome-contato').textContent = nome;
-            carregarContatosChat(); // Para atualizar a classe 'ativo'
-            puxarMensagensReais();
-            
-            clearInterval(chatInterval);
-            chatInterval = setInterval(puxarMensagensReais, 3000); // Poll a cada 3s
         }
 
-        async function puxarMensagensReais() {
-            if(!chatUsuarioAtualId) return;
-            const msgs = await api(`/mensagens/${chatUsuarioAtualId}`);
-            const janela = document.getElementById('chat-mensagens');
-            janela.innerHTML = '';
+        function enviarMensagem() {
+            const input = document.getElementById('chat-input');
+            const texto = input.value.trim();            if (!texto) return;
             
-            msgs.sort((a,b) => new Date(a.data) - new Date(b.data)).forEach(m => {
-                const tipo = m.de === currentUser.id ? 'balao-enviado' : 'balao-recebido';
-                janela.insertAdjacentHTML('beforeend', `<div class="chat-balao ${tipo}">${m.texto}</div>`);
-            });
+            const janela = document.getElementById('chat-mensagens');
+            const balao = document.createElement('div');
+            balao.className = 'chat-balao balao-enviado';
+            balao.textContent = texto;
+            janela.appendChild(balao);
+            input.value = '';
             janela.scrollTop = janela.scrollHeight;
         }
 
-        async function enviarMensagemReal() {
-            if(!chatUsuarioAtualId) return showToast('Selecione um contato!', 'var(--neon-red)');
-            const input = document.getElementById('chat-input');
-            const texto = input.value.trim();
-            if(!texto) return;
-            
-            await api('/mensagens', 'POST', { para: chatUsuarioAtualId, texto });
-            input.value = '';
-            puxarMensagensReais();
+        function toggleConfig(btn) {
+            btn.textContent = btn.textContent === 'Ativar' ? 'Desativar' : 'Ativar';
+            btn.classList.toggle('btn-blue');
+            btn.classList.toggle('btn-red');
         }
 
-        // COMUNIDADES E MERCADO
-        async function carregarComunidades() {
-            const data = await api('/comunidades');
-            const div = document.getElementById('lista-comunidades-reais');
-            div.innerHTML = '';
-            data.forEach(c => {
-                div.insertAdjacentHTML('beforeend', `
-                    <div class="comunidade-card">
-                        <div style="display:flex; gap:15px; align-items:center;">
-                            <img src="${c.imagem}" style="width:60px; height:60px; border-radius:10px; border:2px solid var(--neon-blue);">
-                            <div>
-                                <h3 style="color:var(--neon-blue); margin:0;">${c.nome}</h3>
-                                <p style="font-size:12px; color:var(--text-muted);">${c.membros} membros</p>
-                            </div>
-                        </div>
-                    </div>
-                `);
-            });
-        }
-
-        async function carregarMarketplace() {
-            const data = await api('/marketplace');
-            const div = document.getElementById('grid-mercado-real');
-            div.innerHTML = '';
-            data.forEach(m => {
-                div.insertAdjacentHTML('beforeend', `
-                    <div class="item-mercado">
-                        <img src="${m.imagem}">
-                        <h4 style="margin:10px 0; color:white;">${m.titulo}</h4>
-                        <div class="preco-neon">R$ ${m.preco}</div>
-                        <p style="font-size:12px; color:var(--text-muted);">Vendedor: ${m.vendedor}</p>
-                    </div>
-                `);
-            });
-        }
-
-        // BACKGROUND ANIMATION
+        // CANVAS BACKGROUND ANIMATION
         const canvas = document.getElementById('universo-neon');
-        const ctx = canvas.getContext('2d');
-        function redimensionar() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        window.addEventListener('resize', redimensionar); redimensionar();
-        const pts = []; for(let i=0; i<40; i++) pts.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, vx:(Math.random()-0.5)*0.5, vy:(Math.random()-0.5)*0.5});
-        function anim() {
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-            pts.forEach(p => { p.x+=p.vx; p.y+=p.vy; if(p.x<0||p.x>canvas.width) p.vx*=-1; if(p.y<0||p.y>canvas.height) p.vy*=-1; ctx.fillStyle='#00f0ff'; ctx.beginPath(); ctx.arc(p.x,p.y,1.5,0,Math.PI*2); ctx.fill(); });
-            requestAnimationFrame(anim);
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            let particulas = [];
+            function redimensionarCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+            window.addEventListener('resize', redimensionarCanvas);
+            redimensionarCanvas();
+
+            class Particula {
+                constructor() {
+                    this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+                    this.tamanho = Math.random() * 2.5 + 0.5;
+                    this.velocidadeX = (Math.random() - 0.5) * 0.4; this.velocidadeY = (Math.random() - 0.5) * 0.4;
+                    const cores = ['#00f0ff', '#ff007f', '#da00ff', '#39ff14', '#ffaa00'];
+                    this.cor = cores[Math.floor(Math.random() * cores.length)];
+                    this.opacidade = Math.random() * 0.5 + 0.2;
+                }
+                atualizar() {
+                    this.x += this.velocidadeX; this.y += this.velocidadeY;
+                    if (this.x < 0 || this.x > canvas.width) this.velocidadeX *= -1;
+                    if (this.y < 0 || this.y > canvas.height) this.velocidadeY *= -1;
+                }
+                desenhar() {
+                    ctx.beginPath(); ctx.arc(this.x, this.y, this.tamanho, 0, Math.PI * 2);
+                    ctx.fillStyle = this.cor; ctx.globalAlpha = this.opacidade;
+                    ctx.shadowBlur = 10; ctx.shadowColor = this.cor; ctx.fill();
+                }
+            }
+
+            for (let i = 0; i < 60; i++) particulas.push(new Particula());
+            function animar() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particulas.forEach(p => { p.atualizar(); p.desenhar(); });
+                particulas.forEach((p1, i) => {
+                    particulas.slice(i + 1).forEach(p2 => {
+                        const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+                        if (dist < 120) {
+                            ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
+                            ctx.strokeStyle = p1.cor; ctx.globalAlpha = (1 - dist / 120) * 0.2;
+                            ctx.lineWidth = 0.5; ctx.stroke();
+                        }
+                    });
+                });
+                requestAnimationFrame(animar);
+            }
+            animar();
         }
-        anim();
+
+        // INICIALIZAÇÃO E VERIFICAÇÃO AUTOMÁTICA DE SESSÃO
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('login-email').focus();
+            verificarSessaoAtiva();
+        });
     </script>
 </body>
 </html>
