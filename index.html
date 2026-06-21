@@ -960,7 +960,8 @@
                             <textarea id="caixaTexto" placeholder="O que você está injetando na rede mundial hoje?"></textarea>
                             <input type="file" id="post-imagem" accept="image/*,video/*" style="display: none;" onchange="previewMidiaPost(this)">
                             <div id="preview-midia" style="display: none; margin: 10px 0;">
-                                <img id="preview-img" style="max-width: 100%; max-height: 200px; border-radius: 8px;">
+                                <img id="preview-img" style="max-width: 100%; max-height: 200px; border-radius: 8px; display: none;">
+                                <video id="preview-vid" style="max-width: 100%; max-height: 200px; border-radius: 8px; display: none;" controls></video>
                             </div>
                             <div class="ferramentas-post">
                                 <button onclick="document.getElementById('post-imagem').click()"><i class="fas fa-camera"></i> Foto/Vídeo</button>
@@ -1406,7 +1407,9 @@
                 
                 document.getElementById("caixaTexto").value = "";
                 fileInput.value = "";
-                document.getElementById('preview-midia').style.display = 'none';                
+                document.getElementById('preview-midia').style.display = 'none';
+                document.getElementById('preview-img').src = '';
+                document.getElementById('preview-vid').src = '';                
                 await carregarPosts();
                 showToast('✓ Post publicado!', 'var(--neon-green)');
             } catch (error) {
@@ -1418,13 +1421,22 @@
             if (input.files && input.files[0]) {
                 const preview = document.getElementById('preview-midia');
                 const previewImg = document.getElementById('preview-img');
+                const previewVid = document.getElementById('preview-vid');
                 const file = input.files[0];
                 
                 if (file.type.startsWith('image/')) {
                     previewImg.src = URL.createObjectURL(file);
                     previewImg.style.display = 'block';
+                    previewVid.style.display = 'none';
+                    previewVid.src = '';
+                } else if (file.type.startsWith('video/')) {
+                    previewVid.src = URL.createObjectURL(file);
+                    previewVid.style.display = 'block';
+                    previewImg.style.display = 'none';
+                    previewImg.src = '';
                 } else {
                     previewImg.style.display = 'none';
+                    previewVid.style.display = 'none';
                 }
                 preview.style.display = 'block';
             }
@@ -1708,15 +1720,7 @@
         // MENSAGENS
         async function carregarConversas() {
             const lista = document.getElementById('chat-lista');
-            lista.innerHTML = `
-                <div class="chat-contato ativo" onclick="selecionarContato(this, 'Pedro Santos', 'user1')">
-                    <img src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=50" style="width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--neon-green);">
-                    <div>
-                        <strong style="color: white; font-size: 15px;">Pedro Santos</strong>
-                        <div style="color: var(--neon-green); font-size: 12px;">● Online</div>
-                    </div>
-                </div>
-            `;
+            lista.innerHTML = '<p style="text-align: center; color: var(--text-muted); margin-top: 20px;">Nenhuma conversa ativa no momento.</p>';
         }
 
         function selecionarContato(elemento, nome, userId) {
@@ -1852,4 +1856,4 @@
         }    
     </script>
 </body>
-</html>p
+</html>
