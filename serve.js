@@ -47,6 +47,7 @@ const upload = multer({
 });
 
 const DB_FILE = path.join(__dirname, 'database.json');
+
 function loadDB() {
     if (!fs.existsSync(DB_FILE)) {
         const initialDB = {
@@ -96,7 +97,8 @@ function loadDB() {
                     imagem: 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=300',
                     preco: 5000,
                     vendedor: '@Neo_Store'
-                }            ],
+                }
+            ],
             amigos: [],
             galeria: []
         };
@@ -145,7 +147,8 @@ app.post('/api/auth/register', async (req, res) => {
             senha: hashedSenha,
             avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200',
             bio: 'Desenvolvedor de realidades digitais.',
-            seguidores: 0,            seguindo: 0,
+            seguidores: 0,
+            seguindo: 0,
             nivel: 'Elite',
             criadoEm: new Date().toISOString()
         };
@@ -194,7 +197,8 @@ app.post('/api/auth/login', async (req, res) => {
         });
     } catch (error) {
         console.error('Erro no login:', error);
-        res.status(500).json({ error: 'Erro ao fazer login' });    }
+        res.status(500).json({ error: 'Erro ao fazer login' });
+    }
 });
 
 // POSTS
@@ -243,7 +247,8 @@ app.post('/api/posts/:id/curtir', authenticateToken, (req, res) => {
     const index = post.curtidoPor.indexOf(req.user.id);
     if (index > -1) {
         post.curtidoPor.splice(index, 1);
-        post.curtidas--;    } else {
+        post.curtidas--;
+    } else {
         post.curtidoPor.push(req.user.id);
         post.curtidas++;
     }
@@ -293,6 +298,7 @@ app.get('/api/stories', (req, res) => {
     const activeStories = db.stories.filter(story => new Date(story.expiraEm) > now);
     res.json(activeStories);
 });
+
 app.post('/api/stories', authenticateToken, (req, res) => {
     const { texto, imagem } = req.body;
     const db = loadDB();
@@ -341,6 +347,7 @@ app.post('/api/comunidades/:id/participar', authenticateToken, (req, res) => {
     saveDB(db);
     res.json(comunidade);
 });
+
 // MARKETPLACE
 app.get('/api/marketplace', (req, res) => {
     const db = loadDB();
@@ -390,7 +397,8 @@ app.get('/api/amigos', authenticateToken, (req, res) => {
         a.userId === req.user.id || a.amigoId === req.user.id
     );
     
-    const amigosCompletos = userAmigos.map(a => {        const amigoId = a.userId === req.user.id ? a.amigoId : a.userId;
+    const amigosCompletos = userAmigos.map(a => {
+        const amigoId = a.userId === req.user.id ? a.amigoId : a.userId;
         const amigo = db.users.find(u => u.id === amigoId);
         return {
             id: a.id,
@@ -488,7 +496,8 @@ app.get('/api/mensagens', authenticateToken, (req, res) => {
             const contatoId = msg.remetenteId === userId ? msg.destinatarioId : msg.remetenteId;
             
             if (!conversas[contatoId]) {
-                const contato = db.users.find(u => u.id === contatoId);                conversas[contatoId] = {
+                const contato = db.users.find(u => u.id === contatoId);
+                conversas[contatoId] = {
                     contato: {
                         id: contato.id,
                         nome: contato.nome,
@@ -537,7 +546,8 @@ app.get('/api/mensagens/:contatoId', authenticateToken, (req, res) => {
 });
 
 app.post('/api/mensagens', authenticateToken, (req, res) => {
-    const { destinatarioId, texto } = req.body;    const db = loadDB();
+    const { destinatarioId, texto } = req.body;
+    const db = loadDB();
     
     if (!texto || texto.trim() === '') {
         return res.status(400).json({ error: 'Mensagem não pode ser vazia' });
@@ -586,7 +596,8 @@ app.post('/api/galeria', authenticateToken, (req, res) => {
     db.galeria.push(newItem);
     saveDB(db);
     
-    res.json(newItem);});
+    res.json(newItem);
+});
 
 app.delete('/api/galeria/:id', authenticateToken, (req, res) => {
     const db = loadDB();
@@ -635,7 +646,8 @@ app.put('/api/user/me', authenticateToken, (req, res) => {
     if (nome) user.nome = nome;
     if (bio !== undefined) user.bio = bio;
     if (avatar) user.avatar = avatar;
-        saveDB(db);
+    
+    saveDB(db);
     
     res.json({
         id: user.id,
