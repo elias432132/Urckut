@@ -47,8 +47,7 @@
         @keyframes neon-pulse {
             0%, 100% { box-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue); }
             50% { box-shadow: 0 0 20px var(--neon-blue), 0 0 40px var(--neon-blue); }
-        }
-        @keyframes slideIn {
+        }        @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
@@ -96,8 +95,8 @@
         .btn-blue { border-color: var(--neon-blue); background: rgba(0, 240, 255, 0.1); color: var(--neon-blue); box-shadow: 0 0 10px rgba(0, 240, 255, 0.3); }
         .btn-blue:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 20px var(--neon-blue); transform: translateY(-2px); }
         
-        .btn-green { border-color: var(--neon-green); background: rgba(57, 255, 20, 0.1); color: var(--neon-green); box-shadow: 0 0 10px rgba(57, 255, 20, 0.3); }        .btn-green:hover { background: var(--neon-green); color: #000; box-shadow: 0 0 20px var(--neon-green); transform: translateY(-2px); }
-        
+        .btn-green { border-color: var(--neon-green); background: rgba(57, 255, 20, 0.1); color: var(--neon-green); box-shadow: 0 0 10px rgba(57, 255, 20, 0.3); }
+        .btn-green:hover { background: var(--neon-green); color: #000; box-shadow: 0 0 20px var(--neon-green); transform: translateY(-2px); }        
         .btn-pink { border-color: var(--neon-pink); background: rgba(255, 0, 127, 0.1); color: var(--neon-pink); box-shadow: 0 0 10px rgba(255, 0, 127, 0.3); }
         .btn-pink:hover { background: var(--neon-pink); color: #fff; box-shadow: 0 0 20px var(--neon-pink); transform: translateY(-2px); }
 
@@ -146,8 +145,7 @@
             box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
         }
         header {
-            background: rgba(10, 14, 23, 0.95); backdrop-filter: blur(20px); padding: 15px 30px; 
-            display: flex; justify-content: space-between; align-items: center; 
+            background: rgba(10, 14, 23, 0.95); backdrop-filter: blur(20px); padding: 15px 30px;             display: flex; justify-content: space-between; align-items: center; 
             border-bottom: 2px solid var(--glass-border); 
             position: sticky; top: 0; z-index: 100;
         }
@@ -194,9 +192,9 @@
 
         .area-postagem textarea { 
             width: 100%; height: 80px; background: rgba(0, 0, 0, 0.3); 
-            border: 2px solid rgba(0, 240, 255, 0.2); border-radius: 10px;            padding: 12px; resize: none; color: white; font-family: inherit; 
-            font-size: 14px; outline: none; transition: all 0.3s;
-        }
+            border: 2px solid rgba(0, 240, 255, 0.2); border-radius: 10px;
+            padding: 12px; resize: none; color: white; font-family: inherit; 
+            font-size: 14px; outline: none; transition: all 0.3s;        }
         .area-postagem textarea:focus { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0, 240, 255, 0.3); }
         
         .ferramentas-post { 
@@ -232,6 +230,9 @@
         .post-content {
             font-size: 14px; margin-bottom: 12px; line-height: 1.5;
         }
+        .post-image {
+            width: 100%; max-height: 500px; object-fit: cover; border-radius: 10px; margin: 10px 0;
+        }
         .reacoes { display: flex; gap: 10px; margin-top: 12px; font-size: 13px; flex-wrap: wrap; }
         .reacoes button { 
             background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); 
@@ -242,8 +243,8 @@
         .reacoes button.curtido { color: var(--neon-pink); border-color: var(--neon-pink); background: rgba(255, 0, 127, 0.2); }
 
         .foto-perfil { 
-            width: 100%; border-radius: 12px; border: 3px solid var(--neon-blue); 
-            height: 220px; object-fit: cover; box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);        }
+            width: 100%; border-radius: 12px; border: 3px solid var(--neon-blue);             height: 220px; object-fit: cover; box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+        }
         .nome-usuario { 
             color: var(--neon-pink); font-size: 24px; margin: 15px 0 8px 0; 
             text-shadow: 0 0 12px rgba(255,0,127,0.5); cursor: pointer;
@@ -291,8 +292,8 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--bg-dark);        }
+            object-fit: cover;            border: 3px solid var(--bg-dark);
+        }
         .story-add-btn {
             position: absolute;
             bottom: -2px;
@@ -340,8 +341,8 @@
             width: 100%;
             max-width: 420px;
             height: 90vh;
-            max-height: 750px;
-            background: #000;            border-radius: 15px;
+            max-height: 750px;            background: #000;
+            border-radius: 15px;
             overflow: hidden;
             border: 2px solid var(--neon-pink);
             box-shadow: 0 0 50px rgba(255, 0, 127, 0.5);
@@ -389,8 +390,8 @@
             border: 2px solid var(--neon-pink);
         }
         .story-header-info {
-            flex: 1;
-            color: white;        }
+            flex: 1;            color: white;
+        }
         .story-header-info strong { font-size: 14px; display: block; }
         .story-header-info span { font-size: 11px; color: rgba(255,255,255,0.7); }
         .story-close {
@@ -438,8 +439,8 @@
             right: 15px;
             display: flex;
             gap: 10px;
-            z-index: 10;
-        }        .story-footer input {
+            z-index: 10;        }
+        .story-footer input {
             flex: 1;
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.3);
@@ -487,8 +488,8 @@
             object-fit: cover;
             background: #000;
         }
-
-        .reel-overlay {            position: absolute;
+        .reel-overlay {
+            position: absolute;
             inset: 0;
             background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 40%, transparent 70%, rgba(0,0,0,0.3) 100%);
             pointer-events: none;
@@ -536,8 +537,8 @@
         }
         .reel-music {
             display: flex;
-            align-items: center;
-            gap: 8px;            font-size: 12px;
+            align-items: center;            gap: 8px;
+            font-size: 12px;
             color: rgba(255,255,255,0.9);
         }
         .reel-music-icon {
@@ -585,8 +586,8 @@
         .reel-action-btn.curtido .heart-icon {
             animation: heart-pop 0.4s ease;
         }
-
-        .reel-play-btn {            position: absolute;
+        .reel-play-btn {
+            position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -634,8 +635,8 @@
 
         .chat-container { 
             display: flex; height: 650px; 
-            border: 2px solid var(--glass-border); border-radius: 12px; overflow: hidden;
-        }        .chat-lista { width: 30%; background: rgba(0,0,0,0.6); border-right: 2px solid var(--glass-border); overflow-y: auto; }
+            border: 2px solid var(--glass-border); border-radius: 12px; overflow: hidden;        }
+        .chat-lista { width: 30%; background: rgba(0,0,0,0.6); border-right: 2px solid var(--glass-border); overflow-y: auto; }
         .chat-janela { width: 70%; display: flex; flex-direction: column; background: rgba(16, 20, 31, 0.4); }
         .chat-contato { 
             padding: 18px; border-bottom: 1px solid rgba(255,255,255,0.05); 
@@ -683,8 +684,8 @@
             top: 0;
             left: 0;
             right: 0;
-            padding: 20px;
-            background: rgba(0, 240, 255, 0.1);            border-bottom: 2px solid var(--neon-blue);
+            padding: 20px;            background: rgba(0, 240, 255, 0.1);
+            border-bottom: 2px solid var(--neon-blue);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -732,8 +733,8 @@
         }
         .menu-item i {
             font-size: 20px;
-            width: 30px;
-            text-align: center;        }
+            width: 30px;            text-align: center;
+        }
 
         .overlay {
             position: fixed;
@@ -769,6 +770,39 @@
             transform: rotate(90deg);
         }
 
+        .galeria-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .galeria-item {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid var(--glass-border);
+            transition: all 0.3s;        }
+        .galeria-item:hover {
+            transform: scale(1.05);
+            border-color: var(--neon-blue);
+        }
+        .galeria-item img, .galeria-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: var(--neon-blue);
+            animation: spin 1s ease-in-out infinite;
+        }
+
         @media (max-width: 900px) {
             header { flex-direction: column; gap: 15px; padding: 15px; }
             .menu-navegacao { width: 100%; overflow-x: auto; justify-content: flex-start; }
@@ -782,7 +816,8 @@
             .chat-lista { width: 100%; height: 200px; border-right: none; border-bottom: 2px solid var(--glass-border); }
             .chat-janela { width: 100%; flex: 1; }
 
-            .reels-container { height: 85vh; max-height: none; }            .story-viewer { max-width: 100%; height: 100vh; max-height: none; border-radius: 0; border: none; }
+            .reels-container { height: 85vh; max-height: none; }
+            .story-viewer { max-width: 100%; height: 100vh; max-height: none; border-radius: 0; border: none; }
             
             .menu-lateral { width: 100%; right: -100%; }
         }
@@ -796,11 +831,12 @@
     </style>
 </head>
 <body>
-    <canvas id="universo-neon" aria-hidden="true"></canvas>
-    <div id="toast-container" aria-live="polite"></div>
+    <canvas id="universo-neon" aria-hidden="true"></canvas>    <div id="toast-container" aria-live="polite"></div>
 
+    <!-- OVERLAY -->
     <div class="overlay" id="overlay" onclick="fecharMenuLateral()"></div>
 
+    <!-- MENU LATERAL DE CONFIGURAÇÕES -->
     <div class="menu-lateral" id="menu-lateral">
         <div class="menu-lateral-header">
             <h3><i class="fas fa-cog"></i> Configurações</h3>
@@ -827,20 +863,24 @@
             <i class="fas fa-shopping-bag" style="color: var(--neon-orange);"></i>
             <span>Loja Neon</span>
         </a>
-        <a class="menu-item" onclick="navegarPara('tela-configuracoes'); fecharMenuLateral();">
-            <i class="fas fa-lock" style="color: var(--neon-yellow);"></i>
-            <span>Privacidade</span>        </a>
+        <a class="menu-item" onclick="navegarPara('tela-galeria'); fecharMenuLateral();">
+            <i class="fas fa-images" style="color: var(--neon-yellow);"></i>
+            <span>Galeria</span>
+        </a>
+        <a class="menu-item" onclick="navegarPara('tela-amigos'); fecharMenuLateral();">
+            <i class="fas fa-user-friends" style="color: var(--neon-green);"></i>
+            <span>Amigos</span>
+        </a>
         
         <div style="margin-top: 30px; padding-top: 20px; border-top: 2px dashed rgba(0,240,255,0.2);">
             <div style="text-align: center; padding: 20px;">
-                <img id="menu-avatar" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--neon-pink); margin-bottom: 10px;">
-                <h4 id="menu-nome" style="color: var(--neon-pink); margin: 10px 0 5px;">Neon Hacker</h4>
-                <p style="color: var(--text-muted); font-size: 12px;">Nível: <span style="color: var(--neon-orange);" id="menu-nivel">⭐ Elite</span></p>
+                <img id="menu-avatar" src="" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--neon-pink); margin-bottom: 10px;">
+                <h4 id="menu-nome" style="color: var(--neon-pink); margin: 10px 0 5px;"></h4>
+                <p style="color: var(--text-muted); font-size: 12px;">Nível: <span style="color: var(--neon-orange);">⭐ Elite</span></p>
             </div>
             <button class="btn-neon btn-red" style="width: 100%; margin-top: 15px;" onclick="sairDoSistema()">
                 <i class="fas fa-sign-out-alt"></i> Sair do Sistema
-            </button>
-        </div>
+            </button>        </div>
     </div>
 
     <div id="tela-login" class="login-body">
@@ -852,9 +892,15 @@
             <button class="btn-neon btn-pink" style="width: 100%; margin-top: 20px; padding: 15px; font-size: 16px;" onclick="entrarNoSistema()">
                 <i class="fas fa-sign-in-alt"></i> Acessar Matriz
             </button>
-            <button class="btn-neon btn-blue" style="width: 100%; margin-top: 10px; padding: 10px; font-size: 14px;" onclick="criarNovaIdentidade()">
+            <button class="btn-neon btn-blue" style="width: 100%; margin-top: 10px; padding: 10px; font-size: 14px;" onclick="toggleRegister()">
                 Criar Nova Identidade
             </button>
+            <div id="register-fields" style="display: none; margin-top: 15px;">
+                <input type="text" id="register-nome" placeholder="Nome de Usuário">
+                <button class="btn-neon btn-green" style="width: 100%; margin-top: 10px; padding: 12px;" onclick="registrarUsuario()">
+                    <i class="fas fa-user-plus"></i> Registrar
+                </button>
+            </div>
         </div>
     </div>
 
@@ -868,9 +914,10 @@
                 <button onclick="navegarPara('tela-mensagens')" id="btn-mensagens">MENSAGENS 💬</button>
                 <button onclick="navegarPara('tela-comunidades')" id="btn-comunidades">COMUNIDADES</button>
                 <button onclick="navegarPara('tela-marketplace')" id="btn-marketplace">MARKETPLACE 🛒</button>
+                <button onclick="navegarPara('tela-amigos')" id="btn-amigos">AMIGOS 👥</button>
             </nav>
             <div class="nav-direita">
-                <input type="text" class="search-bar" placeholder="Pesquisar...">
+                <input type="text" class="search-bar" placeholder="Pesquisar..." onkeyup="buscarUsuarios(this.value)">
                 <button class="btn-config" onclick="abrirMenuLateral()" title="Configurações">
                     <i class="fas fa-cog"></i>
                 </button>
@@ -882,11 +929,10 @@
                 
                 <section id="tela-perfil" class="AbaDinamica">
                     
-                    <div class="box" style="padding: 10px 15px;">
-                        <div class="stories-bar" id="stories-bar">
-                            <div class="story-item" onclick="criarMeuStory()">
+                    <div class="box" style="padding: 10px 15px;">                        <div class="stories-bar" id="stories-bar">
+                            <div class="story-item" onclick="abrirModalStory()">
                                 <div class="story-avatar-wrapper seu-story">
-                                    <img id="meu-story-avatar" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200" alt="Seu story">
+                                    <img id="meu-story-avatar" src="" alt="Seu story">
                                     <div class="story-add-btn">+</div>
                                 </div>
                                 <span class="story-nome">Seu story</span>
@@ -898,10 +944,12 @@
                         <div class="box-title">TERMINAL DE TRANSMISSÃO <span>📡</span></div>
                         <div class="area-postagem">
                             <textarea id="caixaTexto" placeholder="O que você está injetando na rede mundial hoje?"></textarea>
+                            <input type="file" id="post-imagem" accept="image/*,video/*" style="display: none;" onchange="previewMidiaPost(this)">
+                            <div id="preview-midia" style="display: none; margin: 10px 0;">
+                                <img id="preview-img" style="max-width: 100%; max-height: 200px; border-radius: 8px;">
+                            </div>
                             <div class="ferramentas-post">
-                                <button onclick="showToast('📷 Upload em breve!', 'var(--neon-orange)')"><i class="fas fa-camera"></i> Foto</button>
-                                <button onclick="showToast('🎥 Grave um reel!', 'var(--neon-purple)'); navegarPara('tela-reels')"><i class="fas fa-video"></i> Reel</button>
-                                <button onclick="showToast('📊 Enquetes em breve!', 'var(--neon-orange)')"><i class="fas fa-poll"></i> Enquete</button>
+                                <button onclick="document.getElementById('post-imagem').click()"><i class="fas fa-camera"></i> Foto/Vídeo</button>
                                 <button class="btn-neon btn-blue" onclick="postarRecado()" style="margin-left: auto;">
                                     <i class="fas fa-paper-plane"></i> Publicar
                                 </button>
@@ -921,31 +969,19 @@
                 <section id="tela-mensagens" class="AbaDinamica" style="display: none;">
                     <div class="box" style="padding: 0; border: none;">
                         <div class="chat-container">
-                            <div class="chat-lista">
-                                <div class="chat-contato ativo" onclick="selecionarContato(this, 'Pedro Santos')">
-                                    <img src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=50" style="width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--neon-green);">
-                                    <div>
-                                        <strong style="color: white; font-size: 15px;">Pedro Santos</strong>
-                                        <div style="color: var(--neon-green); font-size: 12px;">● Online</div>
-                                    </div>                                </div>
-                                <div class="chat-contato" onclick="selecionarContato(this, 'Alice_99')">
-                                    <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=50" style="width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--neon-purple);">
-                                    <div>
-                                        <strong style="color: white; font-size: 15px;">Alice_99</strong>
-                                        <div style="color: var(--text-muted); font-size: 12px;">Acessou recentemente</div>
-                                    </div>
-                                </div>
+                            <div class="chat-lista" id="chat-lista">
+                                <!-- Carregado via API -->
                             </div>
                             <div class="chat-janela">
                                 <div style="padding: 18px; border-bottom: 2px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3);">
-                                    <strong id="chat-nome-contato" style="color: var(--neon-pink); font-size: 16px;">Pedro Santos</strong>
+                                    <strong id="chat-nome-contato" style="color: var(--neon-pink); font-size: 16px;">Selecione um contato</strong>
                                 </div>
                                 <div id="chat-mensagens" style="flex: 1; padding: 18px; display: flex; flex-direction: column; overflow-y: auto;">
-                                    <div class="chat-balao balao-recebido">Conexão estabelecida com a rede Urckut.</div>
-                                    <div class="chat-balao balao-enviado">Terminal operacional online.</div>
+                                    <div style="text-align: center; color: var(--text-muted); margin-top: 50px;">
+                                        Selecione uma conversa para começar                                    </div>
                                 </div>
                                 <div style="padding: 18px; border-top: 2px solid rgba(255,255,255,0.1); display: flex; gap: 12px; background: rgba(0,0,0,0.3);">
-                                    <input type="text" id="chat-input" placeholder="Injetar dados criptografados..." style="flex: 1; background: rgba(0,0,0,0.6); border: 2px solid var(--neon-blue); color: white; padding: 12px; border-radius: 8px; outline: none;" onkeypress="if(event.key==='Enter') enviarMensagem()">
+                                    <input type="text" id="chat-input" placeholder="Digite..." style="flex: 1; background: rgba(0,0,0,0.6); border: 2px solid var(--neon-blue); color: white; padding: 12px; border-radius: 8px; outline: none;" onkeypress="if(event.key==='Enter') enviarMensagem()">
                                     <button class="btn-neon btn-blue" onclick="enviarMensagem()"><i class="fas fa-paper-plane"></i></button>
                                 </div>
                             </div>
@@ -957,7 +993,8 @@
                     <div class="box">
                         <div class="box-title">Comunidades <span>👥</span></div>
                         <div class="lista-comunidades" id="lista-comunidades">
-                            </div>
+                            <!-- Carregado via API -->
+                        </div>
                     </div>
                 </section>
 
@@ -965,39 +1002,47 @@
                     <div class="box">
                         <div class="box-title">Marketplace Neon <span>🛒</span></div>
                         <div class="grid-marketplace" id="grid-marketplace">
-                            </div>
+                            <!-- Carregado via API -->
+                        </div>
                     </div>
                 </section>
 
-                <section id="tela-configuracoes" class="AbaDinamica" style="display: none;">
+                <section id="tela-amigos" class="AbaDinamica" style="display: none;">
                     <div class="box">
-                        <div class="box-title">Configurações <span>⚙️</span></div>
-                        <div class="config-row">
-                            <div>
-                                <strong style="color: white;">Perfil Privado</strong>
-                                <p style="font-size: 12px; color: var(--text-muted); margin: 5px 0 0 0;">Só amigos veem seus posts.</p>
-                            </div>
-                            <button class="btn-neon btn-blue" onclick="toggleConfig(this)">Ativar</button>
+                        <div class="box-title">Amigos <span>👥</span></div>
+                        <div style="margin-bottom: 20px;">
+                            <input type="text" id="buscar-amigo" placeholder="Buscar usuários para adicionar..." style="width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 2px solid var(--neon-blue); color: white; border-radius: 8px; margin-bottom: 15px;">
+                            <button class="btn-neon btn-green" onclick="buscarUsuarios(document.getElementById('buscar-amigo').value)" style="width: 100%;">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
                         </div>
-                        <div class="config-row">
-                            <div><strong style="color: var(--neon-red);">Lista de Bloqueados</strong></div>
-                            <button class="btn-neon btn-red" onclick="showToast('🚫 Lista vazia', 'var(--neon-orange)')">Ver Lista</button>
+                        <div id="lista-amigos" class="lista-comunidades">
+                            <!-- Carregado via API -->
                         </div>
                     </div>
+                </section>
+
+                <section id="tela-galeria" class="AbaDinamica" style="display: none;">
+                    <div class="box">
+                        <div class="box-title">Galeria de Mídias <span>📸</span></div>
+                        <div class="galeria-grid" id="galeria-grid">
+                            <!-- Carregado via API -->
+                        </div>                    </div>
                 </section>
 
             </div>
-
         </main>
     </div>
 
+    <!-- Modal Story -->
     <div class="story-modal" id="story-modal">
         <div class="story-viewer">
             <div class="story-progress-bar" id="story-progress-bar"></div>
-            <div class="story-header">                <img id="story-user-avatar" src="" alt="">
+            <div class="story-header">
+                <img id="story-user-avatar" src="" alt="">
                 <div class="story-header-info">
                     <strong id="story-user-name"></strong>
-                    <span id="story-tempo">há alguns instantes</span>
+                    <span id="story-tempo"></span>
                 </div>
                 <button class="story-close" onclick="fecharStory()"><i class="fas fa-times"></i></button>
             </div>
@@ -1012,30 +1057,32 @@
         </div>
     </div>
 
+    <!-- Modal Upload Story -->
+    <div class="story-modal" id="modal-upload-story">
+        <div style="background: var(--glass-bg); padding: 30px; border-radius: 15px; border: 2px solid var(--neon-blue); max-width: 400px; width: 90%;">
+            <h3 style="color: var(--neon-blue); margin-bottom: 20px;">Criar Story</h3>
+            <input type="file" id="story-file" accept="image/*,video/*" style="width: 100%; margin-bottom: 15px; color: white;">
+            <textarea id="story-texto" placeholder="Adicione uma legenda..." style="width: 100%; height: 80px; background: rgba(0,0,0,0.5); border: 2px solid var(--neon-blue); color: white; padding: 10px; border-radius: 8px; margin-bottom: 15px; resize: none;"></textarea>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-neon btn-blue" onclick="uploadStory()" style="flex: 1;">
+                    <i class="fas fa-upload"></i> Publicar
+                </button>
+                <button class="btn-neon btn-red" onclick="fecharModalUploadStory()" style="flex: 1;">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // CONEXÃO DE DADOS COM O SERVER.JS
+        // CONFIGURAÇÃO DA API
+        const API_URL = window.location.origin;        let token = localStorage.getItem('urckut_token');
         let currentUser = null;
-        let posts = [];
-        let storiesUsuarios = [];
+        let currentChat = null;
+        let storiesData = [];
+        let reelsData = [];
 
-        // Função utilitária centralizada para chamadas à API
-        async function apiFetch(endpoint, method = 'GET', body = null) {
-            const token = localStorage.getItem('urckut_token');
-            const headers = { 'Content-Type': 'application/json' };
-            if (token) {
-                headers['Authorization'] = `Bearer ${token}`;
-            }
-            const config = { method, headers };
-            if (body) config.body = JSON.stringify(body);
-
-            const res = await fetch(endpoint, config);
-            if (!res.ok) {
-                const erro = await res.json().catch(() => ({}));
-                throw new Error(erro.error || `Erro HTTP: ${res.status}`);
-            }
-            return res.json();
-        }
-
+        // UTILITÁRIOS
         function showToast(msg, cor = 'var(--neon-blue)') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -1059,92 +1106,148 @@
             return div.innerHTML;
         }
 
-        // SISTEMA DE AUTENTICAÇÃO ONLINE
+        function formatarTempo(dataISO) {
+            const data = new Date(dataISO);
+            const agora = new Date();
+            const diff = Math.floor((agora - data) / 1000);
+            
+            if (diff < 60) return 'Agora';
+            if (diff < 3600) return `Há ${Math.floor(diff / 60)}m`;
+            if (diff < 86400) return `Há ${Math.floor(diff / 3600)}h`;
+            return `Há ${Math.floor(diff / 86400)}d`;
+        }
+
+        async function apiRequest(endpoint, options = {}) {
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+            
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }            
+            const response = await fetch(`${API_URL}${endpoint}`, {
+                ...options,
+                headers
+            });
+            
+            if (response.status === 401) {
+                localStorage.removeItem('urckut_token');
+                window.location.reload();
+                return null;
+            }
+            
+            return response.json();
+        }
+
+        // AUTENTICAÇÃO
+        function toggleRegister() {
+            const fields = document.getElementById('register-fields');
+            fields.style.display = fields.style.display === 'none' ? 'block' : 'none';
+        }
+
         async function entrarNoSistema() {
             const email = document.getElementById('login-email').value;
             const senha = document.getElementById('login-senha').value;
-            if (!email || !senha) { showToast('⚠️ Preencha todos os campos!', 'var(--neon-red)'); return; }
-
-            try {
-                const data = await apiFetch('/api/auth/login', 'POST', { email, senha });
-                localStorage.setItem('urckut_token', data.token);
-                currentUser = data.user;
-                inicializarPainelLogado();
-                showToast('✓ Acesso autorizado à Matriz!', 'var(--neon-green)');
-            } catch (err) {
-                showToast(`⚠️ ${err.message}`, 'var(--neon-red)');
-            }
-        }
-
-        async function criarNovaIdentidade() {
-            const nome = prompt('Injete o seu Nome Operador de Rede:');
-            if (!nome) return;
-            const email = prompt('Injete o seu Endereço de Rede (Email):');
-            if (!email) return;
-            const senha = prompt('Configure sua Chave de Segurança (Mínimo 6 caracteres):');
-            if (!senha) return;
-
-            try {
-                const data = await apiFetch('/api/auth/register', 'POST', { nome, email, senha });
-                localStorage.setItem('urckut_token', data.token);
-                currentUser = data.user;
-                inicializarPainelLogado();
-                showToast('✓ Nova Identidade gerada e sincronizada na rede!', 'var(--neon-green)');
-            } catch (err) {
-                showToast(`⚠️ ${err.message}`, 'var(--neon-red)');
-            }
-        }
-
-        async function verificarSessaoAtiva() {
-            const token = localStorage.getItem('urckut_token');
-            if (token) {
-                try {
-                    currentUser = await apiFetch('/api/user/me');
-                    inicializarPainelLogado();
-                } catch (err) {
-                    localStorage.removeItem('urckut_token');
-                }
-            }
-        }
-
-        function inicializarPainelLogado() {
-            document.getElementById('tela-login').style.display = 'none';
-            document.getElementById('area-logada').style.display = 'block';
             
-            // Atualiza Perfil do Usuário nas barras e menus
-            if (currentUser) {
-                document.getElementById('menu-nome').textContent = currentUser.nome;
-                document.getElementById('menu-nivel').textContent = `⭐ ${currentUser.nivel || 'User'}`;
-                if (currentUser.avatar) {
-                    document.getElementById('menu-avatar').src = currentUser.avatar;
-                    document.getElementById('meu-story-avatar').src = currentUser.avatar;
-                }
+            if (!email || !senha) {
+                showToast('⚠️ Preencha todos os campos!', 'var(--neon-red)');
+                return;
             }
+            
+            try {
+                const data = await apiRequest('/api/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ email, senha })
+                });
+                
+                if (data.error) {
+                    showToast(data.error, 'var(--neon-red)');
+                    return;
+                }
+                
+                token = data.token;
+                currentUser = data.user;
+                localStorage.setItem('urckut_token', token);
+                localStorage.setItem('urckut_user', JSON.stringify(currentUser));
+                
+                iniciarSistema();
+            } catch (error) {
+                showToast('Erro de conexão', 'var(--neon-red)');
+            }        }
 
-            navegarPara('tela-perfil');
-            carregarPosts();
-            carregarStories();
-            carregarComunidades();
-            carregarMarketplace();
-            inicializarReels();
+        async function registrarUsuario() {
+            const email = document.getElementById('login-email').value;
+            const senha = document.getElementById('login-senha').value;
+            const nome = document.getElementById('register-nome').value;
+            
+            if (!email || !senha || !nome) {
+                showToast('⚠️ Preencha todos os campos!', 'var(--neon-red)');
+                return;
+            }
+            
+            try {
+                const data = await apiRequest('/api/auth/register', {
+                    method: 'POST',
+                    body: JSON.stringify({ email, senha, nome })
+                });
+                
+                if (data.error) {
+                    showToast(data.error, 'var(--neon-red)');
+                    return;
+                }
+                
+                token = data.token;
+                currentUser = data.user;
+                localStorage.setItem('urckut_token', token);
+                localStorage.setItem('urckut_user', JSON.stringify(currentUser));
+                
+                iniciarSistema();
+            } catch (error) {
+                showToast('Erro ao registrar', 'var(--neon-red)');
+            }
         }
 
         function sairDoSistema() {
-            if (confirm('Deseja desconectar e fechar terminal?')) {
+            if (confirm('Sair da matriz?')) {
                 localStorage.removeItem('urckut_token');
-                currentUser = null;
-                document.getElementById('area-logada').style.display = 'none';
-                document.getElementById('tela-login').style.display = 'flex';
-                fecharMenuLateral();
+                localStorage.removeItem('urckut_user');
+                window.location.reload();
             }
         }
 
+        function iniciarSistema() {
+            document.getElementById('tela-login').style.display = 'none';
+            document.getElementById('area-logada').style.display = 'block';
+            
+            // Atualizar menu lateral
+            document.getElementById('menu-nome').textContent = currentUser.nome;
+            document.getElementById('menu-avatar').src = currentUser.avatar || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200';
+            document.getElementById('meu-story-avatar').src = currentUser.avatar || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200';            
+            carregarDadosIniciais();
+            navegarPara('tela-perfil');
+            showToast('✓ Bem-vindo à matriz!', 'var(--neon-green)');
+        }
+
+        async function carregarDadosIniciais() {
+            await Promise.all([
+                carregarPosts(),
+                carregarStories(),
+                carregarComunidades(),
+                carregarMarketplace(),
+                carregarUsuarios()
+            ]);
+        }
+
+        // NAVEGAÇÃO
         function navegarPara(idTela) {
             const abas = document.getElementsByClassName('AbaDinamica');
             for(let i = 0; i < abas.length; i++) {
                 abas[i].style.display = 'none';
             }
+            
             document.querySelectorAll('.menu-navegacao button').forEach(btn => btn.classList.remove('ativo'));
+            
             document.getElementById(idTela).style.display = 'block';
             
             const btnId = 'btn-' + idTela.replace('tela-', '');
@@ -1152,6 +1255,7 @@
             if(btn) btn.classList.add('ativo');
             
             window.scrollTo(0, 0);
+            
             if (idTela !== 'tela-reels') {
                 document.querySelectorAll('.reel-video').forEach(v => v.pause());
             }
@@ -1168,487 +1272,545 @@
             document.getElementById('overlay').classList.remove('ativo');
         }
 
-        // SISTEMA DE POSTS REAL-TIME
-        async function carregarPosts() {
+        // POSTS        async function carregarPosts() {
             try {
-                posts = await apiFetch('/api/posts');
-                renderizarPosts();
-            } catch (err) {
-                console.error('Erro ao buscar feed:', err);
+                const posts = await apiRequest('/api/posts');
+                renderizarPosts(posts || []);
+            } catch (error) {
+                showToast('Erro ao carregar posts', 'var(--neon-red)');
             }
         }
 
-        function renderizarPosts() {
+        function renderizarPosts(posts) {
             const mural = document.getElementById('muralDeRecados');
             mural.innerHTML = '';
-            if (posts.length === 0) {
-                mural.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-muted);"><i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i><p>Nenhuma transmissão interceptada na rede.</p></div>';
+            
+            if (!posts || posts.length === 0) {
+                mural.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-muted);"><i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i><p>Nenhuma postagem ainda. Seja o primeiro!</p></div>';
                 return;
             }
+            
             posts.forEach(post => {
-                const article = document.createElement('article');
-                article.className = 'post-feed';
-                const tempo = formatarTempo(post.data);
-                const ehCurtido = post.curtidoPor && post.curtidoPor.includes(currentUser?.id);
-
-                article.innerHTML = `
-                    <div class="post-header">
-                        <img src="${post.avatar}" alt="${post.usuario}">
-                        <div class="post-header-info">
-                            <strong>${escapeHTML(post.usuario)}</strong>
-                            <span>${tempo} • Rede Pública 🌍</span>
-                        </div>
-                    </div>
-                    <div class="post-content">${escapeHTML(post.texto)}</div>
-                    <div class="reacoes">
-                        <button onclick="curtirPost('${post.id}')" class="${ehCurtido ? 'curtido' : ''}">
-                            <i class="fas fa-thumbs-up"></i> Curtir (${post.curtidas || 0})
-                        </button>
-                        <button onclick="showToast('💬 Módulo de comentários em construção.', 'var(--neon-orange)')">
-                            <i class="fas fa-comment"></i> Comentar (${post.comentarios || 0})
-                        </button>
-                        <button onclick="compartilharPost('${post.id}')">
-                            <i class="fas fa-share"></i> Compartilhar (${post.compartilhamentos || 0})
-                        </button>
-                    </div>
-                `;
-                mural.appendChild(article);
+                const postElement = criarElementoPost(post);
+                mural.appendChild(postElement);
             });
+        }
+
+        function criarElementoPost(post) {
+            const article = document.createElement('article');
+            article.className = 'post-feed';
+            
+            const tempo = formatarTempo(post.data);
+            const ehCurtido = post.curtidoPor && post.curtidoPor.includes(currentUser.id);
+            
+            let midiaHtml = '';
+            if (post.imagem) {
+                if (post.imagem.match(/\.(mp4|webm|ogg)$/i)) {
+                    midiaHtml = `<video class="post-image" controls><source src="${post.imagem}"></video>`;
+                } else {
+                    midiaHtml = `<img src="${post.imagem}" class="post-image" alt="Mídia do post">`;
+                }
+            }
+            
+            article.innerHTML = `
+                <div class="post-header">
+                    <img src="${post.avatar}" alt="${post.usuario}">
+                    <div class="post-header-info">
+                        <strong>${escapeHTML(post.usuario)}</strong>
+                        <span>${tempo} • Público 🌍</span>
+                    </div>
+                </div>
+                <div class="post-content">${escapeHTML(post.texto)}</div>
+                ${midiaHtml}                <div class="reacoes">
+                    <button onclick="curtirPost('${post.id}')" class="${ehCurtido ? 'curtido' : ''}">
+                        <i class="fas fa-thumbs-up"></i> Curtir (${post.curtidas || 0})
+                    </button>
+                    <button onclick="showToast('💬 Comentários em breve!', 'var(--neon-orange)')">
+                        <i class="fas fa-comment"></i> Comentar (${post.comentarios || 0})
+                    </button>
+                    <button onclick="compartilharPost('${post.id}')">
+                        <i class="fas fa-share"></i> Compartilhar (${post.compartilhamentos || 0})
+                    </button>
+                </div>
+            `;
+            
+            return article;
         }
 
         async function postarRecado() {
             const texto = document.getElementById("caixaTexto").value;
-            if (texto.trim() === "") { showToast('⚠️ Terminal rejeitou entrada vazia!', 'var(--neon-red)'); return; }
+            const fileInput = document.getElementById('post-imagem');
+            
+            if (texto.trim() === "" && !fileInput.files[0]) {
+                showToast('⚠️ Escreva algo ou adicione uma mídia!', 'var(--neon-red)');
+                return;
+            }
+            
             try {
-                await apiFetch('/api/posts', 'POST', { texto });
+                let imagemUrl = null;
+                
+                if (fileInput.files[0]) {
+                    // Aqui você precisaria implementar upload de arquivo
+                    // Por enquanto, vamos simular
+                    imagemUrl = URL.createObjectURL(fileInput.files[0]);
+                }
+                
+                const data = await apiRequest('/api/posts', {
+                    method: 'POST',
+                    body: JSON.stringify({ 
+                        texto: texto.trim(),
+                        imagem: imagemUrl
+                    })
+                });
+                
+                if (data.error) {
+                    showToast(data.error, 'var(--neon-red)');
+                    return;
+                }
+                
                 document.getElementById("caixaTexto").value = "";
-                showToast('✓ Post transmitido com sucesso!', 'var(--neon-green)');
-                carregarPosts();
-            } catch (err) {
-                showToast(`⚠️ ${err.message}`, 'var(--neon-red)');
+                fileInput.value = "";
+                document.getElementById('preview-midia').style.display = 'none';                
+                await carregarPosts();
+                showToast('✓ Post publicado!', 'var(--neon-green)');
+            } catch (error) {
+                showToast('Erro ao publicar', 'var(--neon-red)');
+            }
+        }
+
+        function previewMidiaPost(input) {
+            if (input.files && input.files[0]) {
+                const preview = document.getElementById('preview-midia');
+                const previewImg = document.getElementById('preview-img');
+                const file = input.files[0];
+                
+                if (file.type.startsWith('image/')) {
+                    previewImg.src = URL.createObjectURL(file);
+                    previewImg.style.display = 'block';
+                } else {
+                    previewImg.style.display = 'none';
+                }
+                preview.style.display = 'block';
             }
         }
 
         async function curtirPost(postId) {
             try {
-                await apiFetch(`/api/posts/${postId}/curtir`, 'POST');
-                carregarPosts();
-            } catch (err) {
-                showToast('⚠️ Erro ao registrar curtida.', 'var(--neon-red)');
+                const post = await apiRequest(`/api/posts/${postId}/curtir`, {
+                    method: 'POST'
+                });
+                
+                if (post) {
+                    await carregarPosts();
+                }
+            } catch (error) {
+                showToast('Erro ao curtir', 'var(--neon-red)');
             }
         }
 
         async function compartilharPost(postId) {
             try {
-                await apiFetch(`/api/posts/${postId}/compartilhar`, 'POST');
-                showToast('🔁 Sincronizado no seu feed!', 'var(--neon-green)');
-                carregarPosts();
-            } catch (err) {
-                showToast('⚠️ Erro ao compartilhar.', 'var(--neon-red)');
+                await apiRequest(`/api/posts/${postId}/compartilhar`, {
+                    method: 'POST'
+                });
+                showToast('🔁 Compartilhado!', 'var(--neon-green)');
+                await carregarPosts();
+            } catch (error) {
+                showToast('Erro ao compartilhar', 'var(--neon-red)');
             }
         }
-
-        function formatarTempo(dataISO) {
-            const diff = Math.floor((new Date() - new Date(dataISO)) / 1000);
-            if (diff < 60) return 'Agora';
-            if (diff < 3600) return `Há ${Math.floor(diff / 60)}m`;
-            if (diff < 86400) return `Há ${Math.floor(diff / 3600)}h`;
-            return `Há ${Math.floor(diff / 86400)} dias`;
-        }
-
-        // STORIES CONECTADOS (Mapeados da estrutura do backend)
+        // STORIES
         async function carregarStories() {
             try {
-                const rawStories = await apiFetch('/api/stories');
-                
-                // Agrupa a lista plana em pacotes por usuário para manter o componente visual funcionando
-                const grupos = {};
-                rawStories.forEach(s => {
-                    if (!grupos[s.usuario]) {
-                        grupos[s.usuario] = {
-                            usuario: s.usuario,
-                            avatar: s.avatar,
-                            stories: []
-                        };
-                    }
-                    grupos[s.usuario].stories.push({
-                        tipo: 'imagem',
-                        url: s.imagem,
-                        texto: s.texto
-                    });
-                });
-                storiesUsuarios = Object.values(grupos);
+                const stories = await apiRequest('/api/stories');
+                storiesData = stories || [];
                 renderizarStoriesBar();
-            } catch (err) {
-                console.error(err);
+            } catch (error) {
+                console.error('Erro ao carregar stories:', error);
             }
         }
 
         function renderizarStoriesBar() {
             const bar = document.getElementById('stories-bar');
             bar.innerHTML = `
-                <div class="story-item" onclick="criarMeuStory()">
+                <div class="story-item" onclick="abrirModalStory()">
                     <div class="story-avatar-wrapper seu-story">
-                        <img id="meu-story-avatar" src="${currentUser?.avatar || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200'}" alt="Seu story">
+                        <img id="meu-story-avatar" src="${currentUser.avatar}" alt="Seu story">
                         <div class="story-add-btn">+</div>
                     </div>
-                    <span class="story-nome">Injetar Story</span>
+                    <span class="story-nome">Seu story</span>
                 </div>
             `;
-            storiesUsuarios.forEach((user, idx) => {
+            
+            storiesData.forEach((story, idx) => {
                 const item = document.createElement('div');
                 item.className = 'story-item';
-                item.onclick = () => abrirStory(idx, 0);
+                item.onclick = () => abrirStory(idx);
                 item.innerHTML = `
                     <div class="story-avatar-wrapper">
-                        <img src="${user.avatar}" alt="${user.usuario}">
+                        <img src="${story.avatar}" alt="${story.usuario}">
                     </div>
-                    <span class="story-nome">${user.usuario}</span>
+                    <span class="story-nome">${story.usuario}</span>
                 `;
                 bar.appendChild(item);
             });
         }
 
-        async function criarMeuStory() {
-            const texto = prompt('📸 Digite a mensagem do seu Story:');
-            if (!texto) return;
-            const imagem = prompt('🔗 URL de imagem customizada (Deixe em branco para imagem randômica cyberpunk):');
+        function abrirModalStory() {
+            document.getElementById('modal-upload-story').classList.add('ativo');
+            document.getElementById('overlay').classList.add('ativo');
+        }
+
+        function fecharModalUploadStory() {
+            document.getElementById('modal-upload-story').classList.remove('ativo');
+            document.getElementById('overlay').classList.remove('ativo');
+        }
+
+        async function uploadStory() {
+            const fileInput = document.getElementById('story-file');
+            const texto = document.getElementById('story-texto').value;            
+            if (!fileInput.files[0]) {
+                showToast('⚠️ Selecione uma imagem ou vídeo!', 'var(--neon-red)');
+                return;
+            }
             
             try {
-                await apiFetch('/api/stories', 'POST', { texto, imagem: imagem || undefined });
-                showToast('📸 Story adicionado à rede global!', 'var(--neon-green)');
-                carregarStories();
-            } catch (err) {
-                showToast(`⚠️ ${err.message}`, 'var(--neon-red)');
+                // Implementar upload real aqui
+                const imagemUrl = URL.createObjectURL(fileInput.files[0]);
+                
+                const data = await apiRequest('/api/stories', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        texto: texto,
+                        imagem: imagemUrl
+                    })
+                });
+                
+                if (data.error) {
+                    showToast(data.error, 'var(--neon-red)');
+                    return;
+                }
+                
+                fecharModalUploadStory();
+                await carregarStories();
+                showToast('✓ Story publicado!', 'var(--neon-green)');
+            } catch (error) {
+                showToast('Erro ao publicar story', 'var(--neon-red)');
             }
         }
 
-        let storyAtual = { usuario: 0, story: 0 };
-        let storyTimer = null;
+        let storyAtualIndex = -1;
 
-        function abrirStory(userIdx, storyIdx) {
-            storyAtual = { usuario: userIdx, story: storyIdx };
-            const user = storiesUsuarios[userIdx];
-            const story = user.stories[storyIdx];
+        function abrirStory(index) {
+            if (index < 0 || index >= storiesData.length) return;
             
-            document.getElementById('story-user-avatar').src = user.avatar;
-            document.getElementById('story-user-name').textContent = user.usuario;
+            storyAtualIndex = index;
+            const story = storiesData[index];
+            
+            document.getElementById('story-user-avatar').src = story.avatar;
+            document.getElementById('story-user-name').textContent = story.usuario;
+            document.getElementById('story-tempo').textContent = formatarTempo(story.data);
             
             const content = document.getElementById('story-content');
-            content.innerHTML = `<img src="${story.url}" alt="Story"><div style="position:absolute;bottom:80px;left:20px;right:20px;color:white;font-size:18px;text-shadow:0 2px 10px rgba(0,0,0,0.8);text-align:center;font-weight:bold;">${escapeHTML(story.texto)}</div>`;
+            if (story.imagem) {
+                if (story.imagem.match(/\.(mp4|webm|ogg)$/i)) {
+                    content.innerHTML = `<video src="${story.imagem}" autoplay loop></video>`;
+                } else {
+                    content.innerHTML = `<img src="${story.imagem}" alt="Story">`;
+                }            }
             
-            const progressBar = document.getElementById('story-progress-bar');
-            progressBar.innerHTML = '';
-            user.stories.forEach((_, i) => {
-                const segment = document.createElement('div');
-                segment.className = 'story-progress-segment';
-                const fill = document.createElement('div');
-                fill.className = 'story-progress-fill';
-                if (i < storyIdx) fill.classList.add('completo');
-                if (i === storyIdx) fill.classList.add('ativo');
-                segment.appendChild(fill);
-                progressBar.appendChild(segment);
-            });
+            if (story.texto) {
+                const textOverlay = document.createElement('div');
+                textOverlay.style.cssText = 'position:absolute;bottom:80px;left:20px;right:20px;color:white;font-size:18px;text-shadow:0 2px 10px rgba(0,0,0,0.8);text-align:center;font-weight:bold;';
+                textOverlay.textContent = story.texto;
+                content.appendChild(textOverlay);
+            }
             
             document.getElementById('story-modal').classList.add('ativo');
-            clearTimeout(storyTimer);
-            storyTimer = setTimeout(() => storyProximo(), 5000);
+            
+            setTimeout(() => storyProximo(), 5000);
         }
 
         function storyProximo() {
-            const user = storiesUsuarios[storyAtual.usuario];
-            if (storyAtual.story < user.stories.length - 1) {
-                abrirStory(storyAtual.usuario, storyAtual.story + 1);
-            } else if (storyAtual.usuario < storiesUsuarios.length - 1) {
-                abrirStory(storyAtual.usuario + 1, 0);
+            if (storyAtualIndex < storiesData.length - 1) {
+                abrirStory(storyAtualIndex + 1);
             } else {
                 fecharStory();
             }
         }
 
         function storyAnterior() {
-            if (storyAtual.story > 0) {
-                abrirStory(storyAtual.usuario, storyAtual.story - 1);
-            } else if (storyAtual.usuario > 0) {
-                const prevUser = storiesUsuarios[storyAtual.usuario - 1];
-                abrirStory(storyAtual.usuario - 1, prevUser.stories.length - 1);
+            if (storyAtualIndex > 0) {
+                abrirStory(storyAtualIndex - 1);
             }
         }
 
         function fecharStory() {
             document.getElementById('story-modal').classList.remove('ativo');
-            clearTimeout(storyTimer);
+            storyAtualIndex = -1;
         }
 
         function enviarRespostaStory() {
-            showToast('✓ Resposta enviada!', 'var(--neon-pink)');
-            document.getElementById('story-resposta').value = '';
+            const input = document.getElementById('story-resposta');
+            if (input.value.trim()) {
+                showToast('✓ Resposta enviada!', 'var(--neon-pink)');
+                input.value = '';
+            }
         }
 
-        // COMUNIDADES DINDÂMICAS (ALIMENTADAS PELO BACKEND)
+        // COMUNIDADES
         async function carregarComunidades() {
             try {
-                const comunidades = await apiFetch('/api/comunidades');
+                const comunidades = await apiRequest('/api/comunidades');
                 const lista = document.getElementById('lista-comunidades');
                 lista.innerHTML = '';
-
+                
+                if (!comunidades || comunidades.length === 0) {
+                    lista.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Nenhuma comunidade encontrada</p>';                    return;
+                }
+                
                 comunidades.forEach(comunidade => {
-                    const participando = comunidade.participantes && comunidade.participantes.includes(currentUser?.id);
                     const card = document.createElement('div');
                     card.className = 'comunidade-card';
                     card.innerHTML = `
                         <div style="display: flex; gap: 15px; align-items: center;">
                             <img src="${comunidade.imagem}" style="width: 65px; height: 65px; border-radius: 10px; object-fit: cover; border: 2px solid var(--neon-pink);">
                             <div>
-                                <h3 style="margin:0; color:var(--neon-pink); font-size: 17px;">${escapeHTML(comunidade.nome)}</h3>
-                                <p style="font-size:12px; color:var(--text-muted); margin:5px 0;">${comunidade.membros.toLocaleString()} membros</p>
+                                <h3 style="margin:0; color:var(--neon-pink); font-size: 17px;">${comunidade.nome}</h3>
+                                <p style="font-size:12px; color:var(--text-muted); margin:5px 0;">${comunidade.membros} membros</p>
                             </div>
                         </div>
-                        <button class="btn-neon ${participando ? 'btn-purple' : 'btn-green'}" onclick="toggleParticipacao('${comunidade.id}')">
-                            ${participando ? '✓ Participando' : 'Participar'}
-                        </button>
+                        <button class="btn-neon btn-green" onclick="participarComunidade('${comunidade.id}', this)">Participar</button>
                     `;
                     lista.appendChild(card);
                 });
-            } catch (err) {
-                console.error(err);
+            } catch (error) {
+                showToast('Erro ao carregar comunidades', 'var(--neon-red)');
             }
         }
 
-        async function toggleParticipacao(id) {
+        async function participarComunidade(id, btn) {
             try {
-                await apiFetch(`/api/comunidades/${id}/participar`, 'POST');
-                carphanis = carregarComunidades();
-                showToast('✓ Cadastro em comunidade atualizado!', 'var(--neon-green)');
-            } catch (err) {
-                showToast('⚠️ Erro ao ingressar na comunidade.', 'var(--neon-red)');
+                const data = await apiRequest(`/api/comunidades/${id}/participar`, {
+                    method: 'POST'
+                });
+                
+                if (data.error) {
+                    showToast(data.error, 'var(--neon-red)');
+                    return;
+                }
+                
+                if (btn.textContent === 'Participar') {
+                    btn.textContent = '✓ Participando';
+                    btn.classList.replace('btn-green', 'btn-purple');
+                    showToast('🎉 Entrou na comunidade!', 'var(--neon-green)');
+                } else {
+                    btn.textContent = 'Participar';
+                    btn.classList.replace('btn-purple', 'btn-green');
+                }
+            } catch (error) {
+                showToast('Erro ao participar', 'var(--neon-red)');
             }
         }
 
-        // MARKETPLACE CONECTADO (ALIMENTADO PELO BACKEND)
+        // MARKETPLACE
         async function carregarMarketplace() {
-            try {
-                const itens = await apiFetch('/api/marketplace');
+            try {                const items = await apiRequest('/api/marketplace');
                 const grid = document.getElementById('grid-marketplace');
                 grid.innerHTML = '';
-
-                itens.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'item-mercado';
-                    card.innerHTML = `
-                        <img src="${item.imagem}">
-                        <h4 style="margin: 12px 0 8px 0; color: white;">${escapeHTML(item.titulo)}</h4>
-                        <div class="preco-neon">R$ ${item.preco.toLocaleString()}</div>
-                        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Vendedor: ${item.vendedor}</p>
-                        <button class="btn-neon btn-purple" style="width: 100%;" onclick="showToast('🛒 Oferta enviada ao vendedor!', 'var(--neon-green)')">Fazer Oferta</button>
-                    `;
-                    grid.appendChild(card);
-                });
-            } catch (err) {
-                console.error(err);
-            }
-        }
-
-        // VIDEO REELS / TIKTOK (Mantido local com links assets padrão)
-        const reelsData = [
-            {
-                video: 'https://assets.mixkit.co/videos/4329/4329-720.mp4',
-                usuario: 'Neon_Dancer',
-                avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100',                descricao: 'Quando o beat dropa no cyberclub 🎵✨ #cyberpunk #neon #dance',
-                musica: '♫ Synthwave Dreams - CyberArtist',
-                curtidas: '45.2K',
-                comentarios: '1.2K',
-                compartilhamentos: '892'
-            },
-            {
-                video: 'https://assets.mixkit.co/videos/34722/34722-720.mp4',
-                usuario: 'Glitch_Art',
-                avatar: 'https://images.unsplash.com/photo-1566753323558-f4e0952af115?w=100',
-                descricao: 'Tutorial de glitch art em 30s 🎨 #tutorial #art',
-                musica: '♫ Digital Noise - PixelMaster',
-                curtidas: '128K',
-                comentarios: '5.4K',
-                compartilhamentos: '12K'
-            }
-        ];
-
-        function inicializarReels() {
-            const container = document.getElementById('reels-container');
-            container.innerHTML = '';
-            reelsData.forEach((reel) => {
-                const item = document.createElement('div');
-                item.className = 'reel-item';
-                item.innerHTML = `
-                    <video class="reel-video" src="${reel.video}" loop muted playsinline></video>
-                    <div class="reel-overlay"></div>
-                    <button class="reel-play-btn"><i class="fas fa-play"></i></button>
-                    <div class="reel-info">
-                        <div class="reel-user">
-                            <img src="${reel.avatar}" alt="${reel.usuario}">
-                            <strong>@${reel.usuario}</strong>
-                            <button onclick="seguirUsuario(this)">Seguir</button>
-                        </div>
-                        <div class="reel-desc">${reel.descricao}</div>
-                        <div class="reel-music">
-                            <span class="reel-music-icon"><i class="fas fa-compact-disc"></i></span>
-                            ${reel.musica}
-                        </div>
-                    </div>
-                    <div class="reel-actions">
-                        <button class="reel-action-btn" onclick="curtirReel(this)">
-                            <span class="heart-icon"><i class="fas fa-heart"></i></span>
-                            <span>${reel.curtidas}</span>
-                        </button>
-                        <button class="reel-action-btn" onclick="showToast('💬 Comentários em breve.', 'var(--neon-orange)')">
-                            <i class="fas fa-comment"></i>
-                            <span>${reel.comentarios}</span>
-                        </button>                        <button class="reel-action-btn" onclick="showToast('📤 Compartilhado!', 'var(--neon-green)')">
-                            <i class="fas fa-share"></i>
-                            <span>${reel.compartilhamentos}</span>
-                        </button>
-                    </div>
-                `;
-                container.appendChild(item);
-                setupReelInteractions(item);
-            });
-            setupReelsObserver();
-        }
-
-        function setupReelInteractions(item) {
-            const video = item.querySelector('.reel-video');
-            let lastTap = 0;
-            item.addEventListener('click', (e) => {
-                if (e.target.closest('.reel-action-btn') || e.target.closest('.reel-user button')) return;
-                const currentTime = new Date().getTime();
-                const tapLength = currentTime - lastTap;
                 
-                if (tapLength < 300 && tapLength > 0) {
-                    curtirReel(item.querySelector('.reel-action-btn'));
-                    const heart = document.createElement('div');
-                    heart.className = 'reel-double-tap-heart';
-                    heart.innerHTML = '<i class="fas fa-heart"></i>';
-                    heart.style.left = (e.clientX - item.getBoundingClientRect().left - 40) + 'px';
-                    heart.style.top = (e.clientY - item.getBoundingClientRect().top - 40) + 'px';
-                    item.appendChild(heart);
-                    setTimeout(() => heart.remove(), 1000);
-                } else {
-                    setTimeout(() => {
-                        const newTap = new Date().getTime();
-                        if (newTap - currentTime >= 290) {
-                            if (video.paused) { video.play(); item.classList.remove('pausado'); }
-                            else { video.pause(); item.classList.add('pausado'); }
-                        }
-                    }, 300);
+                if (!items || items.length === 0) {
+                    grid.innerHTML = '<p style="text-align: center; color: var(--text-muted); grid-column: 1/-1;">Nenhum item à venda</p>';
+                    return;
                 }
-                lastTap = currentTime;
-            });
-        }
-
-        function setupReelsObserver() {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    const video = entry.target.querySelector('.reel-video');
-                    if (entry.isIntersecting) {
-                        video.play().catch(() => {});
-                        entry.target.classList.remove('pausado');
-                    } else {
-                        video.pause();
-                    }
+                
+                items.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'item-mercado';
+                    div.innerHTML = `
+                        <img src="${item.imagem}" alt="${item.titulo}">
+                        <h4 style="margin: 12px 0 8px 0; color: white;">${item.titulo}</h4>
+                        <div class="preco-neon">R$ ${item.preco}</div>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Vendedor: ${item.vendedor}</p>
+                        <button class="btn-neon btn-purple" style="width: 100%;" onclick="fazerOferta('${item.id}')">
+                            Fazer Oferta
+                        </button>
+                    `;
+                    grid.appendChild(div);
                 });
-            }, { threshold: 0.7 });
-            document.querySelectorAll('.reel-item').forEach(item => observer.observe(item));
+            } catch (error) {
+                showToast('Erro ao carregar marketplace', 'var(--neon-red)');
+            }
         }
 
-        function curtirReel(btn) {
-            btn.classList.toggle('curtido');
-            if (btn.classList.contains('curtido')) showToast('❤️ Você curtiu o Reel!', 'var(--neon-pink)');
+        function fazerOferta(itemId) {
+            const oferta = prompt('Digite sua oferta em R$:');
+            if (oferta && !isNaN(oferta)) {
+                showToast(`🛒 Oferta de R$ ${oferta} enviada!`, 'var(--neon-green)');
+            }
         }
 
-        function seguirUsuario(btn) {
-            btn.textContent = btn.textContent === 'Seguir' ? 'Seguindo' : 'Seguir';
-            btn.style.background = btn.textContent === 'Seguindo' ? 'rgba(255,255,255,0.2)' : 'var(--neon-pink)';
+        // USUÁRIOS E AMIGOS
+        async function carregarUsuarios() {
+            // Implementar endpoint de usuários se necessário
+            await carregarAmigos();
         }
 
-        // CHAT OPERACIONAL
-        function selecionarContato(elemento, nome) {
+        async function carregarAmigos() {
+            const lista = document.getElementById('lista-amigos');
+            // Simulação - implementar endpoint real
+            lista.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Busque usuários para adicionar</p>';
+        }
+
+        async function buscarUsuarios(query) {
+            if (!query || query.length < 2) return;
+            // Implementar busca real            showToast(`Buscando por: ${query}`, 'var(--neon-blue)');
+        }
+
+        // MENSAGENS
+        async function carregarConversas() {
+            const lista = document.getElementById('chat-lista');
+            // Simulação - implementar endpoint real
+            lista.innerHTML = `
+                <div class="chat-contato ativo" onclick="selecionarContato(this, 'Pedro Santos', 'user1')">
+                    <img src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=50" style="width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--neon-green);">
+                    <div>
+                        <strong style="color: white; font-size: 15px;">Pedro Santos</strong>
+                        <div style="color: var(--neon-green); font-size: 12px;">● Online</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function selecionarContato(elemento, nome, userId) {
             document.querySelectorAll('.chat-contato').forEach(c => c.classList.remove('ativo'));
             elemento.classList.add('ativo');
             document.getElementById('chat-nome-contato').textContent = nome;
+            currentChat = { nome, userId };
+            carregarMensagens(userId);
         }
 
-        function enviarMensagem() {
+        function carregarMensagens(userId) {
+            const janela = document.getElementById('chat-mensagens');
+            // Simulação - implementar endpoint real
+            janela.innerHTML = `
+                <div class="chat-balao balao-recebido">Olá! Como vai?</div>
+                <div class="chat-balao balao-enviado">Tudo bem! E você?</div>
+            `;
+        }
+
+        async function enviarMensagem() {
             const input = document.getElementById('chat-input');
-            const texto = input.value.trim();            if (!texto) return;
+            const texto = input.value.trim();
+            
+            if (!texto || !currentChat) {
+                showToast('⚠️ Selecione um contato primeiro!', 'var(--neon-red)');
+                return;
+            }
             
             const janela = document.getElementById('chat-mensagens');
             const balao = document.createElement('div');
             balao.className = 'chat-balao balao-enviado';
             balao.textContent = texto;
             janela.appendChild(balao);
-            input.value = '';
-            janela.scrollTop = janela.scrollHeight;
+            input.value = '';            janela.scrollTop = janela.scrollHeight;
+            
+            // Implementar envio real via API
+            setTimeout(() => {
+                const r = document.createElement('div');
+                r.className = 'chat-balao balao-recebido';
+                r.textContent = 'Recebido!';
+                janela.appendChild(r);
+                janela.scrollTop = janela.scrollHeight;
+            }, 1000);
         }
 
-        function toggleConfig(btn) {
-            btn.textContent = btn.textContent === 'Ativar' ? 'Desativar' : 'Ativar';
-            btn.classList.toggle('btn-blue');
-            btn.classList.toggle('btn-red');
+        // GALERIA
+        async function carregarGaleria() {
+            const grid = document.getElementById('galeria-grid');
+            // Implementar endpoint real
+            grid.innerHTML = '<p style="text-align: center; color: var(--text-muted); grid-column: 1/-1;">Nenhuma mídia na galeria</p>';
         }
 
-        // CANVAS BACKGROUND ANIMATION
+        // INICIALIZAÇÃO
+        window.addEventListener('DOMContentLoaded', () => {
+            if (token) {
+                const savedUser = localStorage.getItem('urckut_user');
+                if (savedUser) {
+                    currentUser = JSON.parse(savedUser);
+                    iniciarSistema();
+                }
+            }
+            document.getElementById('login-email').focus();
+        });
+
+        // CANVAS ANIMATION
         const canvas = document.getElementById('universo-neon');
         if (canvas) {
             const ctx = canvas.getContext('2d');
             let particulas = [];
-            function redimensionarCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+            
+            function redimensionarCanvas() { 
+                canvas.width = window.innerWidth; 
+                canvas.height = window.innerHeight; 
+            }
             window.addEventListener('resize', redimensionarCanvas);
             redimensionarCanvas();
 
             class Particula {
                 constructor() {
-                    this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
-                    this.tamanho = Math.random() * 2.5 + 0.5;
-                    this.velocidadeX = (Math.random() - 0.5) * 0.4; this.velocidadeY = (Math.random() - 0.5) * 0.4;
+                    this.x = Math.random() * canvas.width; 
+                    this.y = Math.random() * canvas.height;
+                    this.tamanho = Math.random() * 2.5 + 0.5; 
+                    this.velocidadeX = (Math.random() - 0.5) * 0.4;                    this.velocidadeY = (Math.random() - 0.5) * 0.4;
                     const cores = ['#00f0ff', '#ff007f', '#da00ff', '#39ff14', '#ffaa00'];
                     this.cor = cores[Math.floor(Math.random() * cores.length)];
                     this.opacidade = Math.random() * 0.5 + 0.2;
                 }
                 atualizar() {
-                    this.x += this.velocidadeX; this.y += this.velocidadeY;
+                    this.x += this.velocidadeX; 
+                    this.y += this.velocidadeY;
                     if (this.x < 0 || this.x > canvas.width) this.velocidadeX *= -1;
                     if (this.y < 0 || this.y > canvas.height) this.velocidadeY *= -1;
                 }
                 desenhar() {
-                    ctx.beginPath(); ctx.arc(this.x, this.y, this.tamanho, 0, Math.PI * 2);
-                    ctx.fillStyle = this.cor; ctx.globalAlpha = this.opacidade;
-                    ctx.shadowBlur = 10; ctx.shadowColor = this.cor; ctx.fill();
+                    ctx.beginPath(); 
+                    ctx.arc(this.x, this.y, this.tamanho, 0, Math.PI * 2);
+                    ctx.fillStyle = this.cor; 
+                    ctx.globalAlpha = this.opacidade; 
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = this.cor;
+                    ctx.fill();
                 }
             }
 
             for (let i = 0; i < 60; i++) particulas.push(new Particula());
+            
+            let animId;
             function animar() {
+                if (document.hidden) { animId = requestAnimationFrame(animar); return; }
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.shadowBlur = 0;
                 particulas.forEach(p => { p.atualizar(); p.desenhar(); });
+                
                 particulas.forEach((p1, i) => {
                     particulas.slice(i + 1).forEach(p2 => {
                         const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
                         if (dist < 120) {
-                            ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
-                            ctx.strokeStyle = p1.cor; ctx.globalAlpha = (1 - dist / 120) * 0.2;
-                            ctx.lineWidth = 0.5; ctx.stroke();
+                            ctx.beginPath();
+                            ctx.moveTo(p1.x, p1.y);
+                            ctx.lineTo(p2.x, p2.y);
+                            ctx.strokeStyle = p1.cor;
+                            ctx.globalAlpha = (1 - dist / 120) * 0.2;
+                            ctx.lineWidth = 0.5;
+                            ctx.stroke();
                         }
                     });
                 });
-                requestAnimationFrame(animar);
+                
+                animId = requestAnimationFrame(animar);
             }
             animar();
-        }
-
-        // INICIALIZAÇÃO E VERIFICAÇÃO AUTOMÁTICA DE SESSÃO
-        window.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('login-email').focus();
-            verificarSessaoAtiva();
-        });
-    </script>
+        }    </script>
 </body>
 </html>
