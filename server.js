@@ -654,9 +654,18 @@ app.put('/api/user/me', authenticateToken, (req, res) => {
     });
 });
 
-// SERVE FRONTEND (Atualizado para funcionar sem precisar de pasta)
+// SERVE FRONTEND - BUSCA INTELIGENTE
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    // Tenta buscar o index.html na raiz do projeto
+    const caminhoArquivo = path.join(__dirname, 'index.html');
+    
+    if (fs.existsSync(caminhoArquivo)) {
+        res.sendFile(caminhoArquivo);
+    } else {
+        // Se não achar, avisa no log o que aconteceu
+        console.error('ERRO: Não achei o arquivo index.html em:', caminhoArquivo);
+        res.status(404).send('Arquivo index.html não encontrado no servidor.');
+    }
 });
 
 app.listen(PORT, () => {
