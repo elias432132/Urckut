@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'urckut-secret-2026';
 
 app.use(cors());
-app.use(express.json({ limit: '50mb' })); // Aumentado para suportar fotos em base64
+app.use(express.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 const DB_FILE = path.join(__dirname, 'database.json');
@@ -20,10 +20,21 @@ function loadDB() {
     if (!fs.existsSync(DB_FILE)) {
         const initialDB = {
             users: [],
-            posts: [],
+            posts: [
+                {
+                    id: uuidv4(),
+                    usuario: 'Pedro Santos',
+                    avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100',
+                    texto: 'Alguém tem convite pra comunidade secreta de Mods de Cyberpunk?',
+                    curtidas: 12,
+                    comentarios: 3,
+                    compartilhamentos: 2,
+                    data: new Date(Date.now() - 7200000).toISOString(),
+                    curtidoPor: []
+                }
+            ],
             stories: [],
             mensagens: [],
-            galeria: [], // Novo: Galeria de fotos e vídeos
             comunidades: [
                 {
                     id: uuidv4(),
@@ -36,8 +47,7 @@ function loadDB() {
                     id: uuidv4(),
                     nome: 'Programadores da Madrugada',
                     imagem: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=150',
-                    membros: 54200,
-                    participantes: []
+                    membros: 54200,                    participantes: []
                 }
             ],
             marketplace: [
@@ -86,8 +96,7 @@ function authenticateToken(req, res, next) {
 
 // AUTH
 app.post('/api/auth/register', async (req, res) => {
-    try {
-        const { email, senha, nome } = req.body;
+    try {        const { email, senha, nome } = req.body;
         const db = loadDB();
         
         if (db.users.find(u => u.email === email)) {
@@ -103,7 +112,6 @@ app.post('/api/auth/register', async (req, res) => {
             avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200',
             bio: 'Desenvolvedor de realidades digitais.',
             seguidores: 0,
-            amigos: [], // Novo array de amigos
             nivel: 'Elite',
             criadoEm: new Date().toISOString()
         };
@@ -115,7 +123,7 @@ app.post('/api/auth/register', async (req, res) => {
         
         res.json({
             token,
-            user: { id: newUser.id, email: newUser.email, nome: newUser.nome, avatar: newUser.avatar, amigos: [] }
+            user: { id: newUser.id, email: newUser.email, nome: newUser.nome, avatar: newUser.avatar }
         });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao criar usuário' });
@@ -140,50 +148,23 @@ app.post('/api/auth/login', async (req, res) => {
         const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });        
         res.json({
             token,
-            user: { id: user.id, email: user.email, nome: user.nome, avatar: user.avatar, bio: user.bio, amigos: user.amigos || [] }
+            user: { id: user.id, email: user.email, nome: user.nome, avatar: user.avatar, bio: user.bio }
         });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao fazer login' });
     }
 });
 
-// USUÁRIOS & AMIGOS
-app.get('/api/users', authenticateToken, (req, res) => {
-    const db = loadDB();
-    const users = db.users.map(u => ({ id: u.id, nome: u.nome, avatar: u.avatar }));
-    res.json(users);
-});
-
-app.post('/api/users/:id/amigo', authenticateToken, (req, res) => {
-    const db = loadDB();
-    const user = db.users.find(u => u.id === req.user.id);
-    const targetUserId = req.params.id;
-    
-    if (user.id === targetUserId) return res.status(400).json({ error: 'Não pode adicionar a si mesmo' });
-    
-    if (!user.amigos) user.amigos = [];
-    const index = user.amigos.indexOf(targetUserId);
-    
-    if (index > -1) {
-        user.amigos.splice(index, 1); // Remove amigo
-    } else {
-        user.amigos.push(targetUserId); // Adiciona amigo
-    }
-    
-    saveDB(db);
-    res.json({ amigos: user.amigos });
-});
-
 // POSTS
-app.get('/api/posts', authenticateToken, (req, res) => {
+app.get('/api/posts', (req, res) => {
     const db = loadDB();
     res.json(db.posts.sort((a, b) => new Date(b.data) - new Date(a.data)));
 });
 
 app.post('/api/posts', authenticateToken, (req, res) => {
-    const { texto, imagem } = req.body;
-    if (!texto && !imagem) {
-        return res.status(400).json({ error: 'Conteúdo não pode ser vazio' });
+    const { texto } = req.body;
+    if (!texto || texto.trim() === '') {
+        return res.status(400).json({ error: 'Texto não pode ser vazio' });
     }
     
     const db = loadDB();
@@ -194,8 +175,7 @@ app.post('/api/posts', authenticateToken, (req, res) => {
         usuario: user.nome,
         avatar: user.avatar,
         userId: user.id,
-        texto: texto ? texto.trim() : '',
-        imagem: imagem || null,
+        texto: texto.trim(),
         curtidas: 0,
         comentarios: 0,
         compartilhamentos: 0,
@@ -205,13 +185,16 @@ app.post('/api/posts', authenticateToken, (req, res) => {
     
     db.posts.unshift(newPost);
     saveDB(db);
+    
     res.json(newPost);
 });
 
 app.post('/api/posts/:id/curtir', authenticateToken, (req, res) => {
     const db = loadDB();
     const post = db.posts.find(p => p.id === req.params.id);
-    if (!post) return res.status(404).json({ error: 'Post não encontrado' });
+    
+    if (!post) {
+        return res.status(404).json({ error: 'Post não encontrado' });    }
     
     const index = post.curtidoPor.indexOf(req.user.id);
     if (index > -1) {
@@ -226,68 +209,119 @@ app.post('/api/posts/:id/curtir', authenticateToken, (req, res) => {
     res.json(post);
 });
 
-// GALERIA
-app.get('/api/galeria', authenticateToken, (req, res) => {
+app.post('/api/posts/:id/compartilhar', authenticateToken, (req, res) => {
     const db = loadDB();
-    res.json(db.galeria.sort((a, b) => new Date(b.data) - new Date(a.data)));
+    const post = db.posts.find(p => p.id === req.params.id);
+    
+    if (!post) {
+        return res.status(404).json({ error: 'Post não encontrado' });
+    }
+    
+    post.compartilhamentos++;
+    saveDB(db);
+    
+    res.json(post);
 });
 
-app.post('/api/galeria', authenticateToken, (req, res) => {
-    const { url, tipo } = req.body;
+// STORIES
+app.get('/api/stories', (req, res) => {
+    const db = loadDB();
+    res.json(db.stories);
+});
+
+app.post('/api/stories', authenticateToken, (req, res) => {
+    const { texto, imagem } = req.body;
     const db = loadDB();
     const user = db.users.find(u => u.id === req.user.id);
     
-    const novoItem = {
+    const newStory = {
         id: uuidv4(),
-        userId: user.id,
         usuario: user.nome,
-        url,
-        tipo: tipo || 'imagem',
-        data: new Date().toISOString()
-    };
-    
-    db.galeria.unshift(novoItem);
+        avatar: user.avatar,
+        userId: user.id,
+        texto: texto || '',
+        imagem: imagem || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800',
+        data: new Date().toISOString(),
+        expiraEm: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+    };    
+    db.stories.push(newStory);
     saveDB(db);
-    res.json(novoItem);
-});
-
-// MENSAGENS (CHAT)
-app.get('/api/mensagens/:userId', authenticateToken, (req, res) => {
-    const db = loadDB();
-    const targetId = req.params.userId;
-    const msgs = db.mensagens.filter(m => 
-        (m.de === req.user.id && m.para === targetId) || 
-        (m.de === targetId && m.para === req.user.id)
-    );
-    res.json(msgs);
-});
-
-app.post('/api/mensagens', authenticateToken, (req, res) => {
-    const { para, texto } = req.body;
-    const db = loadDB();
     
-    const msg = {
-        id: uuidv4(),
-        de: req.user.id,
-        para,
-        texto,
-        data: new Date().toISOString()
-    };
-    
-    db.mensagens.push(msg);
-    saveDB(db);
-    res.json(msg);
+    res.json(newStory);
 });
 
-// COMUNIDADES E MARKETPLACE
-app.get('/api/comunidades', authenticateToken, (req, res) => {
+// COMUNIDADES
+app.get('/api/comunidades', (req, res) => {
     const db = loadDB();
     res.json(db.comunidades);
 });
 
-app.get('/api/marketplace', authenticateToken, (req, res) => {
+app.post('/api/comunidades/:id/participar', authenticateToken, (req, res) => {
+    const db = loadDB();
+    const comunidade = db.comunidades.find(c => c.id === req.params.id);
+    
+    if (!comunidade) {
+        return res.status(404).json({ error: 'Comunidade não encontrada' });
+    }
+    
+    const index = comunidade.participantes.indexOf(req.user.id);
+    if (index > -1) {
+        comunidade.participantes.splice(index, 1);
+        comunidade.membros--;
+    } else {
+        comunidade.participantes.push(req.user.id);
+        comunidade.membros++;
+    }
+    
+    saveDB(db);
+    res.json(comunidade);
+});
+
+// MARKETPLACE
+app.get('/api/marketplace', (req, res) => {
     const db = loadDB();
     res.json(db.marketplace);
+});
+
+// USUÁRIO
+app.get('/api/user/me', authenticateToken, (req, res) => {
+    const db = loadDB();
+    const user = db.users.find(u => u.id === req.user.id);
+    
+    if (!user) {
+        return res.status(404).json({ error: 'Usuário não encontrado' });
+    }
+    
+    res.json({        id: user.id,
+        email: user.email,
+        nome: user.nome,
+        avatar: user.avatar,
+        bio: user.bio,
+        seguidores: user.seguidores,
+        nivel: user.nivel
+    });
+});
+
+app.put('/api/user/me', authenticateToken, (req, res) => {
+    const { nome, bio } = req.body;
+    const db = loadDB();
+    const user = db.users.find(u => u.id === req.user.id);
+    
+    if (!user) {
+        return res.status(404).json({ error: 'Usuário não encontrado' });
+    }
+    
+    if (nome) user.nome = nome;
+    if (bio !== undefined) user.bio = bio;
+    
+    saveDB(db);
+    
+    res.json({
+        id: user.id,
+        nome: user.nome,
+        avatar: user.avatar,
+        bio: user.bio
+    });
 });
 
 // SERVE FRONTEND
