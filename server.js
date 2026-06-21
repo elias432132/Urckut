@@ -13,7 +13,8 @@ const JWT_SECRET = process.env.JWT_SECRET || 'urckut-secret-2026';
 
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
-app.use(express.static(path.join(__dirname, 'public')));
+
+// Configuração para aceitar uploads de imagens
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Configuração do multer para upload de arquivos
@@ -488,7 +489,6 @@ app.get('/api/mensagens', authenticateToken, (req, res) => {
     const db = loadDB();
     const userId = req.user.id;
     
-    // Buscar todas as conversas do usuário
     const conversas = {};
     
     db.mensagens.forEach(msg => {
@@ -508,12 +508,10 @@ app.get('/api/mensagens', authenticateToken, (req, res) => {
                 };
             }
             
-            // Contar mensagens não lidas
             if (msg.destinatarioId === userId && !msg.lida) {
                 conversas[contatoId].naoLidas++;
             }
             
-            // Atualizar última mensagem se for mais recente
             if (new Date(msg.data) > new Date(conversas[contatoId].ultimaMensagem.data)) {
                 conversas[contatoId].ultimaMensagem = msg;
             }
@@ -533,7 +531,6 @@ app.get('/api/mensagens/:contatoId', authenticateToken, (req, res) => {
         (m.remetenteId === contatoId && m.destinatarioId === userId)
     ).sort((a, b) => new Date(a.data) - new Date(b.data));
     
-    // Marcar mensagens como lidas
     mensagens.forEach(m => {
         if (m.destinatarioId === userId) {
             m.lida = true;
@@ -657,9 +654,9 @@ app.put('/api/user/me', authenticateToken, (req, res) => {
     });
 });
 
-// SERVE FRONTEND
+// SERVE FRONTEND (Atualizado para funcionar sem precisar de pasta)
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.listen(PORT, () => {
