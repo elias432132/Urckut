@@ -9,7 +9,7 @@ const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 
 const mongoose = require('mongoose');
-const MONGO_URI = 'mongodb+srv://adrianogatinho1992g7_db_user:(JK7OSNfR6WhgxRxk)@cluster0.dwtwrz6.mongodb.net/?appName=Cluster0';
+const MONGO_URI = 'mongodb+srv://adrianogatinho1992g7_db_user:JK7OSNfR6WhgxRxk@cluster0.dwtwrz6.mongodb.net/?appName=Cluster0';
 
 mongoose.connect(MONGO_URI)
   .then(() => console.log('✅ Conectado ao MongoDB com sucesso!'))
