@@ -16,7 +16,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'urckut-secret-2026';
 cloudinary.config({
   cloud_name: 'w12p0hsz',
   api_key: '593448241427524',
-  api_secret: 'COLE_SEU_API_SECRET_AQUI' // <--- COLE SEU SEGREDO AQUI
+  api_secret: '5GRgxHsOvepEbejX4xzQR2Q8DUg' // <--- COLE SEU SEGREDO AQUI
 });
 
 app.use(cors());
