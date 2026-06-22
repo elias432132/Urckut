@@ -8,10 +8,16 @@ const path = require('path');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 
+const mongoose = require('mongoose');
+const MONGO_URI = 'mongodb+srv://adrianogatinho1992g7_db_user:SUA_NOVA_SENHA@cluster0.dwtwrz6.mongodb.net/?appName=Cluster0';
+
+mongoose.connect(MONGO_URI)
+  .then(() => console.log('✅ Conectado ao MongoDB com sucesso!'))
+  .catch(err => console.error('❌ Erro ao conectar no MongoDB:', err));
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'urckut-secret-2026';
-
 // --- CONFIGURAÇÃO DO CLOUDINARY ---
 cloudinary.config({
   cloud_name: 'w12p0hsz',
