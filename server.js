@@ -7,29 +7,116 @@ const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
-
 const mongoose = require('mongoose');
+
+// --- CONEXÃO MONGODB ---
 const MONGO_URI = 'mongodb+srv://adrianogatinho1992g7_db_user:JK7OSNfR6WhgxRxk@cluster0.dwtwrz6.mongodb.net/?appName=Cluster0';
 
+const dbSchema = new mongoose.Schema({
+    _id: { type: String, default: 'urckut_db' },
+    data: { type: mongoose.Schema.Types.Mixed, default: {} }
+});
+const DBModel = mongoose.model('Database', dbSchema);
+
+const initialData = {
+    users: [],
+    posts: [
+        {
+            id: uuidv4(),
+            usuario: 'Pedro Santos',
+            avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100',
+            texto: 'Alguém tem convite pra comunidade secreta de Mods de Cyberpunk?',
+            curtidas: 12,
+            comentarios: 3,
+            compartilhamentos: 2,
+            data: new Date(Date.now() - 7200000).toISOString(),
+            curtidoPor: []
+        }
+    ],
+    stories: [],
+    mensagens: [],
+    comunidades: [
+        {
+            id: uuidv4(),
+            nome: 'Eu odeio acordar cedo',
+            imagem: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=150',
+            membros: 1204453,
+            participantes: []
+        },
+        {
+            id: uuidv4(),
+            nome: 'Programadores da Madrugada',
+            imagem: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=150',
+            membros: 54200,
+            participantes: []
+        }
+    ],
+    marketplace: [
+        {
+            id: uuidv4(),
+            titulo: 'Placa RTX',
+            imagem: 'https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=300',
+            preco: 2400,
+            vendedor: '@Alice_99'
+        },
+        {
+            id: uuidv4(),
+            titulo: 'Setup Cyberpunk',
+            imagem: 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=300',
+            preco: 5000,
+            vendedor: '@Neo_Store'
+        }
+    ],
+    amigos: [],
+    galeria: []
+};
+
+let memoryDB = initialData;
+
 mongoose.connect(MONGO_URI)
-  .then(() => console.log('✅ Conectado ao MongoDB com sucesso!'))
+  .then(async () => {
+      console.log('✅ Conectado ao MongoDB com sucesso!');
+      try {
+          const doc = await DBModel.findById('urckut_db');
+          if (doc && doc.data && doc.data.users) {
+              memoryDB = doc.data;
+              console.log('✅ Banco de dados carregado da nuvem!');
+          } else {
+              await DBModel.create({ _id: 'urckut_db', data: memoryDB });
+              console.log('✅ Novo banco de dados criado na nuvem!');
+          }
+      } catch (err) {
+          console.error('Erro ao ler do banco:', err);
+      }
+  })
   .catch(err => console.error('❌ Erro ao conectar no MongoDB:', err));
+
+function loadDB() {
+    return memoryDB;
+}
+
+function saveDB(db) {
+    memoryDB = db;
+    // Salva na nuvem em segundo plano sem travar o site
+    DBModel.updateOne({ _id: 'urckut_db' }, { data: memoryDB })
+        .catch(err => console.error('Erro ao salvar na nuvem:', err));
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'urckut-secret-2026';
+
 // --- CONFIGURAÇÃO DO CLOUDINARY ---
 cloudinary.config({
   cloud_name: 'w12p0hsz',
   api_key: '593448241427524',
-  api_secret: '5GRgxHsOvepEbejX4xzQR2Q8DUg' // <--- COLE SEU SEGREDO AQUI
+  api_secret: '5GRgxHsOvepEbejX4xzQR2Q8DUg'
 });
 
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Configuração do multer (salva temporariamente antes de ir pra nuvem)
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const uploadDir = path.join(__dirname, 'uploads');
@@ -46,147 +133,55 @@ const storage = multer.diskStorage({
 
 const upload = multer({ 
     storage,
-    limits: { fileSize: 50 * 1024 * 1024 }, // 50MB
+    limits: { fileSize: 50 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
         const allowedTypes = /jpeg|jpg|png|gif|webp|mp4|webm|mov/;
         const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
         const mimetype = allowedTypes.test(file.mimetype);
-        
-        if (extname && mimetype) {
-            return cb(null, true);
-        }
+        if (extname && mimetype) return cb(null, true);
         cb(new Error('Apenas imagens e vídeos são permitidos!'));
     }
 });
 
-const DB_FILE = path.join(__dirname, 'database.json');
-function loadDB() {
-    if (!fs.existsSync(DB_FILE)) {
-        const initialDB = {
-            users: [],
-            posts: [
-                {
-                    id: uuidv4(),
-                    usuario: 'Pedro Santos',
-                    avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100',
-                    texto: 'Alguém tem convite pra comunidade secreta de Mods de Cyberpunk?',
-                    curtidas: 12,
-                    comentarios: 3,
-                    compartilhamentos: 2,
-                    data: new Date(Date.now() - 7200000).toISOString(),
-                    curtidoPor: []
-                }
-            ],
-            stories: [],
-            mensagens: [],
-            comunidades: [
-                {
-                    id: uuidv4(),
-                    nome: 'Eu odeio acordar cedo',
-                    imagem: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=150',
-                    membros: 1204453,
-                    participantes: []
-                },
-                {
-                    id: uuidv4(),
-                    nome: 'Programadores da Madrugada',
-                    imagem: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=150',
-                    membros: 54200,
-                    participantes: []
-                }
-            ],
-            marketplace: [
-                {
-                    id: uuidv4(),
-                    titulo: 'Placa RTX',
-                    imagem: 'https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=300',
-                    preco: 2400,
-                    vendedor: '@Alice_99'
-                },
-                {
-                    id: uuidv4(),
-                    titulo: 'Setup Cyberpunk',
-                    imagem: 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=300',
-                    preco: 5000,
-                    vendedor: '@Neo_Store'
-                }
-            ],
-            amigos: [],
-            galeria: []
-        };
-        fs.writeFileSync(DB_FILE, JSON.stringify(initialDB, null, 2));
-        return initialDB;
-    }
-    return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
-}
-
-function saveDB(db) {
-    fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
-}
-
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
-    
-    if (!token) {
-        return res.status(401).json({ error: 'Token não fornecido' });
-    }
-    
+    if (!token) return res.status(401).json({ error: 'Token não fornecido' });
     jwt.verify(token, JWT_SECRET, (err, user) => {
-        if (err) {
-            return res.status(403).json({ error: 'Token inválido' });
-        }
+        if (err) return res.status(403).json({ error: 'Token inválido' });
         req.user = user;
         next();
     });
 }
 
-// Middleware de logging
 app.use((req, res, next) => {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
     next();
 });
 
-// Health check pra Render não derrubar o servidor
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// AUTH
 app.post('/api/auth/register', async (req, res) => {
     try {
         const { email, senha, nome } = req.body;
         const db = loadDB();
-        
         if (db.users.find(u => u.email === email)) {
             return res.status(400).json({ error: 'Email já cadastrado' });
         }
-        
         const hashedSenha = await bcrypt.hash(senha, 10);
         const newUser = {
-            id: uuidv4(),
-            email,
-            nome: nome || email.split('@')[0],
-            senha: hashedSenha,
+            id: uuidv4(), email, nome: nome || email.split('@')[0], senha: hashedSenha,
             avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200',
-            bio: 'Desenvolvedor de realidades digitais.',
-            seguidores: 0,
-            seguindo: 0,
-            nivel: 'Elite',
-            criadoEm: new Date().toISOString()
+            bio: 'Desenvolvedor de realidades digitais.', seguidores: 0, seguindo: 0,
+            nivel: 'Elite', criadoEm: new Date().toISOString()
         };
-        
         db.users.push(newUser);
         saveDB(db);
-        
         const token = jwt.sign({ id: newUser.id, email: newUser.email }, JWT_SECRET, { expiresIn: '7d' });
-        
-        res.json({
-            token,
-            user: { id: newUser.id, email: newUser.email, nome: newUser.nome, avatar: newUser.avatar }
-        });
+        res.json({ token, user: { id: newUser.id, email: newUser.email, nome: newUser.nome, avatar: newUser.avatar } });
     } catch (error) {
-        console.error('Erro no registro:', error);
         res.status(500).json({ error: 'Erro ao criar usuário' });
     }
 });
@@ -195,36 +190,17 @@ app.post('/api/auth/login', async (req, res) => {
     try {
         const { email, senha } = req.body;
         const db = loadDB();
-        
         const user = db.users.find(u => u.email === email);
-        if (!user) {
-            return res.status(400).json({ error: 'Usuário não encontrado' });
-        }
-        
+        if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
         const validSenha = await bcrypt.compare(senha, user.senha);
-        if (!validSenha) {
-            return res.status(400).json({ error: 'Senha incorreta' });
-        }
-        
+        if (!validSenha) return res.status(400).json({ error: 'Senha incorreta' });
         const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
-        
-        res.json({
-            token,
-            user: { 
-                id: user.id, 
-                email: user.email, 
-                nome: user.nome, 
-                avatar: user.avatar, 
-                bio: user.bio 
-            }
-        });
+        res.json({ token, user: { id: user.id, email: user.email, nome: user.nome, avatar: user.avatar, bio: user.bio } });
     } catch (error) {
-        console.error('Erro no login:', error);
         res.status(500).json({ error: 'Erro ao fazer login' });
     }
 });
 
-// POSTS
 app.get('/api/posts', (req, res) => {
     const db = loadDB();
     res.json(db.posts.sort((a, b) => new Date(b.data) - new Date(a.data)));
@@ -232,50 +208,26 @@ app.get('/api/posts', (req, res) => {
 
 app.post('/api/posts', authenticateToken, (req, res) => {
     const { texto, imagem } = req.body;
-    if (!texto || texto.trim() === '') {
-        return res.status(400).json({ error: 'Texto não pode ser vazio' });
-    }
-    
+    if (!texto || texto.trim() === '') return res.status(400).json({ error: 'Texto não pode ser vazio' });
     const db = loadDB();
     const user = db.users.find(u => u.id === req.user.id);
-    
     const newPost = {
-        id: uuidv4(),
-        usuario: user.nome,
-        avatar: user.avatar,
-        userId: user.id,
-        texto: texto.trim(),
-        imagem: imagem || null,
-        curtidas: 0,
-        comentarios: 0,
-        compartilhamentos: 0,
-        data: new Date().toISOString(),
-        curtidoPor: []
+        id: uuidv4(), usuario: user.nome, avatar: user.avatar, userId: user.id,
+        texto: texto.trim(), imagem: imagem || null, curtidas: 0, comentarios: 0,
+        compartilhamentos: 0, data: new Date().toISOString(), curtidoPor: []
     };
-    
     db.posts.unshift(newPost);
     saveDB(db);
-    
     res.json(newPost);
 });
 
 app.post('/api/posts/:id/curtir', authenticateToken, (req, res) => {
     const db = loadDB();
     const post = db.posts.find(p => p.id === req.params.id);
-    
-    if (!post) {
-        return res.status(404).json({ error: 'Post não encontrado' });
-    }
-    
+    if (!post) return res.status(404).json({ error: 'Post não encontrado' });
     const index = post.curtidoPor.indexOf(req.user.id);
-    if (index > -1) {
-        post.curtidoPor.splice(index, 1);
-        post.curtidas--;
-    } else {
-        post.curtidoPor.push(req.user.id);
-        post.curtidas++;
-    }
-    
+    if (index > -1) { post.curtidoPor.splice(index, 1); post.curtidas--; } 
+    else { post.curtidoPor.push(req.user.id); post.curtidas++; }
     saveDB(db);
     res.json(post);
 });
@@ -283,306 +235,113 @@ app.post('/api/posts/:id/curtir', authenticateToken, (req, res) => {
 app.post('/api/posts/:id/compartilhar', authenticateToken, (req, res) => {
     const db = loadDB();
     const post = db.posts.find(p => p.id === req.params.id);
-    
-    if (!post) {
-        return res.status(404).json({ error: 'Post não encontrado' });
-    }
-    
+    if (!post) return res.status(404).json({ error: 'Post não encontrado' });
     post.compartilhamentos++;
     saveDB(db);
-    
     res.json(post);
 });
 
-// --- NOVO UPLOAD DE ARQUIVOS (CLOUDINARY) ---
 app.post('/api/upload', authenticateToken, upload.single('file'), async (req, res) => {
     try {
-        if (!req.file) {
-            return res.status(400).json({ error: 'Nenhum arquivo enviado' });
-        }
-        
-        // Envia para o Cloudinary
-        const result = await cloudinary.uploader.upload(req.file.path, {
-            resource_type: "auto"
-        });
-
-        // Apaga o arquivo temporário do servidor para não lotar o espaço
+        if (!req.file) return res.status(400).json({ error: 'Nenhum arquivo enviado' });
+        const result = await cloudinary.uploader.upload(req.file.path, { resource_type: "auto" });
         fs.unlinkSync(req.file.path);
-
-        // Retorna a URL permanente da nuvem
-        res.json({ 
-            url: result.secure_url,
-            filename: req.file.filename,
-            mimetype: req.file.mimetype
-        });
+        res.json({ url: result.secure_url, filename: req.file.filename, mimetype: req.file.mimetype });
     } catch (error) {
-        console.error('Erro no upload Cloudinary:', error);
         res.status(500).json({ error: 'Erro ao enviar para a nuvem' });
     }
 });
 
-// STORIES
 app.get('/api/stories', (req, res) => {
     const db = loadDB();
     const now = new Date();
-    const activeStories = db.stories.filter(story => new Date(story.expiraEm) > now);
-    res.json(activeStories);
+    res.json(db.stories.filter(story => new Date(story.expiraEm) > now));
 });
 
 app.post('/api/stories', authenticateToken, (req, res) => {
     const { texto, imagem } = req.body;
     const db = loadDB();
     const user = db.users.find(u => u.id === req.user.id);
-    
     const newStory = {
-        id: uuidv4(),
-        usuario: user.nome,
-        avatar: user.avatar,
-        userId: user.id,
-        texto: texto || '',
-        imagem: imagem || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800',
-        data: new Date().toISOString(),
-        expiraEm: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+        id: uuidv4(), usuario: user.nome, avatar: user.avatar, userId: user.id,
+        texto: texto || '', imagem: imagem || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800',
+        data: new Date().toISOString(), expiraEm: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
     };
-    
     db.stories.push(newStory);
     saveDB(db);
-    
     res.json(newStory);
 });
 
-// COMUNIDADES
 app.get('/api/comunidades', (req, res) => {
-    const db = loadDB();
-    res.json(db.comunidades);
+    res.json(loadDB().comunidades);
 });
 
 app.post('/api/comunidades/:id/participar', authenticateToken, (req, res) => {
     const db = loadDB();
     const comunidade = db.comunidades.find(c => c.id === req.params.id);
-    
-    if (!comunidade) {
-        return res.status(404).json({ error: 'Comunidade não encontrada' });
-    }
-    
+    if (!comunidade) return res.status(404).json({ error: 'Comunidade não encontrada' });
     const index = comunidade.participantes.indexOf(req.user.id);
-    if (index > -1) {
-        comunidade.participantes.splice(index, 1);
-        comunidade.membros--;
-    } else {
-        comunidade.participantes.push(req.user.id);
-        comunidade.membros++;
-    }
-    
+    if (index > -1) { comunidade.participantes.splice(index, 1); comunidade.membros--; } 
+    else { comunidade.participantes.push(req.user.id); comunidade.membros++; }
     saveDB(db);
     res.json(comunidade);
 });
 
-// MARKETPLACE
 app.get('/api/marketplace', (req, res) => {
-    const db = loadDB();
-    res.json(db.marketplace);
+    res.json(loadDB().marketplace);
 });
 
-// USUÁRIOS
 app.get('/api/users', authenticateToken, (req, res) => {
     const db = loadDB();
-    const users = db.users.map(u => ({
-        id: u.id,
-        nome: u.nome,
-        avatar: u.avatar,
-        bio: u.bio,
-        seguidores: u.seguidores || 0,
-        seguindo: u.seguindo || 0
-    }));
-    res.json(users);
+    res.json(db.users.map(u => ({ id: u.id, nome: u.nome, avatar: u.avatar, bio: u.bio, seguidores: u.seguidores || 0, seguindo: u.seguindo || 0 })));
 });
 
 app.get('/api/users/search', authenticateToken, (req, res) => {
     const { q } = req.query;
-    if (!q || q.length < 2) {
-        return res.json([]);
-    }
-    
+    if (!q || q.length < 2) return res.json([]);
     const db = loadDB();
-    const results = db.users
-        .filter(u => 
-            u.nome.toLowerCase().includes(q.toLowerCase()) ||
-            u.email.toLowerCase().includes(q.toLowerCase())
-        )
-        .map(u => ({
-            id: u.id,
-            nome: u.nome,
-            avatar: u.avatar,
-            bio: u.bio
-        }));
-        res.json(results);
+    res.json(db.users.filter(u => u.nome.toLowerCase().includes(q.toLowerCase()) || u.email.toLowerCase().includes(q.toLowerCase()))
+        .map(u => ({ id: u.id, nome: u.nome, avatar: u.avatar, bio: u.bio })));
 });
 
-// AMIGOS
 app.get('/api/amigos', authenticateToken, (req, res) => {
     const db = loadDB();
-    const userAmigos = db.amigos.filter(a => 
-        (a.userId === req.user.id || a.amigoId === req.user.id) && a.status === 'aceito'
-    );
-    
-    const amigosCompletos = userAmigos.map(a => {
+    const userAmigos = db.amigos.filter(a => (a.userId === req.user.id || a.amigoId === req.user.id) && a.status === 'aceito');
+    res.json(userAmigos.map(a => {
         const amigoId = a.userId === req.user.id ? a.amigoId : a.userId;
         const amigo = db.users.find(u => u.id === amigoId);
-        return {
-            id: a.id,
-            amigo: {
-                id: amigo.id,
-                nome: amigo.nome,
-                avatar: amigo.avatar,
-                bio: amigo.bio
-            },
-            status: a.status,
-            data: a.data
-        };
-    });
-    
-    res.json(amigosCompletos);
-});
-
-app.get('/api/amigos/solicitacoes', authenticateToken, (req, res) => {
-    const db = loadDB();
-    const solicitacoes = db.amigos.filter(a => 
-        a.amigoId === req.user.id && a.status === 'pendente'
-    );
-    
-    const solicitacoesCompletas = solicitacoes.map(a => {
-        const solicitante = db.users.find(u => u.id === a.userId);
-        return {
-            id: a.id,
-            solicitante: {
-                id: solicitante.id,
-                nome: solicitante.nome,
-                avatar: solicitante.avatar
-            },
-            data: a.data
-        };
-    });
-    
-    res.json(solicitacoesCompletas);
+        return { id: a.id, amigo: { id: amigo.id, nome: amigo.nome, avatar: amigo.avatar, bio: amigo.bio }, status: a.status, data: a.data };
+    }));
 });
 
 app.post('/api/amigos/solicitar', authenticateToken, (req, res) => {
     const { amigoId } = req.body;
     const db = loadDB();
-    
-    if (amigoId === req.user.id) {
-        return res.status(400).json({ error: 'Você não pode adicionar a si mesmo' });
-    }
-    
+    if (amigoId === req.user.id) return res.status(400).json({ error: 'Você não pode adicionar a si mesmo' });
     const amigo = db.users.find(u => u.id === amigoId);
-    if (!amigo) {
-        return res.status(404).json({ error: 'Usuário não encontrado' });
-    }
-    
-    const existente = db.amigos.find(a => 
-        (a.userId === req.user.id && a.amigoId === amigoId) ||
-        (a.userId === amigoId && a.amigoId === req.user.id)
-    );
-    
-    if (existente) {
-        return res.status(400).json({ error: 'Solicitação já existe' });
-    }
-    
-    const novaSolicitacao = {
-        id: uuidv4(),
-        userId: req.user.id,
-        amigoId: amigoId,
-        status: 'pendente',
-        data: new Date().toISOString()
-    };
-    
+    if (!amigo) return res.status(404).json({ error: 'Usuário não encontrado' });
+    const existente = db.amigos.find(a => (a.userId === req.user.id && a.amigoId === amigoId) || (a.userId === amigoId && a.amigoId === req.user.id));
+    if (existente) return res.status(400).json({ error: 'Solicitação já existe' });
+    const novaSolicitacao = { id: uuidv4(), userId: req.user.id, amigoId, status: 'pendente', data: new Date().toISOString() };
     db.amigos.push(novaSolicitacao);
     saveDB(db);    
     res.json(novaSolicitacao);
 });
 
-app.post('/api/amigos/:id/aceitar', authenticateToken, (req, res) => {
-    const db = loadDB();
-    const amizade = db.amigos.find(a => a.id === req.params.id);
-    
-    if (!amizade) {
-        return res.status(404).json({ error: 'Solicitação não encontrada' });
-    }
-    
-    if (amizade.amigoId !== req.user.id) {
-        return res.status(403).json({ error: 'Você não pode aceitar esta solicitação' });
-    }
-    
-    amizade.status = 'aceito';
-    saveDB(db);    
-    res.json(amizade);
-});
-
-app.post('/api/amigos/:id/recusar', authenticateToken, (req, res) => {
-    const db = loadDB();
-    const index = db.amigos.findIndex(a => a.id === req.params.id);
-    
-    if (index === -1) {
-        return res.status(404).json({ error: 'Solicitação não encontrada' });
-    }
-    
-    db.amigos.splice(index, 1);
-    saveDB(db);
-    
-    res.json({ success: true });
-});
-
-app.post('/api/amigos/:id/remover', authenticateToken, (req, res) => {
-    const db = loadDB();
-    const index = db.amigos.findIndex(a => 
-        a.id === req.params.id && (a.userId === req.user.id || a.amigoId === req.user.id)
-    );
-    
-    if (index === -1) {
-        return res.status(404).json({ error: 'Amizade não encontrada' });
-    }
-    
-    db.amigos.splice(index, 1);
-    saveDB(db);
-    
-    res.json({ success: true });
-});
-
-// MENSAGENS
 app.get('/api/mensagens', authenticateToken, (req, res) => {
     const db = loadDB();
-    const userId = req.user.id;
-    
     const conversas = {};
-    
     db.mensagens.forEach(msg => {
-        if (msg.remetenteId === userId || msg.destinatarioId === userId) {
-            const contatoId = msg.remetenteId === userId ? msg.destinatarioId : msg.remetenteId;
-            
+        if (msg.remetenteId === req.user.id || msg.destinatarioId === req.user.id) {
+            const contatoId = msg.remetenteId === req.user.id ? msg.destinatarioId : msg.remetenteId;
             if (!conversas[contatoId]) {
                 const contato = db.users.find(u => u.id === contatoId);
-                conversas[contatoId] = {
-                    contato: {
-                        id: contato.id,
-                        nome: contato.nome,
-                        avatar: contato.avatar
-                    },
-                    ultimaMensagem: msg,
-                    naoLidas: 0
-                };
+                conversas[contatoId] = { contato: { id: contato.id, nome: contato.nome, avatar: contato.avatar }, ultimaMensagem: msg, naoLidas: 0 };
             }
-            
-            if (msg.destinatarioId === userId && !msg.lida) {
-                conversas[contatoId].naoLidas++;
-            }
-            
-            if (new Date(msg.data) > new Date(conversas[contatoId].ultimaMensagem.data)) {
-                conversas[contatoId].ultimaMensagem = msg;
-            }
+            if (msg.destinatarioId === req.user.id && !msg.lida) conversas[contatoId].naoLidas++;
+            if (new Date(msg.data) > new Date(conversas[contatoId].ultimaMensagem.data)) conversas[contatoId].ultimaMensagem = msg;
         }
     });
-    
     res.json(Object.values(conversas));
 });
 
@@ -590,164 +349,63 @@ app.get('/api/mensagens/:contatoId', authenticateToken, (req, res) => {
     const db = loadDB();
     const userId = req.user.id;
     const contatoId = req.params.contatoId;
-    
-    const mensagens = db.mensagens.filter(m => 
-        (m.remetenteId === userId && m.destinatarioId === contatoId) ||
-        (m.remetenteId === contatoId && m.destinatarioId === userId)
-    ).sort((a, b) => new Date(a.data) - new Date(b.data));
-    
-    mensagens.forEach(m => {
-        if (m.destinatarioId === userId) {
-            m.lida = true;
-        }
-    });
-    
+    const mensagens = db.mensagens.filter(m => (m.remetenteId === userId && m.destinatarioId === contatoId) || (m.remetenteId === contatoId && m.destinatarioId === userId))
+        .sort((a, b) => new Date(a.data) - new Date(b.data));
+    mensagens.forEach(m => { if (m.destinatarioId === userId) m.lida = true; });
     saveDB(db);
-    
     res.json(mensagens);
 });
 
 app.post('/api/mensagens', authenticateToken, (req, res) => {
     const { destinatarioId, texto } = req.body;
     const db = loadDB();
-    
-    if (!texto || texto.trim() === '') {
-        return res.status(400).json({ error: 'Mensagem não pode ser vazia' });
-    }
-    
-    const destinatario = db.users.find(u => u.id === destinatarioId);
-    if (!destinatario) {
-        return res.status(404).json({ error: 'Destinatário não encontrado' });
-    }
-    
-    const novaMensagem = {
-        id: uuidv4(),
-        remetenteId: req.user.id,
-        destinatarioId: destinatarioId,
-        texto: texto.trim(),
-        data: new Date().toISOString(),
-        lida: false
-    };
-    
+    if (!texto || texto.trim() === '') return res.status(400).json({ error: 'Mensagem vazia' });
+    if (!db.users.find(u => u.id === destinatarioId)) return res.status(404).json({ error: 'Destinatário não encontrado' });
+    const novaMensagem = { id: uuidv4(), remetenteId: req.user.id, destinatarioId, texto: texto.trim(), data: new Date().toISOString(), lida: false };
     db.mensagens.push(novaMensagem);
     saveDB(db);
-    
     res.json(novaMensagem);
 });
 
-app.delete('/api/mensagens/:id', authenticateToken, (req, res) => {
-    const db = loadDB();
-    const index = db.mensagens.findIndex(m => 
-        m.id === req.params.id && m.remetenteId === req.user.id
-    );
-    
-    if (index === -1) {
-        return res.status(404).json({ error: 'Mensagem não encontrada' });
-    }
-    
-    db.mensagens.splice(index, 1);
-    saveDB(db);
-    
-    res.json({ success: true });
-});
-
-// GALERIA
 app.get('/api/galeria', authenticateToken, (req, res) => {
     const db = loadDB();
-    const userGaleria = db.galeria.filter(g => g.userId === req.user.id);
-    res.json(userGaleria.sort((a, b) => new Date(b.data) - new Date(a.data)));
+    res.json(db.galeria.filter(g => g.userId === req.user.id).sort((a, b) => new Date(b.data) - new Date(a.data)));
 });
 
 app.post('/api/galeria', authenticateToken, (req, res) => {
     const { url, tipo, descricao } = req.body;
     const db = loadDB();
-    
-    const newItem = {
-        id: uuidv4(),
-        userId: req.user.id,
-        url,
-        tipo: tipo || 'imagem',
-        descricao: descricao || '',
-        data: new Date().toISOString()
-    };
-    
+    const newItem = { id: uuidv4(), userId: req.user.id, url, tipo: tipo || 'imagem', descricao: descricao || '', data: new Date().toISOString() };
     db.galeria.push(newItem);
     saveDB(db);
-    
     res.json(newItem);
 });
 
-app.delete('/api/galeria/:id', authenticateToken, (req, res) => {
-    const db = loadDB();
-    const index = db.galeria.findIndex(g => g.id === req.params.id && g.userId === req.user.id);
-    
-    if (index === -1) {
-        return res.status(404).json({ error: 'Item não encontrado' });
-    }
-    
-    db.galeria.splice(index, 1);
-    saveDB(db);
-    
-    res.json({ success: true });
-});
-
-// USUÁRIO
 app.get('/api/user/me', authenticateToken, (req, res) => {
     const db = loadDB();
     const user = db.users.find(u => u.id === req.user.id);
-    
-    if (!user) {
-        return res.status(404).json({ error: 'Usuário não encontrado' });
-    }
-    
-    res.json({
-        id: user.id,
-        email: user.email,
-        nome: user.nome,
-        avatar: user.avatar,
-        bio: user.bio,
-        seguidores: user.seguidores || 0,
-        seguindo: user.seguindo || 0,
-        nivel: user.nivel
-    });
+    if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
+    res.json({ id: user.id, email: user.email, nome: user.nome, avatar: user.avatar, bio: user.bio, seguidores: user.seguidores || 0, seguindo: user.seguindo || 0, nivel: user.nivel });
 });
 
 app.put('/api/user/me', authenticateToken, (req, res) => {
     const { nome, bio, avatar } = req.body;
     const db = loadDB();
     const user = db.users.find(u => u.id === req.user.id);
-    
-    if (!user) {
-        return res.status(404).json({ error: 'Usuário não encontrado' });
-    }
-    
+    if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
     if (nome) user.nome = nome;
     if (bio !== undefined) user.bio = bio;
     if (avatar) user.avatar = avatar;
-    
     saveDB(db);
-    
-    res.json({
-        id: user.id,
-        nome: user.nome,
-        avatar: user.avatar,
-        bio: user.bio
-    });
+    res.json({ id: user.id, nome: user.nome, avatar: user.avatar, bio: user.bio });
 });
 
-// SERVE FRONTEND
 app.get('*', (req, res) => {
     const caminhoArquivo = path.join(__dirname, 'index.html');
-    
-    if (fs.existsSync(caminhoArquivo)) {
-        res.sendFile(caminhoArquivo);
-    } else {
-        console.error('ERRO: Não achei o arquivo index.html em:', caminhoArquivo);
-        res.status(404).send('Arquivo index.html não encontrado no servidor.');
-    }
+    if (fs.existsSync(caminhoArquivo)) res.sendFile(caminhoArquivo);
+    else res.status(404).send('Arquivo index.html não encontrado no servidor.');
 });
 
-// Tratamento de erro global
 app.use((err, req, res, next) => {
     console.error('Erro:', err);
     res.status(500).json({ error: 'Erro interno do servidor' });
@@ -755,6 +413,4 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
     console.log(`🚀 Urckut Server rodando na porta ${PORT}`);
-    console.log(`📡 Acesse: http://localhost:${PORT}`);
-    console.log(`🏥 Health check: http://localhost:${PORT}/api/health`);
 });
