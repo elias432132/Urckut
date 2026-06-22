@@ -658,7 +658,6 @@
             margin-left: 6px; box-shadow: 0 0 10px var(--neon-red);
         }
 
-        /* MENU LATERAL DE CONFIGURAÇÕES */
         .menu-lateral {
             position: fixed;
             top: 0;
@@ -684,8 +683,8 @@
             padding: 20px;            
             background: rgba(0, 240, 255, 0.1);
             border-bottom: 2px solid var(--neon-blue);
-            display: flex;            justify-content: space-between;
-            align-items: center;
+            display: flex;
+            justify-content: space-between;            align-items: center;
         }
         .menu-lateral-header h3 {
             color: var(--neon-blue);
@@ -733,8 +732,8 @@
             width: 30px;            
             text-align: center;
         }
-        .overlay {
-            position: fixed;
+
+        .overlay {            position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
@@ -782,8 +781,8 @@
             transition: all 0.3s;        
         }
         .galeria-item:hover {
-            transform: scale(1.05);            border-color: var(--neon-blue);
-        }
+            transform: scale(1.05);
+            border-color: var(--neon-blue);        }
         .galeria-item img, .galeria-item video {
             width: 100%;
             height: 100%;
@@ -800,7 +799,6 @@
             animation: spin 1s ease-in-out infinite;
         }
 
-        /* TELA DE PERFIL COMPLETA */
         .perfil-header {
             position: relative;
             margin-bottom: 20px;
@@ -831,9 +829,9 @@
         .perfil-dados {
             flex: 1;
             padding-bottom: 10px;
-        }        .perfil-nome {
-            font-size: 28px;
-            color: var(--neon-pink);
+        }
+        .perfil-nome {
+            font-size: 28px;            color: var(--neon-pink);
             margin: 0;
             text-shadow: 0 0 15px rgba(255, 0, 127, 0.6);
         }
@@ -879,11 +877,10 @@
             transform: translateY(-2px);
         }
 
-        /* MODAL DE EDIÇÃO DE PERFIL */
-        .modal-edicao {            display: none;
+        .modal-edicao {
+            display: none;
             position: fixed;
-            top: 0;
-            left: 0;
+            top: 0;            left: 0;
             width: 100vw;
             height: 100vh;
             background: rgba(0, 0, 0, 0.8);
@@ -929,10 +926,10 @@
             outline: none;
             transition: all 0.3s;
         }
-        .form-grupo input:focus,        .form-grupo textarea:focus {
+        .form-grupo input:focus,
+        .form-grupo textarea:focus {
             border-color: var(--neon-blue);
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
-        }
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);        }
         .form-grupo textarea {
             min-height: 100px;
             resize: vertical;
@@ -978,10 +975,10 @@
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 animation-duration: 0.01ms !important;
-                transition-duration: 0.01ms !important;            }
+                transition-duration: 0.01ms !important;
+            }
         }
-    </style>
-</head>
+    </style></head>
 <body>
     <canvas id="universo-neon" aria-hidden="true"></canvas>    
     <div id="toast-container" aria-live="polite"></div>
@@ -1027,10 +1024,10 @@
             <div style="text-align: center; padding: 20px;">
                 <img id="menu-avatar" src="" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--neon-pink); margin-bottom: 10px;">
                 <h4 id="menu-nome" style="color: var(--neon-pink); margin: 10px 0 5px;"></h4>
-                <p style="color: var(--text-muted); font-size: 12px;">Nível: <span style="color: var(--neon-orange);">⭐ Elite</span></p>            </div>
+                <p style="color: var(--text-muted); font-size: 12px;">Nível: <span style="color: var(--neon-orange);">⭐ Elite</span></p>
+            </div>
             <button class="btn-neon btn-red" style="width: 100%; margin-top: 15px;" onclick="sairDoSistema()">
-                <i class="fas fa-sign-out-alt"></i> Sair do Sistema
-            </button>        
+                <i class="fas fa-sign-out-alt"></i> Sair do Sistema            </button>        
         </div>
     </div>
 
@@ -1076,11 +1073,10 @@
         </header>
 
         <main class="container">
-            <div class="col-centro">                
+            <div class="col-centro">
+                
                 <section id="tela-perfil" class="AbaDinamica">
-                    <!-- TELA DE PERFIL DO USUÁRIO -->
-                    <div class="box perfil-header">
-                        <div class="perfil-cover"></div>
+                    <div class="box perfil-header">                        <div class="perfil-cover"></div>
                         <div class="perfil-info">
                             <img id="perfil-avatar" src="" alt="Avatar" class="perfil-avatar-grande">
                             <div class="perfil-dados">
@@ -1125,11 +1121,11 @@
                         <div class="box-title">TERMINAL DE TRANSMISSÃO <span>📡</span></div>
                         <div class="area-postagem">
                             <textarea id="caixaTexto" placeholder="O que você está injetando na rede mundial hoje?"></textarea>
-                            <input type="file" id="post-imagem" accept="image/*,video/*" style="display: none;" onchange="previewMidiaPost(this)">                            <div id="preview-midia" style="display: none; margin: 10px 0;">
+                            <input type="file" id="post-imagem" accept="image/*,video/*" style="display: none;" onchange="previewMidiaPost(this)">
+                            <div id="preview-midia" style="display: none; margin: 10px 0;">
                                 <img id="preview-img" style="max-width: 100%; max-height: 200px; border-radius: 8px; display: none;">
                                 <video id="preview-vid" style="max-width: 100%; max-height: 200px; border-radius: 8px; display: none;" controls></video>
-                            </div>
-                            <div class="ferramentas-post">
+                            </div>                            <div class="ferramentas-post">
                                 <button onclick="document.getElementById('post-imagem').click()"><i class="fas fa-camera"></i> Foto/Vídeo</button>
                                 <button class="btn-neon btn-blue" onclick="postarRecado()" style="margin-left: auto;">
                                     <i class="fas fa-paper-plane"></i> Publicar
@@ -1150,8 +1146,7 @@
                 <section id="tela-mensagens" class="AbaDinamica" style="display: none;">
                     <div class="box" style="padding: 0; border: none;">
                         <div class="chat-container">
-                            <div class="chat-lista" id="chat-lista">
-                                </div>
+                            <div class="chat-lista" id="chat-lista"></div>
                             <div class="chat-janela">
                                 <div style="padding: 18px; border-bottom: 2px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3);">
                                     <strong id="chat-nome-contato" style="color: var(--neon-pink); font-size: 16px;">Selecione um contato</strong>
@@ -1173,21 +1168,19 @@
                 <section id="tela-comunidades" class="AbaDinamica" style="display: none;">
                     <div class="box">
                         <div class="box-title">Comunidades <span>👥</span></div>
-                        <div class="lista-comunidades" id="lista-comunidades">
-                            </div>                    </div>
+                        <div class="lista-comunidades" id="lista-comunidades"></div>
+                    </div>
                 </section>
 
                 <section id="tela-marketplace" class="AbaDinamica" style="display: none;">
                     <div class="box">
-                        <div class="box-title">Marketplace Neon <span>🛒</span></div>
-                        <div class="grid-marketplace" id="grid-marketplace">
-                            </div>
+                        <div class="box-title">Marketplace Neon <span></span></div>                        <div class="grid-marketplace" id="grid-marketplace"></div>
                     </div>
                 </section>
 
                 <section id="tela-amigos" class="AbaDinamica" style="display: none;">
                     <div class="box">
-                        <div class="box-title">Amigos <span>👥</span></div>
+                        <div class="box-title">Amigos <span></span></div>
                         <div style="margin-bottom: 20px;">
                             <input type="text" id="buscar-amigo" placeholder="Buscar usuários para adicionar..." style="width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 2px solid var(--neon-blue); color: white; border-radius: 8px; margin-bottom: 15px;">
                             <button class="btn-neon btn-green" onclick="buscarAmigos()" style="width: 100%;">
@@ -1195,8 +1188,7 @@
                             </button>
                         </div>
                         <div id="resultado-busca" style="margin-bottom: 20px;"></div>
-                        <div id="lista-amigos" class="lista-comunidades">
-                            </div>
+                        <div id="lista-amigos" class="lista-comunidades"></div>
                     </div>
                 </section>
 
@@ -1209,8 +1201,7 @@
                                 <i class="fas fa-upload"></i> Upload de Mídia
                             </button>
                         </div>
-                        <div class="galeria-grid" id="galeria-grid">
-                            </div>                    
+                        <div class="galeria-grid" id="galeria-grid"></div>                    
                     </div>
                 </section>
 
@@ -1218,12 +1209,12 @@
         </main>
     </div>
 
-    <!-- MODAL DE EDIÇÃO DE PERFIL -->
     <div class="modal-edicao" id="modal-edicao-perfil">
         <div class="modal-conteudo">
             <h3><i class="fas fa-user-edit"></i> Editar Perfil</h3>
             <div class="form-grupo">
-                <label>Nome de Usuário</label>                <input type="text" id="edit-nome" placeholder="Seu nome">
+                <label>Nome de Usuário</label>
+                <input type="text" id="edit-nome" placeholder="Seu nome">
             </div>
             <div class="form-grupo">
                 <label>Bio</label>
@@ -1232,8 +1223,7 @@
             <div class="form-grupo">
                 <label>Avatar (URL ou Upload)</label>
                 <input type="file" id="edit-avatar-file" accept="image/*" onchange="previewAvatarEdit(this)">
-                <input type="text" id="edit-avatar-url" placeholder="Ou cole uma URL de imagem" style="margin-top: 10px;">
-                <img id="preview-avatar-edit" style="max-width: 100px; max-height: 100px; border-radius: 50%; margin-top: 10px; display: none; border: 2px solid var(--neon-blue);">
+                <input type="text" id="edit-avatar-url" placeholder="Ou cole uma URL de imagem" style="margin-top: 10px;">                <img id="preview-avatar-edit" style="max-width: 100px; max-height: 100px; border-radius: 50%; margin-top: 10px; display: none; border: 2px solid var(--neon-blue);">
             </div>
             <div class="modal-botoes">
                 <button class="btn-neon btn-blue" onclick="salvarPerfil()">
@@ -1272,7 +1262,8 @@
         <div style="background: var(--glass-bg); padding: 30px; border-radius: 15px; border: 2px solid var(--neon-blue); max-width: 400px; width: 90%;">
             <h3 style="color: var(--neon-blue); margin-bottom: 20px;">Criar Story</h3>
             <input type="file" id="story-file" accept="image/*,video/*" style="width: 100%; margin-bottom: 15px; color: white;">
-            <textarea id="story-texto" placeholder="Adicione uma legenda..." style="width: 100%; height: 80px; background: rgba(0,0,0,0.5); border: 2px solid var(--neon-blue); color: white; padding: 10px; border-radius: 8px; margin-bottom: 15px; resize: none;"></textarea>            <div style="display: flex; gap: 10px;">
+            <textarea id="story-texto" placeholder="Adicione uma legenda..." style="width: 100%; height: 80px; background: rgba(0,0,0,0.5); border: 2px solid var(--neon-blue); color: white; padding: 10px; border-radius: 8px; margin-bottom: 15px; resize: none;"></textarea>
+            <div style="display: flex; gap: 10px;">
                 <button class="btn-neon btn-blue" onclick="uploadStory()" style="flex: 1;">
                     <i class="fas fa-upload"></i> Publicar
                 </button>
@@ -1282,39 +1273,41 @@
             </div>
         </div>
     </div>
-
     <script>
-        // CONFIGURAÇÃO DA API - DETECTA AUTOMATICAMENTE O DOMÍNIO
+        console.log(' Urckut inicializando...');
+        
         const API_URL = window.location.origin;
+        console.log('📡 API URL:', API_URL);
         
         let token = null;
         let currentUser = null;
         let currentChat = null;
         let storiesData = [];
-        let reelsData = [];
         let uploadAvatarFile = null;
 
-        // Previne erros se localStorage estiver bloqueado pelo celular
         try {
             token = localStorage.getItem('urckut_token');
+            console.log('🔑 Token encontrado:', token ? 'Sim' : 'Não');
         } catch(e) {
-            console.warn("Navegador bloqueou armazenamento local.");
+            console.warn("️ localStorage bloqueado:", e);
         }
 
-        // UTILITÁRIOS
         function showToast(msg, cor = 'var(--neon-blue)') {
-            // Se for mobile e der erro, joga um alerta gigante para o usuário não perder
-            if (cor === 'var(--neon-red)') {
-                alert(msg.replace('⚠️', '').trim());
-            }
-
+            console.log(' Toast:', msg);
+            
             const container = document.getElementById('toast-container');
+            if (!container) {
+                alert(msg);
+                return;
+            }
+            
             const toast = document.createElement('div');
             toast.className = 'toast';
             toast.style.background = cor;
             toast.style.boxShadow = `0 0 20px ${cor}`;
             toast.innerHTML = `<i class="fas fa-info-circle"></i> ${msg}`;
             container.appendChild(toast);
+            
             setTimeout(() => {
                 toast.style.opacity = '0';
                 toast.style.transform = 'translateX(100%)';
@@ -1322,13 +1315,13 @@
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         }
+
         function escapeHTML(str) {
             if (!str) return '';
             const div = document.createElement('div');
             div.textContent = str;
             return div.innerHTML;
         }
-
         function formatarTempo(dataISO) {
             const data = new Date(dataISO);
             const agora = new Date();
@@ -1341,6 +1334,8 @@
         }
 
         async function apiRequest(endpoint, options = {}) {
+            console.log('🌐 API Request:', endpoint, options.method || 'GET');
+            
             const headers = {
                 'Content-Type': 'application/json',
                 ...options.headers
@@ -1356,21 +1351,27 @@
                     headers
                 });
                 
+                console.log(' Response status:', response.status);
+                
                 if (response.status === 401) {
+                    console.log('🔒 Token expirado, fazendo logout');
                     localStorage.removeItem('urckut_token');
                     window.location.reload();
                     return null;
                 }
                 
-                return await response.json();
+                const data = await response.json();
+                console.log(' Response data:', data);
+                return data;
             } catch (err) {
-                console.error("Erro na requisição Fetch:", err);
+                console.error("❌ Erro na requisição:", err);
                 return { error: 'Erro de conexão com o servidor' };
             }
         }
 
-        // FUNÇÃO DE UPLOAD DE ARQUIVOS
-        async function uploadFile(file) {            const formData = new FormData();
+        async function uploadFile(file) {
+            console.log(' Fazendo upload de:', file.name);            
+            const formData = new FormData();
             formData.append('file', file);
             
             try {
@@ -1382,26 +1383,31 @@
                     body: formData
                 });
                 
+                console.log('📥 Upload response:', response.status);
+                
                 if (!response.ok) {
                     throw new Error('Erro no upload');
                 }
                 
                 const data = await response.json();
+                console.log('✅ Upload sucesso:', data.url);
                 return data.url;
             } catch (error) {
-                console.error('Erro ao fazer upload:', error);
+                console.error(' Erro no upload:', error);
                 showToast('Erro ao fazer upload do arquivo', 'var(--neon-red)');
                 return null;
             }
         }
 
-        // AUTENTICAÇÃO
         function toggleRegister() {
+            console.log('🔄 Toggle register');
             const fields = document.getElementById('register-fields');
             fields.style.display = fields.style.display === 'none' ? 'block' : 'none';
         }
 
         async function entrarNoSistema() {
+            console.log('🔐 Tentando login...');
+            
             const email = document.getElementById('login-email').value;
             const senha = document.getElementById('login-senha').value;
             
@@ -1411,33 +1417,40 @@
             }
             
             try {
+                console.log(' Enviando requisição de login...');
                 const data = await apiRequest('/api/auth/login', {
-                    method: 'POST',
-                    body: JSON.stringify({ email, senha })
+                    method: 'POST',                    body: JSON.stringify({ email, senha })
                 });
+                
+                console.log('📦 Resposta do login:', data);
                 
                 if (data.error) {
                     showToast(data.error, 'var(--neon-red)');
                     return;
-                }                
+                }
+                
                 token = data.token;
                 currentUser = data.user;
                 localStorage.setItem('urckut_token', token);
                 localStorage.setItem('urckut_user', JSON.stringify(currentUser));
                 
+                console.log('✅ Login sucesso!');
                 iniciarSistema();
             } catch (error) {
+                console.error('❌ Erro no login:', error);
                 showToast('Erro de conexão com o servidor', 'var(--neon-red)');
             }        
         }
 
         async function registrarUsuario() {
+            console.log(' Tentando registrar...');
+            
             const email = document.getElementById('login-email').value;
             const senha = document.getElementById('login-senha').value;
             const nome = document.getElementById('register-nome').value;
             
             if (!email || !senha || !nome) {
-                showToast('⚠️ Preencha todos os campos!', 'var(--neon-red)');
+                showToast('️ Preencha todos os campos!', 'var(--neon-red)');
                 return;
             }
             
@@ -1455,8 +1468,7 @@
                 token = data.token;
                 currentUser = data.user;
                 localStorage.setItem('urckut_token', token);
-                localStorage.setItem('urckut_user', JSON.stringify(currentUser));
-                
+                localStorage.setItem('urckut_user', JSON.stringify(currentUser));                
                 iniciarSistema();
             } catch (error) {
                 showToast('Erro ao registrar no servidor', 'var(--neon-red)');
@@ -1468,25 +1480,23 @@
                 localStorage.removeItem('urckut_token');
                 localStorage.removeItem('urckut_user');
                 window.location.reload();
-            }        }
+            }
+        }
 
         function iniciarSistema() {
+            console.log('🚀 Iniciando sistema...');
+            
             document.getElementById('tela-login').style.display = 'none';
             document.getElementById('area-logada').style.display = 'block';
             
-            document.getElementById('menu-nome').textContent = currentUser.nome;
-            document.getElementById('menu-avatar').src = currentUser.avatar || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200';
-            document.getElementById('meu-story-avatar').src = currentUser.avatar || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200';
-            
-            // Atualizar perfil
             atualizarPerfilUI();
-            
             carregarDadosIniciais();
             navegarPara('tela-perfil');
             showToast('✓ Bem-vindo à matriz!', 'var(--neon-green)');
         }
 
         async function carregarDadosIniciais() {
+            console.log('📊 Carregando dados iniciais...');
             await Promise.all([
                 carregarPerfil(),
                 carregarPosts(),
@@ -1499,7 +1509,6 @@
             ]);
         }
 
-        // PERFIL DO USUÁRIO
         async function carregarPerfil() {
             try {
                 const user = await apiRequest('/api/user/me');
@@ -1508,17 +1517,15 @@
                     localStorage.setItem('urckut_user', JSON.stringify(currentUser));
                     atualizarPerfilUI();
                 }
-            } catch (error) {
-                console.error('Erro ao carregar perfil:', error);
+            } catch (error) {                console.error('Erro ao carregar perfil:', error);
             }
         }
 
         function atualizarPerfilUI() {
-            // Menu lateral
             document.getElementById('menu-nome').textContent = currentUser.nome;
             document.getElementById('menu-avatar').src = currentUser.avatar || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200';
-            document.getElementById('meu-story-avatar').src = currentUser.avatar || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200';            
-            // Tela de perfil
+            document.getElementById('meu-story-avatar').src = currentUser.avatar || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200';
+            
             document.getElementById('perfil-nome').textContent = currentUser.nome;
             document.getElementById('perfil-bio').textContent = currentUser.bio || 'Sem bio';
             document.getElementById('perfil-avatar').src = currentUser.avatar || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200';
@@ -1559,14 +1566,13 @@
             const bio = document.getElementById('edit-bio').value.trim();
             
             if (!nome) {
-                showToast('⚠️ Nome é obrigatório!', 'var(--neon-red)');
-                return;
+                showToast('⚠️ Nome é obrigatório!', 'var(--neon-red)');                return;
             }
             
             try {
                 let avatarUrl = currentUser.avatar;
                 
-                // Se tem arquivo de avatar para upload                if (uploadAvatarFile) {
+                if (uploadAvatarFile) {
                     const uploadedUrl = await uploadFile(uploadAvatarFile);
                     if (uploadedUrl) {
                         avatarUrl = uploadedUrl;
@@ -1577,11 +1583,7 @@
                 
                 const data = await apiRequest('/api/user/me', {
                     method: 'PUT',
-                    body: JSON.stringify({
-                        nome: nome,
-                        bio: bio,
-                        avatar: avatarUrl
-                    })
+                    body: JSON.stringify({ nome, bio, avatar: avatarUrl })
                 });
                 
                 if (data && !data.error) {
@@ -1598,7 +1600,6 @@
             }
         }
 
-        // NAVEGAÇÃO
         function navegarPara(idTela) {
             const abas = document.getElementsByClassName('AbaDinamica');
             for(let i = 0; i < abas.length; i++) {
@@ -1614,12 +1615,7 @@
             if(btn) btn.classList.add('ativo');
             
             window.scrollTo(0, 0);
-            
-            if (idTela !== 'tela-reels') {                document.querySelectorAll('.reel-video').forEach(v => v.pause());
-            }
-            
-            // Recarregar dados específicos da tela
-            if (idTela === 'tela-perfil') {
+                        if (idTela === 'tela-perfil') {
                 carregarPerfil();
                 carregarPosts();
             } else if (idTela === 'tela-amigos') {
@@ -1631,7 +1627,6 @@
             }
         }
 
-        // MENU LATERAL
         function abrirMenuLateral() {
             document.getElementById('menu-lateral').classList.add('ativo');
             document.getElementById('overlay').classList.add('ativo');
@@ -1642,7 +1637,6 @@
             document.getElementById('overlay').classList.remove('ativo');
         }
 
-        // POSTS        
         async function carregarPosts() {
             try {
                 const posts = await apiRequest('/api/posts');
@@ -1664,13 +1658,13 @@
             posts.forEach(post => {
                 const postElement = criarElementoPost(post);
                 mural.appendChild(postElement);
-            });        }
+            });
+        }
 
         function criarElementoPost(post) {
             const article = document.createElement('article');
             article.className = 'post-feed';
-            
-            const tempo = formatarTempo(post.data);
+                        const tempo = formatarTempo(post.data);
             const ehCurtido = post.curtidoPor && post.curtidoPor.includes(currentUser.id);
             
             let midiaHtml = '';
@@ -1687,7 +1681,7 @@
                     <img src="${post.avatar}" alt="${post.usuario}">
                     <div class="post-header-info">
                         <strong>${escapeHTML(post.usuario)}</strong>
-                        <span>${tempo} • Público 🌍</span>
+                        <span>${tempo} • Público </span>
                     </div>
                 </div>
                 <div class="post-content">${escapeHTML(post.texto)}</div>
@@ -1713,14 +1707,13 @@
             const fileInput = document.getElementById('post-imagem');
             
             if (texto.trim() === "" && !fileInput.files[0]) {
-                showToast('⚠️ Escreva algo ou adicione uma mídia!', 'var(--neon-red)');                return;
+                showToast('⚠️ Escreva algo ou adicione uma mídia!', 'var(--neon-red)');
+                return;
             }
             
             try {
                 let imagemUrl = null;
-                
-                // Se tem arquivo, faz upload primeiro
-                if (fileInput.files[0]) {
+                                if (fileInput.files[0]) {
                     showToast('⏳ Fazendo upload...', 'var(--neon-blue)');
                     imagemUrl = await uploadFile(fileInput.files[0]);
                     if (!imagemUrl) {
@@ -1730,10 +1723,7 @@
                 
                 const data = await apiRequest('/api/posts', {
                     method: 'POST',
-                    body: JSON.stringify({ 
-                        texto: texto.trim(),
-                        imagem: imagemUrl
-                    })
+                    body: JSON.stringify({ texto: texto.trim(), imagem: imagemUrl })
                 });
                 
                 if (data && data.error) {
@@ -1744,8 +1734,6 @@
                 document.getElementById("caixaTexto").value = "";
                 fileInput.value = "";
                 document.getElementById('preview-midia').style.display = 'none';
-                document.getElementById('preview-img').src = '';
-                document.getElementById('preview-vid').src = '';                
                 await carregarPosts();
                 showToast('✓ Post publicado!', 'var(--neon-green)');
             } catch (error) {
@@ -1762,27 +1750,19 @@
                 
                 if (file.type.startsWith('image/')) {
                     previewImg.src = URL.createObjectURL(file);
-                    previewImg.style.display = 'block';                    previewVid.style.display = 'none';
-                    previewVid.src = '';
+                    previewImg.style.display = 'block';
+                    previewVid.style.display = 'none';
                 } else if (file.type.startsWith('video/')) {
                     previewVid.src = URL.createObjectURL(file);
                     previewVid.style.display = 'block';
                     previewImg.style.display = 'none';
-                    previewImg.src = '';
-                } else {
-                    previewImg.style.display = 'none';
-                    previewVid.style.display = 'none';
                 }
                 preview.style.display = 'block';
             }
         }
 
         async function curtirPost(postId) {
-            try {
-                const post = await apiRequest(`/api/posts/${postId}/curtir`, {
-                    method: 'POST'
-                });
-                
+            try {                const post = await apiRequest(`/api/posts/${postId}/curtir`, { method: 'POST' });
                 if (post && !post.error) {
                     await carregarPosts();
                 }
@@ -1793,9 +1773,7 @@
 
         async function compartilharPost(postId) {
             try {
-                await apiRequest(`/api/posts/${postId}/compartilhar`, {
-                    method: 'POST'
-                });
+                await apiRequest(`/api/posts/${postId}/compartilhar`, { method: 'POST' });
                 showToast('🔁 Compartilhado!', 'var(--neon-green)');
                 await carregarPosts();
             } catch (error) {
@@ -1803,7 +1781,6 @@
             }
         }
 
-        // STORIES
         async function carregarStories() {
             try {
                 const stories = await apiRequest('/api/stories');
@@ -1811,7 +1788,8 @@
                 storiesData = stories || [];
                 renderizarStoriesBar();
             } catch (error) {
-                console.error('Erro ao carregar stories:', error);            }
+                console.error('Erro ao carregar stories:', error);
+            }
         }
 
         function renderizarStoriesBar() {
@@ -1819,7 +1797,7 @@
             bar.innerHTML = `
                 <div class="story-item" onclick="abrirModalStory()">
                     <div class="story-avatar-wrapper seu-story">
-                        <img id="meu-story-avatar" src="${currentUser.avatar}" alt="Seu story">
+                        <img src="${currentUser.avatar}" alt="Seu story">
                         <div class="story-add-btn">+</div>
                     </div>
                     <span class="story-nome">Seu story</span>
@@ -1833,8 +1811,7 @@
                 item.innerHTML = `
                     <div class="story-avatar-wrapper">
                         <img src="${story.avatar}" alt="${story.usuario}">
-                    </div>
-                    <span class="story-nome">${story.usuario}</span>
+                    </div>                    <span class="story-nome">${story.usuario}</span>
                 `;
                 bar.appendChild(item);
             });
@@ -1860,16 +1837,12 @@
             
             try {
                 showToast('⏳ Fazendo upload do story...', 'var(--neon-blue)');
-                const imagemUrl = await uploadFile(fileInput.files[0]);                if (!imagemUrl) {
-                    return;
-                }
+                const imagemUrl = await uploadFile(fileInput.files[0]);
+                if (!imagemUrl) return;
                 
                 const data = await apiRequest('/api/stories', {
                     method: 'POST',
-                    body: JSON.stringify({
-                        texto: texto,
-                        imagem: imagemUrl
-                    })
+                    body: JSON.stringify({ texto, imagem: imagemUrl })
                 });
                 
                 if (data && data.error) {
@@ -1887,8 +1860,7 @@
 
         let storyAtualIndex = -1;
 
-        function abrirStory(index) {
-            if (index < 0 || index >= storiesData.length) return;
+        function abrirStory(index) {            if (index < 0 || index >= storiesData.length) return;
             
             storyAtualIndex = index;
             const story = storiesData[index];
@@ -1906,14 +1878,7 @@
                 }            
             }
             
-            if (story.texto) {
-                const textOverlay = document.createElement('div');
-                textOverlay.style.cssText = 'position:absolute;bottom:80px;left:20px;right:20px;color:white;font-size:18px;text-shadow:0 2px 10px rgba(0,0,0,0.8);text-align:center;font-weight:bold;';
-                textOverlay.textContent = story.texto;                content.appendChild(textOverlay);
-            }
-            
             document.getElementById('story-modal').classList.add('ativo');
-            
             setTimeout(() => storyProximo(), 5000);
         }
 
@@ -1944,9 +1909,7 @@
             }
         }
 
-        // COMUNIDADES
-        async function carregarComunidades() {
-            try {
+        async function carregarComunidades() {            try {
                 const comunidades = await apiRequest('/api/comunidades');
                 const lista = document.getElementById('lista-comunidades');
                 lista.innerHTML = '';
@@ -1958,7 +1921,8 @@
                 
                 comunidades.forEach(comunidade => {
                     const card = document.createElement('div');
-                    card.className = 'comunidade-card';                    card.innerHTML = `
+                    card.className = 'comunidade-card';
+                    card.innerHTML = `
                         <div style="display: flex; gap: 15px; align-items: center;">
                             <img src="${comunidade.imagem}" style="width: 65px; height: 65px; border-radius: 10px; object-fit: cover; border: 2px solid var(--neon-pink);">
                             <div>
@@ -1977,9 +1941,7 @@
 
         async function participarComunidade(id, btn) {
             try {
-                const data = await apiRequest(`/api/comunidades/${id}/participar`, {
-                    method: 'POST'
-                });
+                const data = await apiRequest(`/api/comunidades/${id}/participar`, { method: 'POST' });
                 
                 if (data && data.error) {
                     showToast(data.error, 'var(--neon-red)');
@@ -1996,10 +1958,8 @@
                 }
             } catch (error) {
                 showToast('Erro ao participar', 'var(--neon-red)');
-            }
-        }
+            }        }
 
-        // MARKETPLACE
         async function carregarMarketplace() {
             try {                
                 const items = await apiRequest('/api/marketplace');
@@ -2007,7 +1967,8 @@
                 grid.innerHTML = '';
                 
                 if (!items || items.error || items.length === 0) {
-                    grid.innerHTML = '<p style="text-align: center; color: var(--text-muted); grid-column: 1/-1;">Nenhum item à venda</p>';                    return;
+                    grid.innerHTML = '<p style="text-align: center; color: var(--text-muted); grid-column: 1/-1;">Nenhum item à venda</p>';
+                    return;
                 }
                 
                 items.forEach(item => {
@@ -2036,7 +1997,6 @@
             }
         }
 
-        // USUÁRIOS E AMIGOS
         async function buscarAmigos() {
             const query = document.getElementById('buscar-amigo').value.trim();
             if (!query || query.length < 2) {
@@ -2047,8 +2007,7 @@
             try {
                 const users = await apiRequest(`/api/users/search?q=${encodeURIComponent(query)}`);
                 const resultadoDiv = document.getElementById('resultado-busca');
-                
-                if (!users || users.length === 0) {
+                                if (!users || users.length === 0) {
                     resultadoDiv.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Nenhum usuário encontrado</p>';
                     return;
                 }
@@ -2056,7 +2015,8 @@
                 resultadoDiv.innerHTML = '';
                 users.forEach(user => {
                     if (user.id !== currentUser.id) {
-                        const card = document.createElement('div');                        card.className = 'comunidade-card';
+                        const card = document.createElement('div');
+                        card.className = 'comunidade-card';
                         card.innerHTML = `
                             <div style="display: flex; gap: 15px; align-items: center;">
                                 <img src="${user.avatar}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--neon-blue);">
@@ -2096,8 +2056,7 @@
         }
 
         async function carregarAmigos() {
-            try {
-                const amigos = await apiRequest('/api/amigos');
+            try {                const amigos = await apiRequest('/api/amigos');
                 const lista = document.getElementById('lista-amigos');
                 lista.innerHTML = '';
                 
@@ -2105,7 +2064,8 @@
                     lista.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Nenhum amigo ainda. Busque usuários para adicionar!</p>';
                     return;
                 }
-                                amigos.forEach(amigo => {
+                
+                amigos.forEach(amigo => {
                     const card = document.createElement('div');
                     card.className = 'comunidade-card';
                     card.innerHTML = `
@@ -2133,28 +2093,27 @@
             try {
                 const users = await apiRequest(`/api/users/search?q=${encodeURIComponent(query)}`);
                 if (users && users.length > 0) {
-                    showToast(`🔍 Encontrados ${users.length} usuários`, 'var(--neon-blue)');
+                    showToast(` Encontrados ${users.length} usuários`, 'var(--neon-blue)');
                 }
             } catch (error) {
                 console.error('Erro na busca:', error);
             }
         }
 
-        // MENSAGENS
         async function carregarConversas() {
             try {
                 const conversas = await apiRequest('/api/mensagens');
                 const lista = document.getElementById('chat-lista');
                 lista.innerHTML = '';
-                
-                if (!conversas || conversas.error || conversas.length === 0) {
+                                if (!conversas || conversas.error || conversas.length === 0) {
                     lista.innerHTML = '<p style="text-align: center; color: var(--text-muted); margin-top: 20px;">Nenhuma conversa ativa no momento.</p>';
                     return;
                 }
                 
                 conversas.forEach(conv => {
                     const contato = conv.contato;
-                    const item = document.createElement('div');                    item.className = 'chat-contato';
+                    const item = document.createElement('div');
+                    item.className = 'chat-contato';
                     item.onclick = () => selecionarContato(item, contato.nome, contato.id);
                     item.innerHTML = `
                         <img src="${contato.avatar}" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--neon-blue);">
@@ -2178,7 +2137,7 @@
             setTimeout(() => {
                 const lista = document.getElementById('chat-lista');
                 const contatos = lista.querySelectorAll('.chat-contato');
-                contatos.forEach((contato, index) => {
+                contatos.forEach((contato) => {
                     if (contato.querySelector('strong').textContent === userName) {
                         selecionarContato(contato, userName, userId);
                     }
@@ -2195,15 +2154,15 @@
         }
 
         async function carregarMensagens(userId) {
-            try {
-                const mensagens = await apiRequest(`/api/mensagens/${userId}`);
+            try {                const mensagens = await apiRequest(`/api/mensagens/${userId}`);
                 const janela = document.getElementById('chat-mensagens');
                 janela.innerHTML = '';
                 
                 if (!mensagens || mensagens.error || mensagens.length === 0) {
                     janela.innerHTML = '<div style="text-align: center; color: var(--text-muted); margin-top: 50px;">Nenhuma mensagem ainda. Comece a conversa!</div>';
                     return;
-                }                
+                }
+                
                 mensagens.forEach(msg => {
                     const balao = document.createElement('div');
                     balao.className = `chat-balao ${msg.remetenteId === currentUser.id ? 'balao-enviado' : 'balao-recebido'}`;
@@ -2222,17 +2181,14 @@
             const texto = input.value.trim();
             
             if (!texto || !currentChat) {
-                showToast('⚠️ Selecione um contato primeiro!', 'var(--neon-red)');
+                showToast('️ Selecione um contato primeiro!', 'var(--neon-red)');
                 return;
             }
             
             try {
                 const data = await apiRequest('/api/mensagens', {
                     method: 'POST',
-                    body: JSON.stringify({
-                        destinatarioId: currentChat.userId,
-                        texto: texto
-                    })
+                    body: JSON.stringify({ destinatarioId: currentChat.userId, texto })
                 });
                 
                 if (data && !data.error) {
@@ -2245,23 +2201,18 @@
             }
         }
 
-        // GALERIA
         async function uploadGaleria(input) {
             if (!input.files[0]) return;
-            
-            try {
+                        try {
                 showToast('⏳ Fazendo upload...', 'var(--neon-blue)');
                 const fileUrl = await uploadFile(input.files[0]);
-                if (!fileUrl) return;                
+                if (!fileUrl) return;
+                
                 const tipo = input.files[0].type.startsWith('video') ? 'video' : 'imagem';
                 
                 const data = await apiRequest('/api/galeria', {
                     method: 'POST',
-                    body: JSON.stringify({
-                        url: fileUrl,
-                        tipo: tipo,
-                        descricao: ''
-                    })
+                    body: JSON.stringify({ url: fileUrl, tipo, descricao: '' })
                 });
                 
                 if (data && !data.error) {
@@ -2294,30 +2245,32 @@
                     } else {
                         div.innerHTML = `<img src="${item.url}" alt="Mídia">`;
                     }
-                    div.onclick = () => {
-                        window.open(item.url, '_blank');
-                    };
+                    div.onclick = () => window.open(item.url, '_blank');
                     grid.appendChild(div);
                 });
             } catch (error) {
                 console.error('Erro ao carregar galeria:', error);
-            }        }
-
-        // INICIALIZAÇÃO
+            }
+        }
         window.addEventListener('DOMContentLoaded', () => {
+            console.log('✅ DOM carregado');
+            
             if (token) {
                 try {
                     const savedUser = localStorage.getItem('urckut_user');
                     if (savedUser) {
                         currentUser = JSON.parse(savedUser);
+                        console.log('👤 Usuário carregado:', currentUser.nome);
                         iniciarSistema();
                     }
-                } catch(e) {}
+                } catch(e) {
+                    console.error('Erro ao carregar usuário:', e);
+                }
             }
+            
             document.getElementById('login-email').focus();
         });
 
-        // CANVAS ANIMATION
         const canvas = document.getElementById('universo-neon');
         if (canvas) {
             const ctx = canvas.getContext('2d');
@@ -2348,9 +2301,9 @@
                     if (this.y < 0 || this.y > canvas.height) this.velocidadeY *= -1;
                 }
                 desenhar() {
-                    ctx.beginPath(); 
-                    ctx.arc(this.x, this.y, this.tamanho, 0, Math.PI * 2);
-                    ctx.fillStyle = this.cor;                     ctx.globalAlpha = this.opacidade; 
+                    ctx.beginPath();                     ctx.arc(this.x, this.y, this.tamanho, 0, Math.PI * 2);
+                    ctx.fillStyle = this.cor; 
+                    ctx.globalAlpha = this.opacidade; 
                     ctx.shadowBlur = 10;
                     ctx.shadowColor = this.cor;
                     ctx.fill();
@@ -2384,7 +2337,7 @@
                 animId = requestAnimationFrame(animar);
             }
             animar();
-        }    
+        }
     </script>
 </body>
 </html>
