@@ -6,18 +6,24 @@ const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'urckut-secret-2026';
 
+// --- CONFIGURAÇÃO DO CLOUDINARY ---
+cloudinary.config({
+  cloud_name: 'w12p0hsz',
+  api_key: '593448241427524',
+  api_secret: 'COLE_SEU_API_SECRET_AQUI' // <--- COLE SEU SEGREDO AQUI
+});
+
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
-
-// Configuração para aceitar uploads de imagens
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Configuração do multer para upload de arquivos
+// Configuração do multer (salva temporariamente antes de ir pra nuvem)
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const uploadDir = path.join(__dirname, 'uploads');
@@ -96,7 +102,8 @@ function loadDB() {
                     titulo: 'Setup Cyberpunk',
                     imagem: 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=300',
                     preco: 5000,
-                    vendedor: '@Neo_Store'                }
+                    vendedor: '@Neo_Store'
+                }
             ],
             amigos: [],
             galeria: []
@@ -145,7 +152,8 @@ app.post('/api/auth/register', async (req, res) => {
         const { email, senha, nome } = req.body;
         const db = loadDB();
         
-        if (db.users.find(u => u.email === email)) {            return res.status(400).json({ error: 'Email já cadastrado' });
+        if (db.users.find(u => u.email === email)) {
+            return res.status(400).json({ error: 'Email já cadastrado' });
         }
         
         const hashedSenha = await bcrypt.hash(senha, 10);
@@ -194,7 +202,8 @@ app.post('/api/auth/login', async (req, res) => {
         
         const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
         
-        res.json({            token,
+        res.json({
+            token,
             user: { 
                 id: user.id, 
                 email: user.email, 
@@ -243,6 +252,7 @@ app.post('/api/posts', authenticateToken, (req, res) => {
     
     res.json(newPost);
 });
+
 app.post('/api/posts/:id/curtir', authenticateToken, (req, res) => {
     const db = loadDB();
     const post = db.posts.find(p => p.id === req.params.id);
@@ -278,21 +288,30 @@ app.post('/api/posts/:id/compartilhar', authenticateToken, (req, res) => {
     res.json(post);
 });
 
-// UPLOAD DE ARQUIVOS
-app.post('/api/upload', authenticateToken, upload.single('file'), (req, res) => {
+// --- NOVO UPLOAD DE ARQUIVOS (CLOUDINARY) ---
+app.post('/api/upload', authenticateToken, upload.single('file'), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ error: 'Nenhum arquivo enviado' });
         }
         
-        const fileUrl = `/uploads/${req.file.filename}`;
+        // Envia para o Cloudinary
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            resource_type: "auto"
+        });
+
+        // Apaga o arquivo temporário do servidor para não lotar o espaço
+        fs.unlinkSync(req.file.path);
+
+        // Retorna a URL permanente da nuvem
         res.json({ 
-            url: fileUrl,
+            url: result.secure_url,
             filename: req.file.filename,
             mimetype: req.file.mimetype
         });
     } catch (error) {
-        console.error('Erro no upload:', error);        res.status(500).json({ error: 'Erro ao fazer upload' });
+        console.error('Erro no upload Cloudinary:', error);
+        res.status(500).json({ error: 'Erro ao enviar para a nuvem' });
     }
 });
 
@@ -341,7 +360,8 @@ app.post('/api/comunidades/:id/participar', authenticateToken, (req, res) => {
     }
     
     const index = comunidade.participantes.indexOf(req.user.id);
-    if (index > -1) {        comunidade.participantes.splice(index, 1);
+    if (index > -1) {
+        comunidade.participantes.splice(index, 1);
         comunidade.membros--;
     } else {
         comunidade.participantes.push(req.user.id);
@@ -440,6 +460,7 @@ app.get('/api/amigos/solicitacoes', authenticateToken, (req, res) => {
     
     res.json(solicitacoesCompletas);
 });
+
 app.post('/api/amigos/solicitar', authenticateToken, (req, res) => {
     const { amigoId } = req.body;
     const db = loadDB();
@@ -537,7 +558,8 @@ app.get('/api/mensagens', authenticateToken, (req, res) => {
                 const contato = db.users.find(u => u.id === contatoId);
                 conversas[contatoId] = {
                     contato: {
-                        id: contato.id,                        nome: contato.nome,
+                        id: contato.id,
+                        nome: contato.nome,
                         avatar: contato.avatar
                     },
                     ultimaMensagem: msg,
@@ -586,7 +608,8 @@ app.post('/api/mensagens', authenticateToken, (req, res) => {
     if (!texto || texto.trim() === '') {
         return res.status(400).json({ error: 'Mensagem não pode ser vazia' });
     }
-        const destinatario = db.users.find(u => u.id === destinatarioId);
+    
+    const destinatario = db.users.find(u => u.id === destinatarioId);
     if (!destinatario) {
         return res.status(404).json({ error: 'Destinatário não encontrado' });
     }
@@ -635,7 +658,8 @@ app.post('/api/galeria', authenticateToken, (req, res) => {
     
     const newItem = {
         id: uuidv4(),
-        userId: req.user.id,        url,
+        userId: req.user.id,
+        url,
         tipo: tipo || 'imagem',
         descricao: descricao || '',
         data: new Date().toISOString()
@@ -684,7 +708,8 @@ app.get('/api/user/me', authenticateToken, (req, res) => {
 
 app.put('/api/user/me', authenticateToken, (req, res) => {
     const { nome, bio, avatar } = req.body;
-    const db = loadDB();    const user = db.users.find(u => u.id === req.user.id);
+    const db = loadDB();
+    const user = db.users.find(u => u.id === req.user.id);
     
     if (!user) {
         return res.status(404).json({ error: 'Usuário não encontrado' });
