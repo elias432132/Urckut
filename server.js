@@ -48,7 +48,6 @@ const upload = multer({
 });
 
 const DB_FILE = path.join(__dirname, 'database.json');
-
 function loadDB() {
     if (!fs.existsSync(DB_FILE)) {
         const initialDB = {
@@ -97,8 +96,7 @@ function loadDB() {
                     titulo: 'Setup Cyberpunk',
                     imagem: 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=300',
                     preco: 5000,
-                    vendedor: '@Neo_Store'
-                }
+                    vendedor: '@Neo_Store'                }
             ],
             amigos: [],
             galeria: []
@@ -147,8 +145,7 @@ app.post('/api/auth/register', async (req, res) => {
             nome: nome || email.split('@')[0],
             senha: hashedSenha,
             avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200',
-            bio: 'Desenvolvedor de realidades digitais.',
-            seguidores: 0,
+            bio: 'Desenvolvedor de realidades digitais.',            seguidores: 0,
             seguindo: 0,
             nivel: 'Elite',
             criadoEm: new Date().toISOString()
@@ -197,8 +194,7 @@ app.post('/api/auth/login', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Erro no login:', error);
-        res.status(500).json({ error: 'Erro ao fazer login' });
+        console.error('Erro no login:', error);        res.status(500).json({ error: 'Erro ao fazer login' });
     }
 });
 
@@ -247,8 +243,7 @@ app.post('/api/posts/:id/curtir', authenticateToken, (req, res) => {
     
     const index = post.curtidoPor.indexOf(req.user.id);
     if (index > -1) {
-        post.curtidoPor.splice(index, 1);
-        post.curtidas--;
+        post.curtidoPor.splice(index, 1);        post.curtidas--;
     } else {
         post.curtidoPor.push(req.user.id);
         post.curtidas++;
@@ -297,8 +292,7 @@ app.get('/api/stories', (req, res) => {
     // Filtrar stories expirados (24h)
     const now = new Date();
     const activeStories = db.stories.filter(story => new Date(story.expiraEm) > now);
-    res.json(activeStories);
-});
+    res.json(activeStories);});
 
 app.post('/api/stories', authenticateToken, (req, res) => {
     const { texto, imagem } = req.body;
@@ -348,7 +342,6 @@ app.post('/api/comunidades/:id/participar', authenticateToken, (req, res) => {
     saveDB(db);
     res.json(comunidade);
 });
-
 // MARKETPLACE
 app.get('/api/marketplace', (req, res) => {
     const db = loadDB();
@@ -395,10 +388,9 @@ app.get('/api/users/search', authenticateToken, (req, res) => {
 app.get('/api/amigos', authenticateToken, (req, res) => {
     const db = loadDB();
     const userAmigos = db.amigos.filter(a => 
-        a.userId === req.user.id || a.amigoId === req.user.id
+        (a.userId === req.user.id || a.amigoId === req.user.id) && a.status === 'aceito'
     );
-    
-    const amigosCompletos = userAmigos.map(a => {
+        const amigosCompletos = userAmigos.map(a => {
         const amigoId = a.userId === req.user.id ? a.amigoId : a.userId;
         const amigo = db.users.find(u => u.id === amigoId);
         return {
@@ -417,6 +409,28 @@ app.get('/api/amigos', authenticateToken, (req, res) => {
     res.json(amigosCompletos);
 });
 
+app.get('/api/amigos/solicitacoes', authenticateToken, (req, res) => {
+    const db = loadDB();
+    const solicitacoes = db.amigos.filter(a => 
+        a.amigoId === req.user.id && a.status === 'pendente'
+    );
+    
+    const solicitacoesCompletas = solicitacoes.map(a => {
+        const solicitante = db.users.find(u => u.id === a.userId);
+        return {
+            id: a.id,
+            solicitante: {
+                id: solicitante.id,
+                nome: solicitante.nome,
+                avatar: solicitante.avatar
+            },
+            data: a.data
+        };
+    });
+    
+    res.json(solicitacoesCompletas);
+});
+
 app.post('/api/amigos/solicitar', authenticateToken, (req, res) => {
     const { amigoId } = req.body;
     const db = loadDB();
@@ -425,8 +439,7 @@ app.post('/api/amigos/solicitar', authenticateToken, (req, res) => {
         return res.status(400).json({ error: 'Você não pode adicionar a si mesmo' });
     }
     
-    const amigo = db.users.find(u => u.id === amigoId);
-    if (!amigo) {
+    const amigo = db.users.find(u => u.id === amigoId);    if (!amigo) {
         return res.status(404).json({ error: 'Usuário não encontrado' });
     }
     
@@ -475,7 +488,22 @@ app.post('/api/amigos/:id/recusar', authenticateToken, (req, res) => {
     const index = db.amigos.findIndex(a => a.id === req.params.id);
     
     if (index === -1) {
-        return res.status(404).json({ error: 'Solicitação não encontrada' });
+        return res.status(404).json({ error: 'Solicitação não encontrada' });    }
+    
+    db.amigos.splice(index, 1);
+    saveDB(db);
+    
+    res.json({ success: true });
+});
+
+app.post('/api/amigos/:id/remover', authenticateToken, (req, res) => {
+    const db = loadDB();
+    const index = db.amigos.findIndex(a => 
+        a.id === req.params.id && (a.userId === req.user.id || a.amigoId === req.user.id)
+    );
+    
+    if (index === -1) {
+        return res.status(404).json({ error: 'Amizade não encontrada' });
     }
     
     db.amigos.splice(index, 1);
@@ -509,8 +537,7 @@ app.get('/api/mensagens', authenticateToken, (req, res) => {
             }
             
             if (msg.destinatarioId === userId && !msg.lida) {
-                conversas[contatoId].naoLidas++;
-            }
+                conversas[contatoId].naoLidas++;            }
             
             if (new Date(msg.data) > new Date(conversas[contatoId].ultimaMensagem.data)) {
                 conversas[contatoId].ultimaMensagem = msg;
@@ -559,8 +586,7 @@ app.post('/api/mensagens', authenticateToken, (req, res) => {
         id: uuidv4(),
         remetenteId: req.user.id,
         destinatarioId: destinatarioId,
-        texto: texto.trim(),
-        data: new Date().toISOString(),
+        texto: texto.trim(),        data: new Date().toISOString(),
         lida: false
     };
     
@@ -568,6 +594,22 @@ app.post('/api/mensagens', authenticateToken, (req, res) => {
     saveDB(db);
     
     res.json(novaMensagem);
+});
+
+app.delete('/api/mensagens/:id', authenticateToken, (req, res) => {
+    const db = loadDB();
+    const index = db.mensagens.findIndex(m => 
+        m.id === req.params.id && m.remetenteId === req.user.id
+    );
+    
+    if (index === -1) {
+        return res.status(404).json({ error: 'Mensagem não encontrada' });
+    }
+    
+    db.mensagens.splice(index, 1);
+    saveDB(db);
+    
+    res.json({ success: true });
 });
 
 // GALERIA
@@ -593,8 +635,7 @@ app.post('/api/galeria', authenticateToken, (req, res) => {
     db.galeria.push(newItem);
     saveDB(db);
     
-    res.json(newItem);
-});
+    res.json(newItem);});
 
 app.delete('/api/galeria/:id', authenticateToken, (req, res) => {
     const db = loadDB();
@@ -643,8 +684,7 @@ app.put('/api/user/me', authenticateToken, (req, res) => {
     if (nome) user.nome = nome;
     if (bio !== undefined) user.bio = bio;
     if (avatar) user.avatar = avatar;
-    
-    saveDB(db);
+        saveDB(db);
     
     res.json({
         id: user.id,
@@ -670,5 +710,5 @@ app.get('*', (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`🚀 Urckut Server rodando na porta ${PORT}`);
-    console.log(`📡 Acesse: http://localhost:${PORT}`);
+    console.log(` Acesse: http://localhost:${PORT}`);
 });
