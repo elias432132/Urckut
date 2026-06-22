@@ -128,14 +128,24 @@ function authenticateToken(req, res, next) {
     });
 }
 
+// Middleware de logging
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+    next();
+});
+
+// Health check pra Render não derrubar o servidor
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // AUTH
 app.post('/api/auth/register', async (req, res) => {
     try {
         const { email, senha, nome } = req.body;
         const db = loadDB();
         
-        if (db.users.find(u => u.email === email)) {
-            return res.status(400).json({ error: 'Email já cadastrado' });
+        if (db.users.find(u => u.email === email)) {            return res.status(400).json({ error: 'Email já cadastrado' });
         }
         
         const hashedSenha = await bcrypt.hash(senha, 10);
@@ -145,7 +155,8 @@ app.post('/api/auth/register', async (req, res) => {
             nome: nome || email.split('@')[0],
             senha: hashedSenha,
             avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200',
-            bio: 'Desenvolvedor de realidades digitais.',            seguidores: 0,
+            bio: 'Desenvolvedor de realidades digitais.',
+            seguidores: 0,
             seguindo: 0,
             nivel: 'Elite',
             criadoEm: new Date().toISOString()
@@ -183,8 +194,7 @@ app.post('/api/auth/login', async (req, res) => {
         
         const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
         
-        res.json({
-            token,
+        res.json({            token,
             user: { 
                 id: user.id, 
                 email: user.email, 
@@ -194,7 +204,8 @@ app.post('/api/auth/login', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Erro no login:', error);        res.status(500).json({ error: 'Erro ao fazer login' });
+        console.error('Erro no login:', error);
+        res.status(500).json({ error: 'Erro ao fazer login' });
     }
 });
 
@@ -232,7 +243,6 @@ app.post('/api/posts', authenticateToken, (req, res) => {
     
     res.json(newPost);
 });
-
 app.post('/api/posts/:id/curtir', authenticateToken, (req, res) => {
     const db = loadDB();
     const post = db.posts.find(p => p.id === req.params.id);
@@ -243,7 +253,8 @@ app.post('/api/posts/:id/curtir', authenticateToken, (req, res) => {
     
     const index = post.curtidoPor.indexOf(req.user.id);
     if (index > -1) {
-        post.curtidoPor.splice(index, 1);        post.curtidas--;
+        post.curtidoPor.splice(index, 1);
+        post.curtidas--;
     } else {
         post.curtidoPor.push(req.user.id);
         post.curtidas++;
@@ -281,18 +292,17 @@ app.post('/api/upload', authenticateToken, upload.single('file'), (req, res) => 
             mimetype: req.file.mimetype
         });
     } catch (error) {
-        console.error('Erro no upload:', error);
-        res.status(500).json({ error: 'Erro ao fazer upload' });
+        console.error('Erro no upload:', error);        res.status(500).json({ error: 'Erro ao fazer upload' });
     }
 });
 
 // STORIES
 app.get('/api/stories', (req, res) => {
     const db = loadDB();
-    // Filtrar stories expirados (24h)
     const now = new Date();
     const activeStories = db.stories.filter(story => new Date(story.expiraEm) > now);
-    res.json(activeStories);});
+    res.json(activeStories);
+});
 
 app.post('/api/stories', authenticateToken, (req, res) => {
     const { texto, imagem } = req.body;
@@ -331,8 +341,7 @@ app.post('/api/comunidades/:id/participar', authenticateToken, (req, res) => {
     }
     
     const index = comunidade.participantes.indexOf(req.user.id);
-    if (index > -1) {
-        comunidade.participantes.splice(index, 1);
+    if (index > -1) {        comunidade.participantes.splice(index, 1);
         comunidade.membros--;
     } else {
         comunidade.participantes.push(req.user.id);
@@ -342,6 +351,7 @@ app.post('/api/comunidades/:id/participar', authenticateToken, (req, res) => {
     saveDB(db);
     res.json(comunidade);
 });
+
 // MARKETPLACE
 app.get('/api/marketplace', (req, res) => {
     const db = loadDB();
@@ -380,8 +390,7 @@ app.get('/api/users/search', authenticateToken, (req, res) => {
             avatar: u.avatar,
             bio: u.bio
         }));
-    
-    res.json(results);
+        res.json(results);
 });
 
 // AMIGOS
@@ -390,7 +399,8 @@ app.get('/api/amigos', authenticateToken, (req, res) => {
     const userAmigos = db.amigos.filter(a => 
         (a.userId === req.user.id || a.amigoId === req.user.id) && a.status === 'aceito'
     );
-        const amigosCompletos = userAmigos.map(a => {
+    
+    const amigosCompletos = userAmigos.map(a => {
         const amigoId = a.userId === req.user.id ? a.amigoId : a.userId;
         const amigo = db.users.find(u => u.id === amigoId);
         return {
@@ -430,7 +440,6 @@ app.get('/api/amigos/solicitacoes', authenticateToken, (req, res) => {
     
     res.json(solicitacoesCompletas);
 });
-
 app.post('/api/amigos/solicitar', authenticateToken, (req, res) => {
     const { amigoId } = req.body;
     const db = loadDB();
@@ -439,7 +448,8 @@ app.post('/api/amigos/solicitar', authenticateToken, (req, res) => {
         return res.status(400).json({ error: 'Você não pode adicionar a si mesmo' });
     }
     
-    const amigo = db.users.find(u => u.id === amigoId);    if (!amigo) {
+    const amigo = db.users.find(u => u.id === amigoId);
+    if (!amigo) {
         return res.status(404).json({ error: 'Usuário não encontrado' });
     }
     
@@ -478,8 +488,7 @@ app.post('/api/amigos/:id/aceitar', authenticateToken, (req, res) => {
     }
     
     amizade.status = 'aceito';
-    saveDB(db);
-    
+    saveDB(db);    
     res.json(amizade);
 });
 
@@ -488,7 +497,8 @@ app.post('/api/amigos/:id/recusar', authenticateToken, (req, res) => {
     const index = db.amigos.findIndex(a => a.id === req.params.id);
     
     if (index === -1) {
-        return res.status(404).json({ error: 'Solicitação não encontrada' });    }
+        return res.status(404).json({ error: 'Solicitação não encontrada' });
+    }
     
     db.amigos.splice(index, 1);
     saveDB(db);
@@ -527,8 +537,7 @@ app.get('/api/mensagens', authenticateToken, (req, res) => {
                 const contato = db.users.find(u => u.id === contatoId);
                 conversas[contatoId] = {
                     contato: {
-                        id: contato.id,
-                        nome: contato.nome,
+                        id: contato.id,                        nome: contato.nome,
                         avatar: contato.avatar
                     },
                     ultimaMensagem: msg,
@@ -537,7 +546,8 @@ app.get('/api/mensagens', authenticateToken, (req, res) => {
             }
             
             if (msg.destinatarioId === userId && !msg.lida) {
-                conversas[contatoId].naoLidas++;            }
+                conversas[contatoId].naoLidas++;
+            }
             
             if (new Date(msg.data) > new Date(conversas[contatoId].ultimaMensagem.data)) {
                 conversas[contatoId].ultimaMensagem = msg;
@@ -576,8 +586,7 @@ app.post('/api/mensagens', authenticateToken, (req, res) => {
     if (!texto || texto.trim() === '') {
         return res.status(400).json({ error: 'Mensagem não pode ser vazia' });
     }
-    
-    const destinatario = db.users.find(u => u.id === destinatarioId);
+        const destinatario = db.users.find(u => u.id === destinatarioId);
     if (!destinatario) {
         return res.status(404).json({ error: 'Destinatário não encontrado' });
     }
@@ -586,7 +595,8 @@ app.post('/api/mensagens', authenticateToken, (req, res) => {
         id: uuidv4(),
         remetenteId: req.user.id,
         destinatarioId: destinatarioId,
-        texto: texto.trim(),        data: new Date().toISOString(),
+        texto: texto.trim(),
+        data: new Date().toISOString(),
         lida: false
     };
     
@@ -625,8 +635,7 @@ app.post('/api/galeria', authenticateToken, (req, res) => {
     
     const newItem = {
         id: uuidv4(),
-        userId: req.user.id,
-        url,
+        userId: req.user.id,        url,
         tipo: tipo || 'imagem',
         descricao: descricao || '',
         data: new Date().toISOString()
@@ -635,7 +644,8 @@ app.post('/api/galeria', authenticateToken, (req, res) => {
     db.galeria.push(newItem);
     saveDB(db);
     
-    res.json(newItem);});
+    res.json(newItem);
+});
 
 app.delete('/api/galeria/:id', authenticateToken, (req, res) => {
     const db = loadDB();
@@ -674,8 +684,7 @@ app.get('/api/user/me', authenticateToken, (req, res) => {
 
 app.put('/api/user/me', authenticateToken, (req, res) => {
     const { nome, bio, avatar } = req.body;
-    const db = loadDB();
-    const user = db.users.find(u => u.id === req.user.id);
+    const db = loadDB();    const user = db.users.find(u => u.id === req.user.id);
     
     if (!user) {
         return res.status(404).json({ error: 'Usuário não encontrado' });
@@ -684,7 +693,8 @@ app.put('/api/user/me', authenticateToken, (req, res) => {
     if (nome) user.nome = nome;
     if (bio !== undefined) user.bio = bio;
     if (avatar) user.avatar = avatar;
-        saveDB(db);
+    
+    saveDB(db);
     
     res.json({
         id: user.id,
@@ -694,21 +704,26 @@ app.put('/api/user/me', authenticateToken, (req, res) => {
     });
 });
 
-// SERVE FRONTEND - BUSCA INTELIGENTE
+// SERVE FRONTEND
 app.get('*', (req, res) => {
-    // Tenta buscar o index.html na raiz do projeto
     const caminhoArquivo = path.join(__dirname, 'index.html');
     
     if (fs.existsSync(caminhoArquivo)) {
         res.sendFile(caminhoArquivo);
     } else {
-        // Se não achar, avisa no log o que aconteceu
         console.error('ERRO: Não achei o arquivo index.html em:', caminhoArquivo);
         res.status(404).send('Arquivo index.html não encontrado no servidor.');
     }
 });
 
+// Tratamento de erro global
+app.use((err, req, res, next) => {
+    console.error('Erro:', err);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+});
+
 app.listen(PORT, () => {
     console.log(`🚀 Urckut Server rodando na porta ${PORT}`);
-    console.log(` Acesse: http://localhost:${PORT}`);
+    console.log(`📡 Acesse: http://localhost:${PORT}`);
+    console.log(`🏥 Health check: http://localhost:${PORT}/api/health`);
 });
