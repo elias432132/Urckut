@@ -18,6 +18,7 @@ const dbSchema = new mongoose.Schema({
 });
 const DBModel = mongoose.model('Database', dbSchema);
 
+// Dados iniciais intactos
 const initialData = {
     users: [],
     posts: [
@@ -97,7 +98,6 @@ function loadDB() {
 
 function saveDB(db) {
     memoryDB = db;
-    // Salva na nuvem em segundo plano sem travar o site
     DBModel.updateOne({ _id: 'urckut_db' }, { data: memoryDB })
         .catch(err => console.error('Erro ao salvar na nuvem:', err));
 }
@@ -114,7 +114,9 @@ cloudinary.config({
 });
 
 app.use(cors());
-app.use(express.json({ limit: '10mb' }));
+// Limite aumentado para 250MB
+app.use(express.json({ limit: '250mb' }));
+app.use(express.urlencoded({ limit: '250mb', extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const storage = multer.diskStorage({
@@ -133,13 +135,13 @@ const storage = multer.diskStorage({
 
 const upload = multer({ 
     storage,
-    limits: { fileSize: 50 * 1024 * 1024 },
+    limits: { fileSize: 250 * 1024 * 1024 }, // LIMITE MÁXIMO DE 250MB
     fileFilter: (req, file, cb) => {
-        const allowedTypes = /jpeg|jpg|png|gif|webp|mp4|webm|mov/;
+        const allowedTypes = /jpeg|jpg|png|gif|webp|mp4|webm|mov|mp3|wav|ogg/;
         const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
         const mimetype = allowedTypes.test(file.mimetype);
         if (extname && mimetype) return cb(null, true);
-        cb(new Error('Apenas imagens e vídeos são permitidos!'));
+        cb(new Error('Apenas imagens, vídeos e áudios são permitidos!'));
     }
 });
 
@@ -163,6 +165,29 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// --- ROTA DE UPLOAD CLOUDINARY (250MB - Upload_Large) ---
+app.post('/api/upload', authenticateToken, upload.single('file'), async (req, res) => {
+    try {
+        if (!req.file) return res.status(400).json({ error: 'Nenhum arquivo enviado' });
+        
+        const result = await cloudinary.uploader.upload_large(req.file.path, { 
+            resource_type: "auto",
+            chunk_size: 6000000 // Divide envios grandes em pedaços de 6MB
+        });
+        
+        fs.unlinkSync(req.file.path);
+        res.json({ url: result.secure_url, filename: req.file.filename, mimetype: req.file.mimetype });
+    } catch (error) {
+        console.error('Erro no Cloudinary:', error);
+        res.status(500).json({ error: 'Erro ao enviar para a nuvem' });
+    }
+});
+
+// ==========================================
+// MÓDULO DE AUTENTICAÇÃO
+// ==========================================
+
+// 1. Antigo: Registro por Email
 app.post('/api/auth/register', async (req, res) => {
     try {
         const { email, senha, nome } = req.body;
@@ -186,14 +211,19 @@ app.post('/api/auth/register', async (req, res) => {
     }
 });
 
+// 2. Antigo: Login por Email
 app.post('/api/auth/login', async (req, res) => {
     try {
         const { email, senha } = req.body;
         const db = loadDB();
         const user = db.users.find(u => u.email === email);
         if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
-        const validSenha = await bcrypt.compare(senha, user.senha);
-        if (!validSenha) return res.status(400).json({ error: 'Senha incorreta' });
+        
+        if (user.senha) {
+            const validSenha = await bcrypt.compare(senha, user.senha);
+            if (!validSenha) return res.status(400).json({ error: 'Senha incorreta' });
+        }
+        
         const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
         res.json({ token, user: { id: user.id, email: user.email, nome: user.nome, avatar: user.avatar, bio: user.bio } });
     } catch (error) {
@@ -201,20 +231,74 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
+// 3. Novo: Login OTP por Telefone (Gameverse)
+app.post('/api/auth/otp', (req, res) => {
+    try {
+        const { phone, tag } = req.body;
+        if (!phone || !tag) return res.status(400).json({ error: 'Telefone e Gamertag são obrigatórios' });
+        
+        const db = loadDB();
+        let user = db.users.find(u => u.phone === phone);
+        
+        if (!user) {
+            user = {
+                id: uuidv4(), phone, nome: tag, tag, email: `${phone}@gameverse.local`,
+                avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200',
+                bio: 'Explorando o GameVerse.', seguidores: 0, seguindo: 0,
+                criadoEm: new Date().toISOString()
+            };
+            db.users.push(user);
+            saveDB(db);
+        } else {
+            user.tag = tag;
+            user.nome = tag;
+        }
+
+        const token = jwt.sign({ id: user.id, phone: user.phone, nome: user.nome }, JWT_SECRET, { expiresIn: '7d' });
+        res.json({ token, user: { id: user.id, phone: user.phone, nome: user.nome, tag: user.tag, avatar: user.avatar, bio: user.bio } });
+    } catch (error) {
+        res.status(500).json({ error: 'Erro na autenticação OTP' });
+    }
+});
+
+// ==========================================
+// ROTAS DE POSTS E FEED
+// ==========================================
 app.get('/api/posts', (req, res) => {
     const db = loadDB();
-    res.json(db.posts.sort((a, b) => new Date(b.data) - new Date(a.data)));
+    res.json(db.posts.sort((a, b) => new Date(b.data || b.time) - new Date(a.data || a.time)));
 });
 
 app.post('/api/posts', authenticateToken, (req, res) => {
-    const { texto, imagem } = req.body;
-    if (!texto || texto.trim() === '') return res.status(400).json({ error: 'Texto não pode ser vazio' });
+    const { texto, imagem, type, desc, media, tags, music, title, artist } = req.body;
     const db = loadDB();
     const user = db.users.find(u => u.id === req.user.id);
+    
     const newPost = {
-        id: uuidv4(), usuario: user.nome, avatar: user.avatar, userId: user.id,
-        texto: texto.trim(), imagem: imagem || null, curtidas: 0, comentarios: 0,
-        compartilhamentos: 0, data: new Date().toISOString(), curtidoPor: []
+        id: uuidv4(), 
+        usuario: user.nome, 
+        author: user.nome,
+        avatar: user.avatar, 
+        authorPic: user.avatar,
+        userId: user.id,
+        texto: (texto || desc || '').trim(), 
+        desc: (desc || texto || '').trim(),
+        imagem: imagem || media || null, 
+        media: media || imagem || null,
+        type: type || (imagem ? 'photo' : 'text'),
+        tags: tags || [],
+        music: music || null,
+        title: title || null,
+        artist: artist || null,
+        curtidas: 0, 
+        likes: 0,
+        comentarios: 0, 
+        comments: [],
+        compartilhamentos: 0, 
+        shares: 0,
+        data: new Date().toISOString(), 
+        time: new Date().toISOString(),
+        curtidoPor: []
     };
     db.posts.unshift(newPost);
     saveDB(db);
@@ -226,8 +310,15 @@ app.post('/api/posts/:id/curtir', authenticateToken, (req, res) => {
     const post = db.posts.find(p => p.id === req.params.id);
     if (!post) return res.status(404).json({ error: 'Post não encontrado' });
     const index = post.curtidoPor.indexOf(req.user.id);
-    if (index > -1) { post.curtidoPor.splice(index, 1); post.curtidas--; } 
-    else { post.curtidoPor.push(req.user.id); post.curtidas++; }
+    if (index > -1) { 
+        post.curtidoPor.splice(index, 1); 
+        if(post.curtidas !== undefined) post.curtidas--; 
+        if(post.likes !== undefined) post.likes--; 
+    } else { 
+        post.curtidoPor.push(req.user.id); 
+        if(post.curtidas !== undefined) post.curtidas++; 
+        if(post.likes !== undefined) post.likes++; 
+    }
     saveDB(db);
     res.json(post);
 });
@@ -236,22 +327,34 @@ app.post('/api/posts/:id/compartilhar', authenticateToken, (req, res) => {
     const db = loadDB();
     const post = db.posts.find(p => p.id === req.params.id);
     if (!post) return res.status(404).json({ error: 'Post não encontrado' });
-    post.compartilhamentos++;
+    if(post.compartilhamentos !== undefined) post.compartilhamentos++;
+    if(post.shares !== undefined) post.shares++;
     saveDB(db);
     res.json(post);
 });
 
-app.post('/api/upload', authenticateToken, upload.single('file'), async (req, res) => {
-    try {
-        if (!req.file) return res.status(400).json({ error: 'Nenhum arquivo enviado' });
-        const result = await cloudinary.uploader.upload(req.file.path, { resource_type: "auto" });
-        fs.unlinkSync(req.file.path);
-        res.json({ url: result.secure_url, filename: req.file.filename, mimetype: req.file.mimetype });
-    } catch (error) {
-        res.status(500).json({ error: 'Erro ao enviar para a nuvem' });
-    }
+app.post('/api/posts/:id/comentar', authenticateToken, (req, res) => {
+    const { text, emoji } = req.body;
+    if (!text) return res.status(400).json({ error: 'Comentário vazio' });
+    const db = loadDB();
+    const post = db.posts.find(p => p.id === req.params.id);
+    if (!post) return res.status(404).json({ error: 'Post não encontrado' });
+    const user = db.users.find(u => u.id === req.user.id);
+    
+    const novoComentario = {
+        id: uuidv4(), author: user.nome, emoji: emoji || '🎮', text, time: new Date().toISOString()
+    };
+    
+    if(!post.comments) post.comments = [];
+    post.comments.push(novoComentario);
+    if(post.comentarios !== undefined) post.comentarios++;
+    saveDB(db);
+    res.json(post);
 });
 
+// ==========================================
+// STORIES, COMUNIDADES E MARKETPLACE
+// ==========================================
 app.get('/api/stories', (req, res) => {
     const db = loadDB();
     const now = new Date();
@@ -259,12 +362,12 @@ app.get('/api/stories', (req, res) => {
 });
 
 app.post('/api/stories', authenticateToken, (req, res) => {
-    const { texto, imagem } = req.body;
+    const { texto, imagem, type, media } = req.body;
     const db = loadDB();
     const user = db.users.find(u => u.id === req.user.id);
     const newStory = {
-        id: uuidv4(), usuario: user.nome, avatar: user.avatar, userId: user.id,
-        texto: texto || '', imagem: imagem || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800',
+        id: uuidv4(), usuario: user.nome, author: user.nome, avatar: user.avatar, userId: user.id,
+        texto: texto || '', imagem: imagem || media || null, mediaType: type || 'image',
         data: new Date().toISOString(), expiraEm: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
     };
     db.stories.push(newStory);
@@ -291,17 +394,40 @@ app.get('/api/marketplace', (req, res) => {
     res.json(loadDB().marketplace);
 });
 
+// ==========================================
+// USUÁRIOS E AMIGOS
+// ==========================================
 app.get('/api/users', authenticateToken, (req, res) => {
     const db = loadDB();
-    res.json(db.users.map(u => ({ id: u.id, nome: u.nome, avatar: u.avatar, bio: u.bio, seguidores: u.seguidores || 0, seguindo: u.seguindo || 0 })));
+    res.json(db.users.map(u => ({ id: u.id, nome: u.nome, tag: u.tag, avatar: u.avatar, bio: u.bio, seguidores: u.seguidores || 0, seguindo: u.seguindo || 0 })));
 });
 
 app.get('/api/users/search', authenticateToken, (req, res) => {
     const { q } = req.query;
     if (!q || q.length < 2) return res.json([]);
     const db = loadDB();
-    res.json(db.users.filter(u => u.nome.toLowerCase().includes(q.toLowerCase()) || u.email.toLowerCase().includes(q.toLowerCase()))
-        .map(u => ({ id: u.id, nome: u.nome, avatar: u.avatar, bio: u.bio })));
+    res.json(db.users.filter(u => u.nome.toLowerCase().includes(q.toLowerCase()) || (u.email && u.email.toLowerCase().includes(q.toLowerCase())))
+        .map(u => ({ id: u.id, nome: u.nome, tag: u.tag, avatar: u.avatar, bio: u.bio })));
+});
+
+app.get('/api/user/me', authenticateToken, (req, res) => {
+    const db = loadDB();
+    const user = db.users.find(u => u.id === req.user.id);
+    if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
+    res.json({ id: user.id, email: user.email, nome: user.nome, tag: user.tag || user.nome, phone: user.phone, avatar: user.avatar, bio: user.bio, seguidores: user.seguidores || 0, seguindo: user.seguindo || 0, nivel: user.nivel });
+});
+
+app.put('/api/user/me', authenticateToken, (req, res) => {
+    const { nome, tag, bio, avatar } = req.body;
+    const db = loadDB();
+    const user = db.users.find(u => u.id === req.user.id);
+    if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
+    if (nome) user.nome = nome;
+    if (tag) { user.tag = tag; user.nome = tag; }
+    if (bio !== undefined) user.bio = bio;
+    if (avatar) user.avatar = avatar;
+    saveDB(db);
+    res.json({ id: user.id, nome: user.nome, tag: user.tag, avatar: user.avatar, bio: user.bio });
 });
 
 app.get('/api/amigos', authenticateToken, (req, res) => {
@@ -310,7 +436,7 @@ app.get('/api/amigos', authenticateToken, (req, res) => {
     res.json(userAmigos.map(a => {
         const amigoId = a.userId === req.user.id ? a.amigoId : a.userId;
         const amigo = db.users.find(u => u.id === amigoId);
-        return { id: a.id, amigo: { id: amigo.id, nome: amigo.nome, avatar: amigo.avatar, bio: amigo.bio }, status: a.status, data: a.data };
+        return { id: a.id, amigo: { id: amigo.id, nome: amigo.nome, tag: amigo.tag, avatar: amigo.avatar, bio: amigo.bio }, status: a.status, data: a.data };
     }));
 });
 
@@ -328,6 +454,9 @@ app.post('/api/amigos/solicitar', authenticateToken, (req, res) => {
     res.json(novaSolicitacao);
 });
 
+// ==========================================
+// MENSAGENS E GALERIA
+// ==========================================
 app.get('/api/mensagens', authenticateToken, (req, res) => {
     const db = loadDB();
     const conversas = {};
@@ -336,10 +465,14 @@ app.get('/api/mensagens', authenticateToken, (req, res) => {
             const contatoId = msg.remetenteId === req.user.id ? msg.destinatarioId : msg.remetenteId;
             if (!conversas[contatoId]) {
                 const contato = db.users.find(u => u.id === contatoId);
-                conversas[contatoId] = { contato: { id: contato.id, nome: contato.nome, avatar: contato.avatar }, ultimaMensagem: msg, naoLidas: 0 };
+                if(contato) {
+                    conversas[contatoId] = { contato: { id: contato.id, nome: contato.nome, avatar: contato.avatar }, ultimaMensagem: msg, naoLidas: 0 };
+                }
             }
-            if (msg.destinatarioId === req.user.id && !msg.lida) conversas[contatoId].naoLidas++;
-            if (new Date(msg.data) > new Date(conversas[contatoId].ultimaMensagem.data)) conversas[contatoId].ultimaMensagem = msg;
+            if (conversas[contatoId]) {
+                if (msg.destinatarioId === req.user.id && !msg.lida) conversas[contatoId].naoLidas++;
+                if (new Date(msg.data) > new Date(conversas[contatoId].ultimaMensagem.data)) conversas[contatoId].ultimaMensagem = msg;
+            }
         }
     });
     res.json(Object.values(conversas));
@@ -381,25 +514,18 @@ app.post('/api/galeria', authenticateToken, (req, res) => {
     res.json(newItem);
 });
 
-app.get('/api/user/me', authenticateToken, (req, res) => {
-    const db = loadDB();
-    const user = db.users.find(u => u.id === req.user.id);
-    if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
-    res.json({ id: user.id, email: user.email, nome: user.nome, avatar: user.avatar, bio: user.bio, seguidores: user.seguidores || 0, seguindo: user.seguindo || 0, nivel: user.nivel });
+// ==========================================
+// SERVIR FRONTENDS MULTIPLOS
+// ==========================================
+
+// Rota específica para abrir o Gameverse (Corrigido para gameverse.html)
+app.get('/gameverse', (req, res) => {
+    const caminhoArquivo = path.join(__dirname, 'gameverse.html');
+    if (fs.existsSync(caminhoArquivo)) res.sendFile(caminhoArquivo);
+    else res.status(404).send('Arquivo gameverse.html não encontrado no servidor.');
 });
 
-app.put('/api/user/me', authenticateToken, (req, res) => {
-    const { nome, bio, avatar } = req.body;
-    const db = loadDB();
-    const user = db.users.find(u => u.id === req.user.id);
-    if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
-    if (nome) user.nome = nome;
-    if (bio !== undefined) user.bio = bio;
-    if (avatar) user.avatar = avatar;
-    saveDB(db);
-    res.json({ id: user.id, nome: user.nome, avatar: user.avatar, bio: user.bio });
-});
-
+// Rota padrão para abrir o seu site original
 app.get('*', (req, res) => {
     const caminhoArquivo = path.join(__dirname, 'index.html');
     if (fs.existsSync(caminhoArquivo)) res.sendFile(caminhoArquivo);
@@ -412,5 +538,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`🚀 Urckut Server rodando na porta ${PORT}`);
+    console.log(`🚀 Servidor rodando na porta ${PORT}`);
 });
