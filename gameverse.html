@@ -607,8 +607,8 @@ body.fullscreen .screen{padding-bottom:0;}
 // CONFIGURAÇÃO DE API (Conectando ao Server.js)
 // ==========================================
 
-// ⚠️ ATENÇÃO ELIAS: COLOQUE O LINK REAL DO SEU RENDER AQUI EMBAIXO NO LUGAR DE "SEU-LINK-DO-RENDER-AQUI" ⚠️
-const API_URL = 'https://SEU-LINK-DO-RENDER-AQUI.onrender.com/api'; 
+// AQUI FOI ONDE EU CORRIGI A URL DO RENDER! 👇
+const API_URL = 'https://urckut.onrender.com/api'; 
 let authToken = localStorage.getItem('gameverse_token') || null;
 
 async function apiCall(endpoint, method = 'GET', body = null) {
