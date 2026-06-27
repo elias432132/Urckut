@@ -1,0 +1,48 @@
+name: Gerar APK Gameverse
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Construir APK Android
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Baixar os arquivos
+        uses: actions/checkout@v4
+
+      - name: 2. Configurar o Motor (Node.js)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: 3. Configurar Sistema Android (Java)
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: 4. Instalar o Construtor (Cordova)
+        run: npm install -g cordova
+
+      - name: 5. Montar a Estrutura do App
+        run: |
+          cordova create app com.gameverse.app "Gameverse"
+          rm -rf app/www/*
+          cp gameverse.html app/www/index.html
+          cp -r img app/www/img || true
+          
+      - name: 6. Gerar o arquivo APK
+        working-directory: ./app
+        run: |
+          cordova platform add android
+          cordova build android
+          
+      - name: 7. Salvar o APK pronto
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gameverse-APK
+          path: app/platforms/android/app/build/outputs/apk/debug/app-debug.apk
