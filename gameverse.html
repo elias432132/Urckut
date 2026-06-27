@@ -607,10 +607,11 @@ body.fullscreen .screen{padding-bottom:0;}
 // CONFIGURAÇÃO DE API (Conectando ao Server.js)
 // ==========================================
 
-// AQUI FOI ONDE EU CORRIGI A URL DO RENDER! 👇
+// URL DO RENDER
 const API_URL = 'https://urckut.onrender.com/api'; 
 let authToken = localStorage.getItem('gameverse_token') || null;
 
+// Função apiCall aprimorada com tratamento de erros robusto
 async function apiCall(endpoint, method = 'GET', body = null) {
     const headers = {};
     if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
@@ -628,8 +629,14 @@ async function apiCall(endpoint, method = 'GET', body = null) {
 
     const res = await fetch(API_URL + endpoint, options);
     if (!res.ok) {
-        const err = await res.text();
-        throw new Error(err);
+        let errMessage = 'Erro de comunicação';
+        try {
+            const errJson = await res.json();
+            errMessage = errJson.message || errJson.error || JSON.stringify(errJson);
+        } catch (e) {
+            errMessage = await res.text() || `Erro HTTP: ${res.status}`;
+        }
+        throw new Error(errMessage);
     }
     return res.json();
 }
@@ -890,14 +897,21 @@ function applyProfilePic() {
 }
 
 // ==========================================
-// AUTENTICAÇÃO COM SENHA E LOGIN ÚNICO
+// AUTENTICAÇÃO COM SENHA E LOGIN ÚNICO (Modificado)
 // ==========================================
 async function loginUser() {
+    const loginBtn = document.querySelector('.login-box .btn-primary');
     const loginId = document.getElementById('loginIdInput').value.trim();
     const password = document.getElementById('passwordInput').value.trim();
     
     if(!loginId) { showToast('❌ Digite o número ou Gamertag'); return; }
     if(!password) { showToast('❌ Digite a senha'); return; }
+    
+    // BLOQUEIA O BOTÃO E MUDA O VISUAL PARA EVITAR DUPLO CLIQUE
+    loginBtn.disabled = true;
+    loginBtn.innerHTML = '⏳ CONECTANDO...';
+    loginBtn.style.opacity = '0.6';
+    loginBtn.style.cursor = 'not-allowed';
     
     showToast('⏳ Conectando ao servidor...');
     
@@ -928,6 +942,12 @@ async function loginUser() {
         
     } catch (error) {
         showToast('❌ Erro no login: ' + error.message);
+    } finally {
+        // LIBERA O BOTÃO SEMPRE
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = '🚀 ENTRAR';
+        loginBtn.style.opacity = '1';
+        loginBtn.style.cursor = 'pointer';
     }
 }
 
