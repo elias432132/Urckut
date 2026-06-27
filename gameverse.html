@@ -44,25 +44,12 @@ canvas#particleCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index
 .login-box h2{text-align:center;color:var(--neon16);font-size:1.2rem;margin-bottom:20px;}
 .input-group{margin-bottom:18px;position:relative;}
 .input-group label{display:block;font-size:0.8rem;color:#aaa;margin-bottom:6px;}
-.phone-input{display:flex;align-items:center;gap:8px;}
-.country-code{background:rgba(0,255,255,0.1);border:1px solid rgba(0,255,255,0.3);border-radius:12px;padding:14px 12px;color:#fff;font-size:1rem;width:80px;}
 .input-group input{width:100%;padding:14px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:#fff;font-size:1rem;outline:none;transition:all 0.3s;}
 .input-group input:focus{border-color:var(--current-neon);box-shadow:0 0 20px rgba(0,255,255,0.2);}
-.input-group select{padding:14px 12px;background:rgba(0,255,255,0.1);border:1px solid rgba(0,255,255,0.3);border-radius:12px;color:#fff;font-size:1rem;outline:none;}
-.input-group select option{background:#1a1a2e;}
 .btn-primary{width:100%;padding:16px;border:none;border-radius:14px;font-size:1.1rem;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--neon16),var(--neon21));color:#fff;position:relative;overflow:hidden;transition:all 0.3s;letter-spacing:1px;margin-top:10px;}
 .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,255,255,0.4);}
 .btn-primary:active{transform:translateY(0);}
 .terms{text-align:center;font-size:0.7rem;color:#555;margin-top:15px;line-height:1.4;}
-
-#verifyScreen{position:fixed;inset:0;z-index:999;display:none;flex-direction:column;align-items:center;justify-content:center;background:var(--bg-dark);}
-#verifyScreen.active{display:flex;}
-.verify-box{width:90%;max-width:380px;background:rgba(15,15,30,0.9);border:1px solid rgba(0,255,255,0.2);border-radius:20px;padding:30px;text-align:center;}
-.otp-inputs{display:flex;gap:10px;justify-content:center;margin:25px 0;}
-.otp-inputs input{width:50px;height:55px;text-align:center;font-size:1.5rem;font-weight:700;background:rgba(255,255,255,0.05);border:1px solid rgba(0,255,255,0.3);border-radius:12px;color:#fff;outline:none;}
-.otp-inputs input:focus{border-color:var(--neon16);box-shadow:0 0 15px rgba(0,255,255,0.3);}
-.resend-timer{color:#888;font-size:0.85rem;margin-top:10px;}
-.resend-timer span{color:var(--neon16);cursor:pointer;}
 
 .header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(10,10,20,0.95);border-bottom:1px solid rgba(255,255,255,0.05);backdrop-filter:blur(20px);min-height:56px;}
 .header-left{display:flex;align-items:center;gap:10px;}
@@ -347,7 +334,7 @@ body.fullscreen .screen{padding-bottom:0;}
 @media(min-width:768px){
     body{display:flex;justify-content:center;background:#000;}
     #bgCanvas,#particleCanvas{width:100vw;height:100vh;left:0;transform:none;}
-    #app,#loginScreen,#verifyScreen,#chatView,#settingsView,#callScreen,#statusViewer,.notif-overlay,.modal-overlay{width:100%;max-width:480px;position:fixed;left:50%;transform:translateX(-50%);border-left:1px solid rgba(255,255,255,0.1);border-right:1px solid rgba(255,255,255,0.1);}
+    #app,#loginScreen,#chatView,#settingsView,#callScreen,#statusViewer,.notif-overlay,.modal-overlay{width:100%;max-width:480px;position:fixed;left:50%;transform:translateX(-50%);border-left:1px solid rgba(255,255,255,0.1);border-right:1px solid rgba(255,255,255,0.1);}
     .bottom-nav{max-width:480px;left:50%;transform:translateX(-50%);}
     .notif-panel{max-width:360px;}
 }
@@ -371,41 +358,17 @@ body.fullscreen .screen{padding-bottom:0;}
     <div class="login-logo">🎮 GAMEVERSE</div>
     <div class="login-subtitle">A rede social definitiva para gamers.<br>Conecte-se, jogue e domine.</div>
     <div class="login-box">
-        <h2>🔗 Vincular WhatsApp</h2>
+        <h2>🔗 Acesso Restrito</h2>
         <div class="input-group">
-            <label>Número do WhatsApp</label>
-            <div class="phone-input">
-                <select class="country-code" id="countryCode">
-                    <option value="+55">🇧🇷 +55</option>
-                    <option value="+1">🇺🇸 +1</option>
-                    <option value="+351">🇵🇹 +351</option>
-                </select>
-                <input type="tel" id="phoneInput" placeholder="(11) 99999-9999" maxlength="15">
-            </div>
+            <label>Número do WhatsApp ou Gamertag</label>
+            <input type="text" id="loginIdInput" placeholder="Ex: (11) 99999-9999 ou ShadowKiller_X">
         </div>
         <div class="input-group">
-            <label>Gamertag (nome de jogador)</label>
-            <input type="text" id="gamertagInput" placeholder="Ex: ShadowKiller_X" maxlength="20">
+            <label>Senha</label>
+            <input type="password" id="passwordInput" placeholder="Sua senha secreta">
         </div>
-        <button class="btn-primary" onclick="sendOTP()">🚀 ENTRAR NO GAMEVERSE</button>
+        <button class="btn-primary" onclick="loginUser()">🚀 ENTRAR</button>
         <div class="terms">Ao continuar, você concorda com os Termos de Serviço<br>e Política de Privacidade do GameVerse.</div>
-    </div>
-</div>
-
-<div id="verifyScreen">
-    <div class="verify-box">
-        <h2 style="color:var(--neon16);margin-bottom:8px;">🔐 Verificação</h2>
-        <p style="color:#888;font-size:0.85rem;">Digite o código enviado para o seu WhatsApp<br><small style="color:#555;">(Dica: qualquer código de 6 dígitos funciona)</small></p>
-        <div class="otp-inputs">
-            <input type="text" maxlength="1" class="otp-digit">
-            <input type="text" maxlength="1" class="otp-digit">
-            <input type="text" maxlength="1" class="otp-digit">
-            <input type="text" maxlength="1" class="otp-digit">
-            <input type="text" maxlength="1" class="otp-digit">
-            <input type="text" maxlength="1" class="otp-digit">
-        </div>
-        <button class="btn-primary" onclick="verifyOTP()">✅ VERIFICAR</button>
-        <div class="resend-timer">Reenviar código em <span id="resendTimer">30s</span></div>
     </div>
 </div>
 
@@ -643,7 +606,9 @@ body.fullscreen .screen{padding-bottom:0;}
 // ==========================================
 // CONFIGURAÇÃO DE API (Conectando ao Server.js)
 // ==========================================
-const API_URL = '/api'; // Aponta para a mesma raiz onde o Node.js está rodando
+
+// ⚠️ ATENÇÃO ELIAS: COLOQUE O LINK REAL DO SEU RENDER AQUI EMBAIXO NO LUGAR DE "SEU-LINK-DO-RENDER-AQUI" ⚠️
+const API_URL = 'https://SEU-LINK-DO-RENDER-AQUI.onrender.com/api'; 
 let authToken = localStorage.getItem('gameverse_token') || null;
 
 async function apiCall(endpoint, method = 'GET', body = null) {
@@ -886,8 +851,6 @@ async function init() {
         applyUser();
         applyProfilePic();
         setTimeout(() => initApp(), 100);
-    } else {
-        setupOTPInputs();
     }
 }
 
@@ -927,55 +890,21 @@ function applyProfilePic() {
 }
 
 // ==========================================
-// AUTENTICAÇÃO
+// AUTENTICAÇÃO COM SENHA E LOGIN ÚNICO
 // ==========================================
-function sendOTP() {
-    const phone = document.getElementById('phoneInput').value;
-    const tag = document.getElementById('gamertagInput').value.trim();
-    if(phone.length < 8) { showToast('❌ Digite um número válido'); return; }
-    if(!tag) { showToast('❌ Escolha um Gamertag'); return; }
+async function loginUser() {
+    const loginId = document.getElementById('loginIdInput').value.trim();
+    const password = document.getElementById('passwordInput').value.trim();
     
-    // Armazena temporariamente para usar na tela de verificação
-    state.currentUser = { phone: document.getElementById('countryCode').value + phone, tag };
-    
-    document.getElementById('loginScreen').classList.add('hidden');
-    document.getElementById('verifyScreen').classList.add('active');
-    startResendTimer();
-    showToast('📱 Código enviado para ' + state.currentUser.phone);
-}
-
-function setupOTPInputs() {
-    document.querySelectorAll('.otp-digit').forEach((input, i, inputs) => {
-        input.addEventListener('input', () => { if(input.value && i < inputs.length-1) inputs[i+1].focus(); });
-        input.addEventListener('keydown', (e) => { if(e.key === 'Backspace' && !input.value && i > 0) inputs[i-1].focus(); });
-    });
-}
-
-function startResendTimer() {
-    let s = 30;
-    const el = document.getElementById('resendTimer');
-    const t = setInterval(() => {
-        s--;
-        el.textContent = s + 's';
-        if(s <= 0) {
-            clearInterval(t);
-            el.innerHTML = '<span onclick="showToast(\'📱 Código reenviado!\')">Reenviar</span>';
-        }
-    }, 1000);
-}
-
-// LOGIN NO BACKEND
-async function verifyOTP() {
-    const digits = document.querySelectorAll('.otp-digit');
-    const code = Array.from(digits).map(d => d.value).join('');
-    if(code.length < 6) { showToast('❌ Digite o código completo'); return; }
+    if(!loginId) { showToast('❌ Digite o número ou Gamertag'); return; }
+    if(!password) { showToast('❌ Digite a senha'); return; }
     
     showToast('⏳ Conectando ao servidor...');
     
     try {
-        const response = await apiCall('/auth/otp', 'POST', {
-            phone: state.currentUser.phone,
-            tag: state.currentUser.tag
+        const response = await apiCall('/auth/login', 'POST', {
+            loginId: loginId,
+            password: password
         });
         
         authToken = response.token;
@@ -984,7 +913,7 @@ async function verifyOTP() {
         state.currentUser = response.user;
         state.profilePic = response.user.avatar;
         
-        document.getElementById('verifyScreen').style.display = 'none';
+        document.getElementById('loginScreen').classList.add('hidden');
         document.getElementById('app').style.display = 'flex';
         applyUser();
         applyProfilePic();
@@ -998,7 +927,7 @@ async function verifyOTP() {
         setTimeout(() => initApp(), 100);
         
     } catch (error) {
-        showToast('❌ Erro no servidor: ' + error.message);
+        showToast('❌ Erro no login: ' + error.message);
     }
 }
 
