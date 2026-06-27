@@ -211,23 +211,69 @@ app.post('/api/auth/register', async (req, res) => {
     }
 });
 
-// 2. Antigo: Login por Email
+// ==========================================
+// Rota Mágica de Login (Funciona para Gameverse e Urckut ao mesmo tempo!)
+// Substituiu a antiga rota de "Login por Email"
+// ==========================================
 app.post('/api/auth/login', async (req, res) => {
     try {
-        const { email, senha } = req.body;
-        const db = loadDB();
-        const user = db.users.find(u => u.email === email);
-        if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
-        
-        if (user.senha) {
-            const validSenha = await bcrypt.compare(senha, user.senha);
-            if (!validSenha) return res.status(400).json({ error: 'Senha incorreta' });
+        // Pega os dados, não importa de qual app vieram
+        const { loginId, password, email, senha } = req.body;
+
+        // O identificador pode ser o número, email ou gamertag
+        const identificador = loginId || email; 
+        const senhaRecebida = password || senha;
+
+        // Verifica se a pessoa preencheu tudo
+        if (!identificador || !senhaRecebida) {
+            return res.status(400).json({ error: "Preencha todos os campos!" });
         }
+
+        // ==========================================
+        // LÓGICA DO SEU BANCO DE DADOS (Conectada ao loadDB)
+        // Aqui o sistema procura o usuário que tenha esse identificador
+        // ==========================================
+        const db = loadDB();
         
-        const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
-        res.json({ token, user: { id: user.id, email: user.email, nome: user.nome, avatar: user.avatar, bio: user.bio } });
+        const user = db.users.find(u => 
+            u.email === identificador || 
+            u.phone === identificador || 
+            u.tag === identificador
+        );
+
+        if (!user) {
+            return res.status(401).json({ error: "Usuário não encontrado." });
+        }
+
+        // Verifica a senha (usando bcrypt para comparar a senha encriptada)
+        if (user.senha) {
+            const validSenha = await bcrypt.compare(senhaRecebida, user.senha);
+            if (!validSenha) {
+                return res.status(401).json({ error: "Senha incorreta!" });
+            }
+        }
+
+        // ==========================================
+        // SE DEU TUDO CERTO (Libera o acesso)
+        // ==========================================
+        const token = jwt.sign({ id: user.id, email: user.email, phone: user.phone }, JWT_SECRET, { expiresIn: '7d' });
+
+        res.json({
+            token: token,
+            user: {
+                id: user.id,
+                nome: user.nome,
+                tag: user.tag || user.nome,
+                avatar: user.avatar,
+                bio: user.bio,
+                email: user.email,
+                phone: user.phone
+            }
+        });
+
     } catch (error) {
-        res.status(500).json({ error: 'Erro ao fazer login' });
+        console.error("Erro no Login:", error);
+        res.status(500).json({ error: "Erro interno no servidor" });
     }
 });
 
