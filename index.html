@@ -1058,8 +1058,8 @@
         <div class="login-container">
             <h1>URCKUT</h1>
             <p>The Cybernetic Social Operating System</p>
-            <input type="email" id="login-email" placeholder="Endereço de Rede" autocomplete="email">
-            <input type="password" id="login-senha" placeholder="Chave de Acesso" autocomplete="current-password">
+            <input type="email" id="login-email" placeholder="Endereço de Rede (Email ou Número)" autocomplete="email">
+            <input type="password" id="login-senha" placeholder="Chave de Acesso (Senha)" autocomplete="current-password">
             <button class="btn-neon btn-pink" style="width: 100%; margin-top: 20px; padding: 15px; font-size: 16px;" onclick="entrarNoSistema()">
                 <i class="fas fa-sign-in-alt"></i> Acessar Matriz
             </button>
@@ -1304,7 +1304,8 @@
     <script>
         console.log('🚀 Urckut inicializando...');
         
-        const API_URL = window.location.origin;
+        // ⚠️ ATENÇÃO ELIAS: COLOQUE O LINK REAL DO SEU RENDER AQUI ⚠️
+        const API_URL = 'https://SEU-LINK-DO-RENDER-AQUI.onrender.com';
         console.log('📡 API URL:', API_URL);
         
         let token = null;
