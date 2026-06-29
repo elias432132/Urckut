@@ -605,11 +605,16 @@ body.fullscreen .screen{padding-bottom:0;}
 
 <script>
 // ==========================================
-// CONFIGURAÇÃO DE API (Conectando ao Server.js)
+// CONFIGURAÇÃO DE API E VARIÁVEIS GLOBAIS
 // ==========================================
 
 const API_URL = 'https://urckut.onrender.com/api'; 
 let authToken = localStorage.getItem('gameverse_token') || null;
+
+// Variáveis para Áudio Real
+let mediaRecorder;
+let audioChunks = [];
+let audioStream;
 
 async function apiCall(endpoint, method = 'GET', body = null) {
     const headers = {};
@@ -666,7 +671,7 @@ const state = {
     likedPosts: [],
     savedPosts: [],
     myStatuses: [],
-    myPosts: [], // Virá do Servidor
+    myPosts: [], 
     callHistory: [],
     friends: [],
     contacts: [],
@@ -917,7 +922,7 @@ async function loginUser() {
         setTimeout(() => initApp(), 100);
         
     } catch (error) {
-        // DESTRAVA O BOTÃO SE DER ERRO
+        // DESTRAVA O BOTÃO SE DER ERRO (Loop corrigido)
         btn.disabled = false;
         btn.innerHTML = textoOriginal;
         btn.style.opacity = '1';
@@ -1773,9 +1778,23 @@ function renderLiveSection() {
     container.innerHTML = `<div class="live-banner" onclick="startMyLive()"><div class="live-badge"><div class="pulse"></div> AO VIVO</div><div class="live-title">🎮 Iniciar sua Live</div><div class="live-viewers">Compartilhe sua gameplay com o mundo!</div></div>`;
 }
 
-function startMyLive() {
-    showToast('🔴 Live iniciada!');
-    addNotification('📺', '#ff0066', 'Sua live começou!', 'Convide amigos para assistir');
+// ==========================================
+// AQUI ESTÁ A CORREÇÃO DO BOTÃO DE LIVE
+// ==========================================
+async function startMyLive() {
+    try {
+        showToast("⏳ Preparando sistema de Live...");
+        // Exige a permissão do Android para usar Câmera e Microfone
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        
+        showToast("🔴 VOCÊ ESTÁ AO VIVO!");
+        addNotification('📺', '#ff0066', 'Sua live começou!', 'Convide amigos para assistir');
+        
+        // Mantém a câmera ligada (apenas para habilitar a permissão no Android)
+        // Opcional: Desligar após testar para não gastar bateria no background
+    } catch(err) {
+        showToast("❌ Erro: O app precisa de permissão de Câmera.");
+    }
 }
 
 function renderGamesList() {
@@ -2187,19 +2206,62 @@ function insertEmoji(emoji) {
     document.getElementById('emojiPicker').classList.remove('open');
 }
 
-function startRecording() {
+// ==========================================
+// AQUI ESTÁ A CORREÇÃO DO ÁUDIO (Grava de Verdade e Envia)
+// ==========================================
+async function startRecording() {
     if(!state.recording) {
-        state.recording = true;
-        state.recSeconds = 0;
-        document.getElementById('recIndicator').classList.add('active');
-        document.getElementById('chatInputArea').style.display = 'none';
-        state.recTimer = setInterval(() => {
-            state.recSeconds++;
-            const m = Math.floor(state.recSeconds/60).toString().padStart(2,'0');
-            const s = (state.recSeconds%60).toString().padStart(2,'0');
-            document.getElementById('recTime').textContent = m + ':' + s;
-        }, 1000);
-        showToast('🎤 Gravando...');
+        try {
+            audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(audioStream);
+            audioChunks = [];
+            
+            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+            
+            mediaRecorder.onstop = async () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                const file = new File([audioBlob], "audio.webm", { type: 'audio/webm' });
+                
+                showToast("⏳ Enviando áudio...");
+                try {
+                    const mediaUrl = await uploadFileToBackend(file);
+                    
+                    const time = new Date().getHours().toString().padStart(2, '0') + ':' + new Date().getMinutes().toString().padStart(2, '0');
+                    const chatId = state.currentChatType === 'user' ? 'user_'+state.currentChat.name : 'group_'+state.currentChat.id;
+                    if(!state.chatMessages[chatId]) state.chatMessages[chatId] = [];
+                    
+                    // Envia mensagem com o player de áudio clicável
+                    state.chatMessages[chatId].push({ 
+                        text: `<audio controls src="${mediaUrl}" style="max-width:200px;"></audio>`, 
+                        sent: true, time, sender: state.currentUser.tag 
+                    });
+                    
+                    saveLocalPreferences();
+                    renderMessages();
+                    renderChatList();
+                    showToast('✅ Áudio enviado!');
+                } catch (err) {
+                    showToast('❌ Erro ao enviar áudio');
+                }
+            };
+            
+            mediaRecorder.start();
+
+            state.recording = true;
+            state.recSeconds = 0;
+            document.getElementById('recIndicator').classList.add('active');
+            document.getElementById('chatInputArea').style.display = 'none';
+            
+            state.recTimer = setInterval(() => {
+                state.recSeconds++;
+                const m = Math.floor(state.recSeconds/60).toString().padStart(2,'0');
+                const s = (state.recSeconds%60).toString().padStart(2,'0');
+                document.getElementById('recTime').textContent = m + ':' + s;
+            }, 1000);
+            showToast('🎤 Gravando...');
+        } catch(e) {
+            showToast("❌ Permissão de microfone negada!");
+        }
     }
 }
 
@@ -2208,6 +2270,12 @@ function cancelRecording() {
     clearInterval(state.recTimer);
     document.getElementById('recIndicator').classList.remove('active');
     document.getElementById('chatInputArea').style.display = 'flex';
+    
+    if(mediaRecorder && mediaRecorder.state === "recording") {
+        mediaRecorder.stop();
+        audioChunks = []; 
+        if(audioStream) audioStream.getTracks().forEach(track => track.stop());
+    }
     showToast('❌ Cancelado');
 }
 
@@ -2216,15 +2284,11 @@ function stopRecording() {
     clearInterval(state.recTimer);
     document.getElementById('recIndicator').classList.remove('active');
     document.getElementById('chatInputArea').style.display = 'flex';
-    const dur = document.getElementById('recTime').textContent;
-    const time = new Date().getHours().toString().padStart(2, '0') + ':' + new Date().getMinutes().toString().padStart(2, '0');
-    const chatId = state.currentChatType === 'user' ? 'user_'+state.currentChat.name : 'group_'+state.currentChat.id;
-    if(!state.chatMessages[chatId]) state.chatMessages[chatId] = [];
-    state.chatMessages[chatId].push({ text: '🎤 Áudio ('+dur+')', sent: true, time, sender: state.currentUser.tag });
-    saveLocalPreferences();
-    renderMessages();
-    renderChatList();
-    showToast('✅ Áudio enviado!');
+    
+    if(mediaRecorder && mediaRecorder.state === "recording") {
+        mediaRecorder.stop(); // Isso dispara o onstop que criamos acima para subir pro Cloudinary
+        if(audioStream) audioStream.getTracks().forEach(track => track.stop());
+    }
 }
 
 function openSearch() {
