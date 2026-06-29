@@ -113,7 +113,8 @@ cloudinary.config({
   api_secret: '5GRgxHsOvepEbejX4xzQR2Q8DUg'
 });
 
-app.use(cors());
+// AQUI ESTÁ A CORREÇÃO PRINCIPAL DO CORS PARA O APK NÃO TRAVAR
+app.use(cors({ origin: '*' }));
 // Limite aumentado para 250MB
 app.use(express.json({ limit: '250mb' }));
 app.use(express.urlencoded({ limit: '250mb', extended: true }));
