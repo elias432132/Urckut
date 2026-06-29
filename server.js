@@ -12,14 +12,13 @@ const mongoose = require('mongoose');
 // --- CONEXÃO MONGODB ---
 const MONGO_URI = 'mongodb+srv://adrianogatinho1992g7_db_user:JK7OSNfR6WhgxRxk@cluster0.dwtwrz6.mongodb.net/?appName=Cluster0';
 
-// MUDANÇA: Substituído 'urckut_db' por 'gameverse_db'
 const dbSchema = new mongoose.Schema({
-    _id: { type: String, default: 'gameverse_db' },
+    _id: { type: String, default: 'urckut_db' },
     data: { type: mongoose.Schema.Types.Mixed, default: {} }
 });
 const DBModel = mongoose.model('Database', dbSchema);
 
-// Dados iniciais limpos (Apenas para o GameVerse, sem comunidades e sem marketplace)
+// Dados iniciais intactos
 const initialData = {
     users: [],
     posts: [
@@ -37,26 +36,56 @@ const initialData = {
     ],
     stories: [],
     mensagens: [],
+    comunidades: [
+        {
+            id: uuidv4(),
+            nome: 'Eu odeio acordar cedo',
+            imagem: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=150',
+            membros: 1204453,
+            participantes: []
+        },
+        {
+            id: uuidv4(),
+            nome: 'Programadores da Madrugada',
+            imagem: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=150',
+            membros: 54200,
+            participantes: []
+        }
+    ],
+    marketplace: [
+        {
+            id: uuidv4(),
+            titulo: 'Placa RTX',
+            imagem: 'https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=300',
+            preco: 2400,
+            vendedor: '@Alice_99'
+        },
+        {
+            id: uuidv4(),
+            titulo: 'Setup Cyberpunk',
+            imagem: 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=300',
+            preco: 5000,
+            vendedor: '@Neo_Store'
+        }
+    ],
     amigos: [],
     galeria: []
 };
 
 let memoryDB = initialData;
-let isDbReady = false; // VARIAVEL DE CONTROLE PARA O COLD START
 
 mongoose.connect(MONGO_URI)
   .then(async () => {
       console.log('✅ Conectado ao MongoDB com sucesso!');
       try {
-          const doc = await DBModel.findById('gameverse_db'); // MUDANÇA
+          const doc = await DBModel.findById('urckut_db');
           if (doc && doc.data && doc.data.users) {
               memoryDB = doc.data;
-              console.log('✅ Banco de dados do GameVerse carregado da nuvem!');
+              console.log('✅ Banco de dados carregado da nuvem!');
           } else {
-              await DBModel.create({ _id: 'gameverse_db', data: memoryDB }); // MUDANÇA
-              console.log('✅ Novo banco de dados do GameVerse criado na nuvem!');
+              await DBModel.create({ _id: 'urckut_db', data: memoryDB });
+              console.log('✅ Novo banco de dados criado na nuvem!');
           }
-          isDbReady = true; // SINALIZA QUE ESTÁ PRONTO PARA RECEBER REQUISIÇÕES
       } catch (err) {
           console.error('Erro ao ler do banco:', err);
       }
@@ -69,7 +98,7 @@ function loadDB() {
 
 function saveDB(db) {
     memoryDB = db;
-    DBModel.updateOne({ _id: 'gameverse_db' }, { data: memoryDB }) // MUDANÇA
+    DBModel.updateOne({ _id: 'urckut_db' }, { data: memoryDB })
         .catch(err => console.error('Erro ao salvar na nuvem:', err));
 }
 
@@ -84,24 +113,11 @@ cloudinary.config({
   api_secret: '5GRgxHsOvepEbejX4xzQR2Q8DUg'
 });
 
-// MUDANÇA: CORS focado em Webview
-app.use(cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
+app.use(cors());
+// Limite aumentado para 250MB
 app.use(express.json({ limit: '250mb' }));
 app.use(express.urlencoded({ limit: '250mb', extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// MUDANÇA: MIDDLEWARE DE PROTEÇÃO CONTRA O COLD START
-app.use((req, res, next) => {
-    if (!isDbReady && req.path !== '/api/health') {
-        return res.status(503).json({ error: 'Servidor iniciando, tente novamente em alguns segundos...' });
-    }
-    next();
-});
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -168,13 +184,40 @@ app.post('/api/upload', authenticateToken, upload.single('file'), async (req, re
 });
 
 // ==========================================
-// MÓDULO DE AUTENTICAÇÃO (MUDANÇA: Rota de email do Urckut excluída)
+// MÓDULO DE AUTENTICAÇÃO
 // ==========================================
 
-// Rota Mágica de Login (Gameverse e senhas antigas)
+// 1. Antigo: Registro por Email
+app.post('/api/auth/register', async (req, res) => {
+    try {
+        const { email, senha, nome } = req.body;
+        const db = loadDB();
+        if (db.users.find(u => u.email === email)) {
+            return res.status(400).json({ error: 'Email já cadastrado' });
+        }
+        const hashedSenha = await bcrypt.hash(senha, 10);
+        const newUser = {
+            id: uuidv4(), email, nome: nome || email.split('@')[0], senha: hashedSenha,
+            avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200',
+            bio: 'Desenvolvedor de realidades digitais.', seguidores: 0, seguindo: 0,
+            nivel: 'Elite', criadoEm: new Date().toISOString()
+        };
+        db.users.push(newUser);
+        saveDB(db);
+        const token = jwt.sign({ id: newUser.id, email: newUser.email }, JWT_SECRET, { expiresIn: '7d' });
+        res.json({ token, user: { id: newUser.id, email: newUser.email, nome: newUser.nome, avatar: newUser.avatar } });
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao criar usuário' });
+    }
+});
+
+// ==========================================
+// Rota Mágica de Login (Funciona para Gameverse e Urckut ao mesmo tempo!)
+// ==========================================
 app.post('/api/auth/login', async (req, res) => {
     try {
         const { loginId, password, email, senha } = req.body;
+
         const identificador = loginId || email; 
         const senhaRecebida = password || senha;
 
@@ -194,14 +237,11 @@ app.post('/api/auth/login', async (req, res) => {
             return res.status(401).json({ error: "Usuário não encontrado." });
         }
 
-        // MUDANÇA: Proteção de segurança caso o usuário não tenha senha definida
-        if (!user.senha) {
-            return res.status(401).json({ error: "Esta conta só pode ser acessada via código no celular (OTP)." });
-        }
-
-        const validSenha = await bcrypt.compare(senhaRecebida, user.senha);
-        if (!validSenha) {
-            return res.status(401).json({ error: "Senha incorreta!" });
+        if (user.senha) {
+            const validSenha = await bcrypt.compare(senhaRecebida, user.senha);
+            if (!validSenha) {
+                return res.status(401).json({ error: "Senha incorreta!" });
+            }
         }
 
         const token = jwt.sign({ id: user.id, email: user.email, phone: user.phone }, JWT_SECRET, { expiresIn: '7d' });
@@ -225,7 +265,7 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
-// Login OTP por Telefone (Gameverse)
+// 3. Novo: Login OTP por Telefone (Gameverse)
 app.post('/api/auth/otp', (req, res) => {
     try {
         const { phone, tag } = req.body;
@@ -347,7 +387,7 @@ app.post('/api/posts/:id/comentar', authenticateToken, (req, res) => {
 });
 
 // ==========================================
-// STORIES E STATUS
+// STORIES, COMUNIDADES E MARKETPLACE
 // ==========================================
 app.get('/api/stories', (req, res) => {
     const db = loadDB();
@@ -367,6 +407,25 @@ app.post('/api/stories', authenticateToken, (req, res) => {
     db.stories.push(newStory);
     saveDB(db);
     res.json(newStory);
+});
+
+app.get('/api/comunidades', (req, res) => {
+    res.json(loadDB().comunidades);
+});
+
+app.post('/api/comunidades/:id/participar', authenticateToken, (req, res) => {
+    const db = loadDB();
+    const comunidade = db.comunidades.find(c => c.id === req.params.id);
+    if (!comunidade) return res.status(404).json({ error: 'Comunidade não encontrada' });
+    const index = comunidade.participantes.indexOf(req.user.id);
+    if (index > -1) { comunidade.participantes.splice(index, 1); comunidade.membros--; } 
+    else { comunidade.participantes.push(req.user.id); comunidade.membros++; }
+    saveDB(db);
+    res.json(comunidade);
+});
+
+app.get('/api/marketplace', (req, res) => {
+    res.json(loadDB().marketplace);
 });
 
 // ==========================================
@@ -490,18 +549,21 @@ app.post('/api/galeria', authenticateToken, (req, res) => {
 });
 
 // ==========================================
-// SERVIR FRONTEND EXCLUSIVO: GAMEVERSE
+// SERVIR FRONTENDS MULTIPLOS
 // ==========================================
+
+// Rota específica para abrir o Gameverse (Corrigido para gameverse.html)
+app.get('/gameverse', (req, res) => {
+    const caminhoArquivo = path.join(__dirname, 'gameverse.html');
+    if (fs.existsSync(caminhoArquivo)) res.sendFile(caminhoArquivo);
+    else res.status(404).send('Arquivo gameverse.html não encontrado no servidor.');
+});
+
+// Rota padrão para abrir o seu site original
 app.get('*', (req, res) => {
-    // MUDANÇA: Exibe apenas o GameVerse em qualquer rota acessada
-    // DICA: Se você tiver salvo o arquivo HTML principal como 'index.html', mude 'gameverse.html' abaixo para 'index.html'
-    const caminhoArquivo = path.join(__dirname, 'gameverse.html'); 
-    
-    if (fs.existsSync(caminhoArquivo)) {
-        res.sendFile(caminhoArquivo);
-    } else {
-        res.status(404).send('🎮 Erro: Arquivo do GameVerse não encontrado no servidor. Verifique o nome do arquivo HTML.');
-    }
+    const caminhoArquivo = path.join(__dirname, 'index.html');
+    if (fs.existsSync(caminhoArquivo)) res.sendFile(caminhoArquivo);
+    else res.status(404).send('Arquivo index.html não encontrado no servidor.');
 });
 
 app.use((err, req, res, next) => {
