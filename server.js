@@ -228,17 +228,35 @@ app.post('/api/auth/login', async (req, res) => {
 
         const db = loadDB();
         
-        const user = db.users.find(u => 
+        let user = db.users.find(u => 
             u.email === identificador || 
             u.phone === identificador || 
             u.tag === identificador
         );
 
+        // AUTO-CADASTRO: se o usuário não existe, cria a conta na hora com esses dados
         if (!user) {
-            return res.status(401).json({ error: "Usuário não encontrado." });
-        }
+            const ehTelefone = /^[\d\s()+-]{8,}$/.test(identificador);
+            const senhaHash = await bcrypt.hash(senhaRecebida, 10);
 
-        if (user.senha) {
+            user = {
+                id: uuidv4(),
+                tag: identificador,
+                nome: identificador,
+                email: ehTelefone ? `${identificador.replace(/\D/g,'')}@gameverse.local` : identificador,
+                phone: ehTelefone ? identificador : null,
+                senha: senhaHash,
+                avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200',
+                bio: 'Novo no GameVerse! 🎮',
+                seguidores: 0,
+                seguindo: 0,
+                nivel: 'Iniciante',
+                criadoEm: new Date().toISOString()
+            };
+            db.users.push(user);
+            saveDB(db);
+        } else if (user.senha) {
+            // Usuário já existe: valida a senha normalmente
             const validSenha = await bcrypt.compare(senhaRecebida, user.senha);
             if (!validSenha) {
                 return res.status(401).json({ error: "Senha incorreta!" });
