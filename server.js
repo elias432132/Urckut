@@ -475,6 +475,21 @@ app.get('/api/amigos', authenticateToken, (req, res) => {
     }));
 });
 
+// NOVO: lista pedidos de amizade PENDENTES recebidos pelo usuário logado
+app.get('/api/amigos/pendentes', authenticateToken, (req, res) => {
+    const db = loadDB();
+    const pendentes = db.amigos.filter(a => a.amigoId === req.user.id && a.status === 'pendente');
+    res.json(pendentes.map(a => {
+        const solicitante = db.users.find(u => u.id === a.userId);
+        return {
+            id: a.id,
+            solicitante: solicitante ? { id: solicitante.id, nome: solicitante.nome, tag: solicitante.tag, avatar: solicitante.avatar, bio: solicitante.bio } : null,
+            status: a.status,
+            data: a.data
+        };
+    }).filter(p => p.solicitante));
+});
+
 app.post('/api/amigos/solicitar', authenticateToken, (req, res) => {
     const { amigoId } = req.body;
     const db = loadDB();
@@ -487,6 +502,32 @@ app.post('/api/amigos/solicitar', authenticateToken, (req, res) => {
     db.amigos.push(novaSolicitacao);
     saveDB(db);    
     res.json(novaSolicitacao);
+});
+
+// NOVO: aceitar um pedido de amizade pendente
+app.post('/api/amigos/:id/aceitar', authenticateToken, (req, res) => {
+    const db = loadDB();
+    const pedido = db.amigos.find(a => a.id === req.params.id);
+    if (!pedido) return res.status(404).json({ error: 'Solicitação não encontrada' });
+    if (pedido.amigoId !== req.user.id) return res.status(403).json({ error: 'Você não pode aceitar esta solicitação' });
+    if (pedido.status === 'aceito') return res.json(pedido);
+    pedido.status = 'aceito';
+    saveDB(db);
+    res.json(pedido);
+});
+
+// NOVO: recusar/cancelar um pedido de amizade
+app.post('/api/amigos/:id/recusar', authenticateToken, (req, res) => {
+    const db = loadDB();
+    const idx = db.amigos.findIndex(a => a.id === req.params.id);
+    if (idx === -1) return res.status(404).json({ error: 'Solicitação não encontrada' });
+    const pedido = db.amigos[idx];
+    if (pedido.amigoId !== req.user.id && pedido.userId !== req.user.id) {
+        return res.status(403).json({ error: 'Você não pode remover esta solicitação' });
+    }
+    db.amigos.splice(idx, 1);
+    saveDB(db);
+    res.json({ ok: true });
 });
 
 // ==========================================
