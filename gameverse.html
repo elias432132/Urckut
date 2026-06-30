@@ -51,6 +51,10 @@ canvas#particleCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index
 .btn-primary:active{transform:translateY(0);}
 .btn-primary:disabled {background:#555; cursor:not-allowed; box-shadow:none; opacity: 0.5; color: #ccc;}
 .terms{text-align:center;font-size:0.7rem;color:#555;margin-top:15px;line-height:1.4;}
+.login-error{display:none;background:rgba(255,51,85,0.12);border:1px solid rgba(255,51,85,0.35);color:#ff8095;border-radius:12px;padding:12px 14px;font-size:0.8rem;margin-bottom:16px;line-height:1.4;}
+.login-error.show{display:block;}
+.login-debug{display:none;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#888;border-radius:10px;padding:8px 10px;font-size:0.65rem;margin-top:12px;word-break:break-all;}
+.login-debug.show{display:block;}
 
 .header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(10,10,20,0.95);border-bottom:1px solid rgba(255,255,255,0.05);backdrop-filter:blur(20px);min-height:56px;}
 .header-left{display:flex;align-items:center;gap:10px;}
@@ -292,7 +296,7 @@ body.fullscreen .screen{padding-bottom:0;}
 .setting-label{font-size:0.9rem;}
 .toggle{width:48px;height:26px;border-radius:13px;background:rgba(255,255,255,0.1);position:relative;cursor:pointer;transition:all 0.3s;border:none;outline:none;}
 .toggle.active{background:var(--neon16);}
-.toggle::after{content:'absolute';top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:all 0.3s;}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:all 0.3s;}
 .toggle.active::after{left:25px;}
 
 .color-swatch{width:100%;aspect-ratio:1;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform 0.2s;}
@@ -360,6 +364,7 @@ body.fullscreen .screen{padding-bottom:0;}
     <div class="login-subtitle">A rede social definitiva para gamers.<br>Conecte-se, jogue e domine.</div>
     <div class="login-box">
         <h2>🔗 Acesso Restrito</h2>
+        <div class="login-error" id="loginError"></div>
         <div class="input-group">
             <label>Número do WhatsApp ou Gamertag</label>
             <input type="text" id="loginIdInput" placeholder="Ex: (11) 99999-9999 ou ShadowKiller_X">
@@ -370,6 +375,7 @@ body.fullscreen .screen{padding-bottom:0;}
         </div>
         <button class="btn-primary" onclick="loginUser()">🚀 ENTRAR</button>
         <div class="terms">Ao continuar, você concorda com os Termos de Serviço<br>e Política de Privacidade do GameVerse.</div>
+        <div class="login-debug" id="loginDebug"></div>
     </div>
 </div>
 
@@ -608,33 +614,64 @@ body.fullscreen .screen{padding-bottom:0;}
 // CONFIGURAÇÃO DE API E VARIÁVEIS GLOBAIS
 // ==========================================
 
-const API_URL = 'https://urckut.onrender.com/api'; 
-let authToken = localStorage.getItem('gameverse_token') || null;
+const API_URL = 'https://urckut.onrender.com/api';
+let authToken = null;
+try { authToken = localStorage.getItem('gameverse_token') || null; } catch(e) { console.warn('localStorage indisponível', e); }
 
 // Variáveis para Áudio Real
 let mediaRecorder;
 let audioChunks = [];
 let audioStream;
 
+// Timeout customizado para fetch (essencial em WebView Android, que às vezes
+// trava em "pending" indefinidamente sem dar erro nem sucesso)
+function fetchComTimeout(url, options, timeoutMs = 15000) {
+    return new Promise((resolve, reject) => {
+        const controller = new AbortController();
+        const timer = setTimeout(() => {
+            controller.abort();
+            reject(new Error('TIMEOUT: O servidor não respondeu em ' + (timeoutMs/1000) + 's. Verifique sua internet.'));
+        }, timeoutMs);
+
+        fetch(url, { ...options, signal: controller.signal })
+            .then(res => { clearTimeout(timer); resolve(res); })
+            .catch(err => { clearTimeout(timer); reject(err); });
+    });
+}
+
 async function apiCall(endpoint, method = 'GET', body = null) {
     const headers = {};
     if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
-    
+
     // Se o corpo não for um FormData (arquivo), definimos como JSON
     if (body && !(body instanceof FormData)) {
         headers['Content-Type'] = 'application/json';
     }
 
     const options = { method, headers };
-    
+
     if (body) {
         options.body = body instanceof FormData ? body : JSON.stringify(body);
     }
 
-    const res = await fetch(API_URL + endpoint, options);
+    let res;
+    try {
+        res = await fetchComTimeout(API_URL + endpoint, options, 20000);
+    } catch (networkErr) {
+        // Erro de rede real (sem internet, DNS, CORS, App sem permissão de Internet, etc)
+        console.error('Erro de rede em apiCall:', networkErr);
+        throw new Error('Sem conexão com o servidor (' + networkErr.message + ')');
+    }
+
     if (!res.ok) {
-        const err = await res.text();
-        throw new Error(err);
+        let errMsg = 'Erro ' + res.status;
+        try {
+            const errJson = await res.json();
+            errMsg = errJson.error || errJson.message || errMsg;
+        } catch(e) {
+            try { errMsg = await res.text(); } catch(e2) {}
+        }
+        throw new Error(errMsg);
     }
     return res.json();
 }
@@ -671,14 +708,20 @@ const state = {
     likedPosts: [],
     savedPosts: [],
     myStatuses: [],
-    myPosts: [], 
+    myPosts: [],
     callHistory: [],
     friends: [],
     contacts: [],
     myGroups: [],
     chatMessages: {},
     profilePic: null,
-    selectedGames: []
+    selectedGames: [],
+    // NOVO: amigos e mensagens reais vindas do servidor
+    realFriends: [],       // amigos aceitos vindos de /api/amigos
+    pendingRequests: [],   // pedidos recebidos vindos de /api/amigos/pendentes
+    searchResults: [],     // resultado de busca de usuários
+    realConversations: [], // lista de conversas reais (/api/mensagens)
+    chatPollInterval: null
 };
 
 for(let i=1; i<=71; i++) {
@@ -724,35 +767,37 @@ function saveLocalPreferences() {
 
 async function loadData() {
     // Carrega preferências locais
-    const saved = localStorage.getItem('gameverse_local');
-    if(saved) {
-        const data = JSON.parse(saved);
-        state.settings = {...state.settings, ...(data.settings || {})};
-        state.achievements = data.achievements || [];
-        state.savedPosts = data.savedPosts || [];
-        state.likedPosts = data.likedPosts || [];
-        state.callHistory = data.callHistory || [];
-        state.friends = data.friends || [];
-        state.contacts = data.contacts || [];
-        state.myGroups = data.myGroups || [];
-        state.chatMessages = data.chatMessages || {};
-        state.selectedGames = data.selectedGames || [];
-    }
-    
+    try {
+        const saved = localStorage.getItem('gameverse_local');
+        if(saved) {
+            const data = JSON.parse(saved);
+            state.settings = {...state.settings, ...(data.settings || {})};
+            state.achievements = data.achievements || [];
+            state.savedPosts = data.savedPosts || [];
+            state.likedPosts = data.likedPosts || [];
+            state.callHistory = data.callHistory || [];
+            state.friends = data.friends || [];
+            state.contacts = data.contacts || [];
+            state.myGroups = data.myGroups || [];
+            state.chatMessages = data.chatMessages || {};
+            state.selectedGames = data.selectedGames || [];
+        }
+    } catch(e) { console.warn('Erro ao ler localStorage', e); }
+
     // Autenticação Real no Servidor
     if (authToken) {
         try {
             // Busca dados do usuário no Backend
             const userData = await apiCall('/user/me');
-            state.currentUser = { 
-                id: userData.id, 
-                phone: userData.phone, 
-                tag: userData.tag, 
-                nome: userData.nome 
+            state.currentUser = {
+                id: userData.id,
+                phone: userData.phone,
+                tag: userData.tag,
+                nome: userData.nome
             };
             state.profilePic = userData.avatar;
             document.getElementById('profileBio').textContent = userData.bio || 'Toque para editar sua bio...';
-            
+
             // Busca Posts do Backend
             const postsData = await apiCall('/posts');
             state.myPosts = postsData;
@@ -765,7 +810,7 @@ async function loadData() {
         } catch(e) {
             console.warn('Sessão expirada ou erro de conexão:', e);
             authToken = null;
-            localStorage.removeItem('gameverse_token');
+            try { localStorage.removeItem('gameverse_token'); } catch(e2) {}
         }
     }
     return false;
@@ -792,7 +837,7 @@ function updateProfileStats() {
     const f = document.getElementById('statFriends');
     const g = document.getElementById('statGroups');
     const a = document.getElementById('statAch');
-    if(f) f.textContent = state.friends.length;
+    if(f) f.textContent = state.realFriends.length;
     if(g) g.textContent = state.myGroups.length;
     if(a) a.textContent = state.achievements.length;
 }
@@ -853,6 +898,11 @@ function initApp() {
     renderNotifications();
     renderEmojiPicker();
     updateProfileStats();
+
+    // Carrega dados sociais reais do servidor (amigos, pedidos, conversas)
+    Promise.all([atualizarAmigosReais(), atualizarPendentes(), atualizarConversasReais()])
+        .then(() => { renderChatList(); updateProfileStats(); })
+        .catch(e => console.warn('Erro ao carregar dados sociais', e));
 }
 
 function applyUser() {
@@ -881,18 +931,28 @@ function applyProfilePic() {
 async function loginUser() {
     const btn = document.querySelector('.login-box .btn-primary');
     const textoOriginal = btn.innerHTML;
-    
+    const errBox = document.getElementById('loginError');
+    const debugBox = document.getElementById('loginDebug');
+    errBox.classList.remove('show');
+    errBox.textContent = '';
+
     const loginId = document.getElementById('loginIdInput').value.trim();
     const password = document.getElementById('passwordInput').value.trim();
-    
-    if(!loginId) { showToast('❌ Digite o número ou Gamertag'); return; }
-    if(!password) { showToast('❌ Digite a senha'); return; }
-    
+
+    if(!loginId) { mostrarErroLogin('Digite o número ou Gamertag'); return; }
+    if(!password) { mostrarErroLogin('Digite a senha'); return; }
+
+    // Checagem rápida: o app tem acesso à rede?
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+        mostrarErroLogin('Seu dispositivo está sem conexão com a internet. Verifique o Wi-Fi/dados móveis.');
+        return;
+    }
+
     // TRAVA O BOTÃO PARA EVITAR CLIQUES DUPLOS
     btn.disabled = true;
     btn.innerHTML = '⏳ CONECTANDO...';
     btn.style.opacity = '0.5';
-    
+
     try {
         // MANDA OS DADOS NOS DOIS FORMATOS
         const response = await apiCall('/auth/login', 'POST', {
@@ -901,38 +961,51 @@ async function loginUser() {
             password: password,
             senha: password
         });
-        
+
         authToken = response.token;
-        localStorage.setItem('gameverse_token', authToken);
-        
+        try { localStorage.setItem('gameverse_token', authToken); } catch(e) { console.warn('Não foi possível salvar o token localmente', e); }
+
         state.currentUser = response.user;
         state.profilePic = response.user.avatar;
-        
+
         document.getElementById('loginScreen').classList.add('hidden');
         document.getElementById('app').style.display = 'flex';
         applyUser();
         applyProfilePic();
-        
+
         // Puxa posts do server
-        const postsData = await apiCall('/posts');
-        state.myPosts = postsData;
-        
+        try {
+            const postsData = await apiCall('/posts');
+            state.myPosts = postsData;
+        } catch(e) { console.warn('Falha ao carregar posts após login', e); }
+
         saveLocalPreferences();
-        showToast('✅ Bem-vindo, ' + state.currentUser.tag + '!');
+        showToast('✅ Bem-vindo, ' + (state.currentUser.tag || state.currentUser.nome) + '!');
         setTimeout(() => initApp(), 100);
-        
+
     } catch (error) {
         // DESTRAVA O BOTÃO SE DER ERRO (Loop corrigido)
         btn.disabled = false;
         btn.innerHTML = textoOriginal;
         btn.style.opacity = '1';
-        showToast('❌ Erro no login: ' + error.message);
+        mostrarErroLogin(error.message || 'Erro desconhecido no login');
+        if (debugBox) {
+            debugBox.textContent = 'Detalhes técnicos: ' + (error.stack || error.message || error);
+            debugBox.classList.add('show');
+        }
     }
+}
+
+function mostrarErroLogin(msg) {
+    const errBox = document.getElementById('loginError');
+    if(!errBox) { showToast('❌ ' + msg); return; }
+    errBox.textContent = '❌ ' + msg;
+    errBox.classList.add('show');
 }
 
 function logout() {
     if(confirm('Deseja realmente sair?')) {
-        localStorage.removeItem('gameverse_token');
+        try { localStorage.removeItem('gameverse_token'); } catch(e) {}
         location.reload();
     }
 }
@@ -1088,10 +1161,10 @@ function renderStatuses() {
         <div class="status-ring add"><div></div></div>
         <span class="status-name">Adicionar</span>
     </div>`;
-    
+
     // Status do servidor + Status Locais caso tenha algum cache
-    const allStatuses = [...state.myStatuses]; 
-    
+    const allStatuses = [...state.myStatuses];
+
     allStatuses.forEach((s, i) => {
         const c1 = state.neonColors[i*7%71], c2 = state.neonColors[(i*7+20)%71];
         // suportando campos mistos
@@ -1137,12 +1210,12 @@ async function saveStatus() {
     const text = document.getElementById('statusTextInput').value.trim();
     const emoji = document.getElementById('statusEmojiInput').value.trim() || '🎮';
     const fileInput = document.getElementById('statusFileInput');
-    
+
     if(!text && !fileInput.files[0]) { showToast('❌ Adicione texto ou arquivo!'); return; }
-    
+
     let mediaUrl = null;
     let type = 'text';
-    
+
     if (fileInput.files[0]) {
         showToast('⏳ Fazendo upload do status...');
         try {
@@ -1153,12 +1226,12 @@ async function saveStatus() {
             return;
         }
     }
-    
+
     try {
         const newStory = await apiCall('/stories', 'POST', {
             texto: text, media: mediaUrl, type: type
         });
-        
+
         state.myStatuses.push(newStory);
         closeFormModal();
         showToast('✅ Status publicado!');
@@ -1177,20 +1250,20 @@ function viewMyStatus(index) {
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    
+
     document.getElementById('statusUser').textContent = s.author || s.usuario || 'Usuário';
     document.getElementById('statusText').textContent = s.texto || s.text || '';
-    
+
     const prog = document.getElementById('statusProgress');
     prog.innerHTML = '<div class="status-progress-bar"><div class="status-progress-fill" id="statusFill"></div></div>';
-    
+
     let progress = 0;
     let t = 0;
     cancelAnimationFrame(state.statusViewerRAF);
-    
+
     const mediaToPlay = s.media || s.imagem;
     let videoEl = null;
-    
+
     if (mediaToPlay && (s.mediaType === 'video' || mediaToPlay.match(/\.(mp4|webm|mov)/i))) {
         videoEl = document.createElement('video');
         videoEl.src = mediaToPlay;
@@ -1205,7 +1278,7 @@ function viewMyStatus(index) {
         }
         t += 0.02;
         const w = canvas.width, h = canvas.height;
-        
+
         if(mediaToPlay) {
             if(videoEl) {
                 if (videoEl.readyState >= 2) {
@@ -1228,7 +1301,7 @@ function viewMyStatus(index) {
             grad.addColorStop(1, state.neonColors[(state.neonIndex + 30) % 71] + '40');
             ctx.fillStyle = grad;
             ctx.fillRect(0,0,w,h);
-            
+
             for(let i=0; i<12; i++){
                 const x = w/2 + Math.sin(t + i*0.5) * w * 0.4;
                 const y = h/2 + Math.cos(t*0.7 + i*0.7) * h * 0.4;
@@ -1238,12 +1311,12 @@ function viewMyStatus(index) {
                 ctx.fillStyle = state.neonColors[(state.neonIndex + i*6) % 71] + '40';
                 ctx.fill();
             }
-            
+
             ctx.font = '80px sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText(s.emoji || '🎮', w/2, h/2+30);
         }
-        
+
         if(s.texto || s.text) {
             ctx.font = 'bold 28px sans-serif';
             ctx.fillStyle = '#fff';
@@ -1252,11 +1325,11 @@ function viewMyStatus(index) {
             ctx.fillText(s.texto || s.text, w/2, h/2 + (mediaToPlay ? 100 : -60));
             ctx.shadowBlur = 0;
         }
-        
+
         progress += 0.2; // ~8 segundos de duração por status
         const fill = document.getElementById('statusFill');
         if(fill) fill.style.width = Math.min(progress, 100) + '%';
-        
+
         if(progress < 100) state.statusViewerRAF = requestAnimationFrame(anim);
         else {
             if (videoEl) videoEl.pause();
@@ -1274,42 +1347,68 @@ function closeStatusViewer() { document.getElementById('statusViewer').classList
 function renderChatList(filter = 'all') {
     const container = document.getElementById('chatList');
     const search = (document.getElementById('chatSearch')?.value || '').toLowerCase();
-    
+
+    // Conversas reais (amigos com quem já trocou mensagem ou são amigos aceitos)
+    const realChats = state.realFriends.map(f => ({
+        name: f.tag || f.nome,
+        emoji: '🎮',
+        color: '#00ffff',
+        type: 'realuser',
+        id: 'realuser_' + f.id,
+        userId: f.id,
+        avatar: f.avatar
+    }));
+
     const allChats = [
+        ...realChats,
         ...state.contacts.map(c => ({...c, type:'user', id:'user_'+c.name})),
         ...state.myGroups.map(g => ({...g, type:'group', id:'group_'+g.id}))
     ];
-    
+
     const filtered = allChats.filter(c => {
         if(!c || !c.name) return false;
         return !search || c.name.toLowerCase().includes(search);
     });
-    
+
     if(filtered.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
                 <div class="empty-icon">💬</div>
                 <h3>Nenhuma conversa ainda</h3>
-                <p>Adicione contatos ou crie grupos para começar a conversar</p>
+                <p>Adicione amigos de verdade ou crie grupos para começar a conversar</p>
                 <button onclick="openCreateModal()">➕ Criar Agora</button>
             </div>`;
         return;
     }
-    
+
     let html = '';
     filtered.forEach(item => {
         if(!item) return;
-        const msgs = state.chatMessages[item.id] || [];
-        const lastMsg = msgs[msgs.length-1];
-        const unread = msgs.filter(m => !m.sent && !m.read).length;
-        const timeDisplay = lastMsg ? lastMsg.time : '';
-        const lastText = lastMsg ? (lastMsg.sent ? 'Você: ' : '') + lastMsg.text : 'Toque para conversar';
+        let lastText = 'Toque para conversar';
+        let timeDisplay = '';
+        let unread = 0;
+
+        if(item.type === 'realuser') {
+            const conv = state.realConversations.find(c => c.contato && c.contato.id === item.userId);
+            if(conv && conv.ultimaMensagem) {
+                lastText = (conv.ultimaMensagem.remetenteId !== item.userId ? 'Você: ' : '') + conv.ultimaMensagem.texto;
+                timeDisplay = formatDate(conv.ultimaMensagem.data);
+                unread = conv.naoLidas || 0;
+            }
+        } else {
+            const msgs = state.chatMessages[item.id] || [];
+            const lastMsg = msgs[msgs.length-1];
+            timeDisplay = lastMsg ? lastMsg.time : '';
+            lastText = lastMsg ? (lastMsg.sent ? 'Você: ' : '') + lastMsg.text : 'Toque para conversar';
+            unread = msgs.filter(m => !m.sent && !m.read).length;
+        }
+
         html += `<div class="chat-item" onclick="openChat('${item.id}', '${item.type}')">
-            <div class="chat-avatar" style="background:${item.color || '#00ffff'}30;color:${item.color || '#00ffff'};border-color:${item.color || '#00ffff'}40">
-                ${item.emoji || '👤'}
+            <div class="chat-avatar ${item.type === 'realuser' ? 'online' : ''}" style="background:${item.color || '#00ffff'}30;color:${item.color || '#00ffff'};border-color:${item.color || '#00ffff'}40">
+                ${item.avatar ? `<img src="${item.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : (item.emoji || '👤')}
             </div>
             <div class="chat-info">
-                <div class="chat-name">${item.name || 'Sem nome'} ${item.type === 'group' ? '<span style="font-size:0.65rem;color:#888;">· Grupo</span>' : ''}</div>
+                <div class="chat-name">${item.name || 'Sem nome'} ${item.type === 'group' ? '<span style="font-size:0.65rem;color:#888;">· Grupo</span>' : ''}${item.type === 'realuser' ? '<span style="font-size:0.65rem;color:#00ff66;">· Amigo</span>' : ''}</div>
                 <div class="chat-last">${lastText}</div>
             </div>
             <div class="chat-meta">
@@ -1331,7 +1430,11 @@ function switchChatTab(el, tab) {
 
 function openChat(chatId, type) {
     let item;
-    if(type === 'user') {
+    if(type === 'realuser') {
+        const f = state.realFriends.find(fr => 'realuser_'+fr.id === chatId);
+        if(!f) { showToast('❌ Amigo não encontrado'); return; }
+        item = { name: f.tag || f.nome, emoji: '🎮', color: '#00ffff', userId: f.id, avatar: f.avatar };
+    } else if(type === 'user') {
         item = state.contacts.find(c => 'user_'+c.name === chatId);
     } else {
         item = state.myGroups.find(g => 'group_'+g.id === chatId);
@@ -1340,25 +1443,57 @@ function openChat(chatId, type) {
         showToast('❌ Conversa não encontrada');
         return;
     }
-    
+
     state.currentChat = item;
     state.currentChatType = type;
     document.getElementById('cvName').textContent = item.name || 'Sem nome';
-    document.getElementById('cvAvatar').textContent = item.emoji || '👤';
+    document.getElementById('cvAvatar').innerHTML = item.avatar ? `<img src="${item.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : (item.emoji || '👤');
     document.getElementById('cvAvatar').style.background = (item.color || '#00ffff') + '30';
     document.getElementById('cvAvatar').style.color = item.color || '#00ffff';
-    document.getElementById('cvStatus').textContent = type === 'group' ? `${item.members || 1} membros` : 'Online';
-    
-    const msgs = state.chatMessages[chatId] || [];
-    msgs.forEach(m => m.read = true);
-    saveLocalPreferences();
-    renderMessages();
+    document.getElementById('cvStatus').textContent = type === 'group' ? `${item.members || 1} membros` : (type === 'realuser' ? 'Amigo no GameVerse' : 'Online');
+
+    if(type === 'realuser') {
+        carregarMensagensReais(item.userId);
+        clearInterval(state.chatPollInterval);
+        state.chatPollInterval = setInterval(() => {
+            if(state.currentChat && state.currentChatType === 'realuser') {
+                carregarMensagensReais(item.userId, true);
+            }
+        }, 4000);
+    } else {
+        const msgs = state.chatMessages[chatId] || [];
+        msgs.forEach(m => m.read = true);
+        saveLocalPreferences();
+        renderMessages();
+    }
+
     document.getElementById('chatView').classList.add('active');
     renderChatList();
 }
 
+async function carregarMensagensReais(userId, silencioso) {
+    try {
+        const mensagens = await apiCall('/mensagens/' + userId);
+        const container = document.getElementById('chatMessages');
+        if(!state.currentChat) return;
+        if(mensagens.length === 0) {
+            container.innerHTML = '<div class="empty-state"><div class="empty-icon">💬</div><h3>Envie a primeira mensagem!</h3></div>';
+            return;
+        }
+        container.innerHTML = mensagens.map(m => `
+            <div class="msg ${m.remetenteId !== userId ? 'sent' : 'received'}">
+                ${escapeHtml(m.texto)}
+                <div class="msg-time">${new Date(m.data).getHours().toString().padStart(2,'0')}:${new Date(m.data).getMinutes().toString().padStart(2,'0')} ${m.remetenteId !== userId ? '<span class="read">'+(m.lida?'✓✓':'✓')+'</span>' : ''}</div>
+            </div>`).join('');
+        if(!silencioso) container.scrollTop = container.scrollHeight;
+    } catch(e) {
+        if(!silencioso) showToast('❌ Erro ao carregar mensagens: ' + e.message);
+    }
+}
+
 function closeChatView() {
     document.getElementById('chatView').classList.remove('active');
+    clearInterval(state.chatPollInterval);
     state.currentChat = null;
     state.currentChatType = null;
 }
@@ -1380,10 +1515,25 @@ function renderMessages() {
     container.scrollTop = container.scrollHeight;
 }
 
-function sendMessage() {
+async function sendMessage() {
     const input = document.getElementById('msgInput');
     const text = input.value.trim();
     if(!text || !state.currentChat) return;
+
+    if(state.currentChatType === 'realuser') {
+        input.value = '';
+        input.style.height = 'auto';
+        try {
+            await apiCall('/mensagens', 'POST', { destinatarioId: state.currentChat.userId, texto: text });
+            await carregarMensagensReais(state.currentChat.userId);
+            await atualizarConversasReais();
+            renderChatList();
+        } catch(e) {
+            showToast('❌ Erro ao enviar mensagem: ' + e.message);
+        }
+        return;
+    }
+
     const now = new Date();
     const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
     const chatId = state.currentChatType === 'user' ? 'user_'+state.currentChat.name : 'group_'+state.currentChat.id;
@@ -1417,27 +1567,27 @@ function renderFeed() {
             </div>`;
         return;
     }
-    
+
     let html = '';
     state.myPosts.forEach((post, i) => {
         if(!post) return;
         const isLiked = post.curtidoPor && state.currentUser && post.curtidoPor.includes(state.currentUser.id);
         const liked = state.likedPosts.includes(post.id) || isLiked;
-        
+
         const saved = state.savedPosts.includes(post.id);
         const dateStr = formatDate(post.time || post.data);
         const tagsHtml = (post.tags || []).map(t => `<span class="video-tag">${escapeHtml(t)}</span>`).join(' ');
-        
+
         // Híbrido com dados do servidor
         const autorNome = post.author || post.usuario || 'Usuário';
         const autorPic = post.authorPic || post.avatar;
         const avatarHtml = autorPic ? `<img src="${autorPic}">` : '';
         const isVerified = state.achievements.includes('verified');
         const verifiedBadge = isVerified ? '<span style="color:#00ffff;font-size:0.75rem;margin-left:4px;">✓</span>' : '';
-        
+
         const postMedia = post.media || post.imagem;
         const postDesc = post.desc || post.texto || '';
-        
+
         let mediaHtml = '';
         if((post.type === 'video' || (postMedia && postMedia.match(/\.(mp4|webm|mov)/i))) && postMedia) {
             mediaHtml = `<video style="width:100%;height:100%;object-fit:cover;" controls loop playsinline><source src="${postMedia}" type="video/mp4"></video>`;
@@ -1448,10 +1598,10 @@ function renderFeed() {
         } else {
             mediaHtml = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a1a2e,#16213e);padding:40px;"><div style="font-size:1.2rem;line-height:1.6;text-align:center;">${escapeHtml(postDesc)}</div></div>`;
         }
-        
+
         const curtidasCount = post.likes || post.curtidas || 0;
         const comentariosCount = post.comments ? post.comments.length : (post.comentarios || 0);
-        
+
         html += `
         <div class="video-card" id="videoCard${post.id}">
             <div class="video-bg">${mediaHtml}</div>
@@ -1585,12 +1735,12 @@ async function savePost() {
     const desc = document.getElementById('postDescInput').value.trim();
     const tagsStr = document.getElementById('postTagsInput').value.trim();
     const fileInput = document.getElementById('postFileInput');
-    
+
     if(!desc && type !== 'text') { showToast('❌ Adicione uma descrição'); return; }
     if(type !== 'text' && !fileInput.files[0]) { showToast('❌ Selecione um arquivo'); return; }
-    
+
     const tags = tagsStr ? tagsStr.split(/\s+/).filter(t => t.startsWith('#')).slice(0, 5) : [];
-    
+
     let mediaUrl = null;
     let title = null;
     let artist = null;
@@ -1614,19 +1764,19 @@ async function savePost() {
         const newPost = await apiCall('/posts', 'POST', {
             type, desc, media: mediaUrl, tags, title, artist
         });
-        
+
         state.myPosts.unshift(newPost);
         closeFormModal();
         showToast('✅ Publicado com sucesso!');
         unlockAchievement('first_post');
         renderFeed();
-        
+
         // Pula pra tela do Feed automaticamente
         setTimeout(() => {
             const feedNav = document.querySelectorAll('.nav-item')[1];
             switchScreen('feed', feedNav);
         }, 500);
-        
+
     } catch (e) {
         showToast('❌ Erro ao salvar o post');
     }
@@ -1635,20 +1785,20 @@ async function savePost() {
 async function toggleLikePost(postId, el) {
     try {
         const response = await apiCall(`/posts/${postId}/curtir`, 'POST');
-        
+
         const index = state.myPosts.findIndex(p => p.id === postId);
         if(index > -1) {
             state.myPosts[index] = response; // Atualiza post
         }
-        
+
         const icon = el.querySelector('.va-icon');
         const count = document.getElementById('likeCount'+postId);
-        
+
         if (response.curtidoPor.includes(state.currentUser.id)) {
             icon.classList.add('liked');
             icon.textContent = '❤️';
             if (!state.likedPosts.includes(postId)) state.likedPosts.push(postId);
-            
+
             // Animação Pop do Coração
             const heart = document.createElement('div');
             heart.textContent = '❤️';
@@ -1664,7 +1814,7 @@ async function toggleLikePost(postId, el) {
             icon.textContent = '🤍';
             state.likedPosts = state.likedPosts.filter(id => id !== postId);
         }
-        
+
         count.textContent = response.likes || response.curtidas || 0;
         saveLocalPreferences();
     } catch (e) {
@@ -1683,7 +1833,7 @@ function openComments(postId) {
     const post = state.myPosts.find(p => p.id === postId);
     if(!post) return;
     const commentsList = post.comments || [];
-    
+
     let commentsHtml = '';
     if(commentsList.length === 0) {
         commentsHtml = '<div class="empty-state" style="padding:30px;"><div class="empty-icon">💬</div><h3>Nenhum comentário ainda</h3><p>Seja o primeiro a comentar!</p></div>';
@@ -1705,12 +1855,12 @@ async function addComment(postId) {
     const input = document.getElementById('commentInput');
     const text = input.value.trim();
     if(!text) return;
-    
+
     try {
         const responsePost = await apiCall(`/posts/${postId}/comentar`, 'POST', { text });
         const index = state.myPosts.findIndex(p => p.id === postId);
         if(index > -1) state.myPosts[index] = responsePost;
-        
+
         showToast('💬 Comentário adicionado!');
         openComments(postId);
         renderFeed();
@@ -1724,7 +1874,7 @@ async function sharePost(postId) {
         const responsePost = await apiCall(`/posts/${postId}/compartilhar`, 'POST');
         const index = state.myPosts.findIndex(p => p.id === postId);
         if(index > -1) state.myPosts[index] = responsePost;
-        
+
         showToast('📤 Vídeo compartilhado!');
         renderFeed();
     } catch (e) {
@@ -1786,10 +1936,10 @@ async function startMyLive() {
         showToast("⏳ Preparando sistema de Live...");
         // Exige a permissão do Android para usar Câmera e Microfone
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        
+
         showToast("🔴 VOCÊ ESTÁ AO VIVO!");
         addNotification('📺', '#ff0066', 'Sua live começou!', 'Convide amigos para assistir');
-        
+
         // Mantém a câmera ligada (apenas para habilitar a permissão no Android)
         // Opcional: Desligar após testar para não gastar bateria no background
     } catch(err) {
@@ -1953,9 +2103,11 @@ function switchScreen(screen, el) {
 }
 
 function renderProfileMenu() {
+    const qtdAmigos = state.realFriends.length;
+    const pendentesTxt = state.pendingRequests.length > 0 ? ` · ${state.pendingRequests.length} pedido(s) novo(s)` : '';
     const items = [
         {icon:'📝',color:'#00ffff',title:'Editar Perfil',desc:'Nome, bio, avatar', action:'editProfile()'},
-        {icon:'👥',color:'#00ff66',title:'Amigos',desc:`${state.friends.length} amigos`, action:'showFriendsList()'},
+        {icon:'👥',color:'#00ff66',title:'Amigos',desc:`${qtdAmigos} amigos${pendentesTxt}`, action:'showFriendsList()'},
         {icon:'🏆',color:'#ffcc00',title:'Conquistas',desc:`${state.achievements.length} desbloqueadas`, action:'showAchievements()'},
         {icon:'🔖',color:'#9933ff',title:'Vídeos Salvos',desc:`${state.savedPosts.length} salvos`, action:'showSavedPosts()'},
         {icon:'⚙️',color:'#888',title:'Configurações',desc:'Tema e preferências', action:'openSettings()'},
@@ -1980,15 +2132,15 @@ async function uploadProfilePic() {
     input.onchange = async function(e) {
         const file = e.target.files[0];
         if(!file) return;
-        
+
         showToast('⏳ Atualizando foto de perfil...');
         try {
             const mediaUrl = await uploadFileToBackend(file);
             state.profilePic = mediaUrl;
-            
+
             // Atualiza no banco
             await apiCall('/user/me', 'PUT', { avatar: mediaUrl });
-            
+
             applyProfilePic();
             showToast('✅ Foto de perfil atualizada!');
         } catch(err) {
@@ -2006,7 +2158,7 @@ async function saveProfile() {
     const tag = document.getElementById('editName').value.trim();
     const bio = document.getElementById('editBio').value.trim();
     if(!tag) { showToast('❌ Nome não pode ser vazio'); return; }
-    
+
     try {
         const res = await apiCall('/user/me', 'PUT', { tag, bio });
         state.currentUser.tag = res.tag;
@@ -2021,18 +2173,150 @@ async function saveProfile() {
 
 function editProfileAvatar(e) { e.stopPropagation(); uploadProfilePic(); }
 
+async function atualizarConversasReais() {
+    try {
+        state.realConversations = await apiCall('/mensagens');
+    } catch(e) { console.warn('Erro ao buscar conversas', e); }
+}
+
+async function atualizarAmigosReais() {
+    try {
+        const lista = await apiCall('/amigos');
+        state.realFriends = lista.map(a => a.amigo);
+        updateProfileStats();
+        renderProfileMenu();
+    } catch(e) { console.warn('Erro ao buscar amigos', e); }
+}
+
+async function atualizarPendentes() {
+    try {
+        state.pendingRequests = await apiCall('/amigos/pendentes');
+        renderProfileMenu();
+    } catch(e) { console.warn('Erro ao buscar pedidos pendentes', e); }
+}
+
 function showFriendsList() {
+    openFormModal('👥 Amigos', '<div class="empty-state"><div class="empty-icon">⏳</div><h3>Carregando...</h3></div>');
+    renderFriendsModal();
+}
+
+async function renderFriendsModal() {
+    await Promise.all([atualizarAmigosReais(), atualizarPendentes()]);
+
     let html = '';
-    if(state.friends.length === 0) {
-        html = '<div class="empty-state"><div class="empty-icon">👥</div><h3>Nenhum amigo ainda</h3><p>Adicione contatos para começar</p></div>';
-    } else {
-        html = state.friends.map(name => {
-            const c = state.contacts.find(x => x.name === name);
-            if(!c) return '';
-            return `<div class="friend-card"><div class="chat-avatar" style="background:${c.color}30;color:${c.color};width:46px;height:46px;">${c.emoji}</div><div class="friend-info"><div class="friend-name">${c.name}</div><div class="friend-game">${c.game || 'Gamer'}</div></div><button class="friend-btn remove" onclick="removeFriend('${c.name}')">Remover</button></div>`;
-        }).join('');
+
+    if(state.pendingRequests.length > 0) {
+        html += `<div style="padding:10px 4px;font-size:0.8rem;color:var(--neon16);font-weight:700;">PEDIDOS RECEBIDOS (${state.pendingRequests.length})</div>`;
+        html += state.pendingRequests.map(p => `
+            <div class="friend-card">
+                <div class="chat-avatar" style="background:#00ffff30;color:#00ffff;width:46px;height:46px;">
+                    ${p.solicitante.avatar ? `<img src="${p.solicitante.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : '🎮'}
+                </div>
+                <div class="friend-info">
+                    <div class="friend-name">${escapeHtml(p.solicitante.tag || p.solicitante.nome)}</div>
+                    <div class="friend-game">Quer ser seu amigo</div>
+                </div>
+                <button class="friend-btn add" onclick="aceitarPedido('${p.id}')">Aceitar</button>
+                <button class="friend-btn remove" onclick="recusarPedido('${p.id}')" style="margin-left:6px;">✕</button>
+            </div>`).join('');
     }
-    openFormModal('Amigos (' + state.friends.length + ')', html);
+
+    html += `<div style="padding:10px 4px;font-size:0.8rem;color:var(--neon16);font-weight:700;">MEUS AMIGOS (${state.realFriends.length})</div>`;
+
+    if(state.realFriends.length === 0) {
+        html += '<div class="empty-state"><div class="empty-icon">👥</div><h3>Nenhum amigo ainda</h3><p>Busque pelo nome ou gamertag abaixo</p></div>';
+    } else {
+        html += state.realFriends.map(f => `
+            <div class="friend-card" onclick="closeFormModal();openChat('realuser_${f.id}','realuser')">
+                <div class="chat-avatar" style="background:#00ffff30;color:#00ffff;width:46px;height:46px;">
+                    ${f.avatar ? `<img src="${f.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : '🎮'}
+                </div>
+                <div class="friend-info">
+                    <div class="friend-name">${escapeHtml(f.tag || f.nome)}</div>
+                    <div class="friend-game">${escapeHtml(f.bio || 'Gamer')}</div>
+                </div>
+            </div>`).join('');
+    }
+
+    html += `<div style="padding:16px 4px 8px;border-top:1px solid rgba(255,255,255,0.05);margin-top:14px;">
+        <label style="font-size:0.8rem;color:#aaa;display:block;margin-bottom:8px;">Buscar jogador por nome ou gamertag:</label>
+        <div style="display:flex;gap:8px;">
+            <input type="text" id="friendSearchInput" placeholder="Digite pelo menos 2 letras..." style="flex:1;padding:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:#fff;outline:none;" oninput="buscarUsuarios(this.value)">
+        </div>
+        <div id="friendSearchResults" style="margin-top:10px;"></div>
+    </div>`;
+
+    document.getElementById('formModalTitle').textContent = '👥 Amigos';
+    document.getElementById('formModalBody').innerHTML = html;
+}
+
+let buscaTimeout = null;
+function buscarUsuarios(termo) {
+    clearTimeout(buscaTimeout);
+    const resultsDiv = document.getElementById('friendSearchResults');
+    if(!termo || termo.trim().length < 2) { resultsDiv.innerHTML = ''; return; }
+    resultsDiv.innerHTML = '<div style="font-size:0.75rem;color:#666;padding:8px;">Buscando...</div>';
+    buscaTimeout = setTimeout(async () => {
+        try {
+            const resultados = await apiCall('/users/search?q=' + encodeURIComponent(termo.trim()));
+            const jaAmigos = state.realFriends.map(f => f.id);
+            const filtrados = resultados.filter(u => u.id !== state.currentUser.id);
+            if(filtrados.length === 0) {
+                resultsDiv.innerHTML = '<div style="font-size:0.8rem;color:#666;padding:8px;">Nenhum jogador encontrado</div>';
+                return;
+            }
+            resultsDiv.innerHTML = filtrados.map(u => `
+                <div class="friend-card" style="border-bottom:none;background:rgba(255,255,255,0.02);border-radius:10px;margin-bottom:6px;">
+                    <div class="chat-avatar" style="background:#00ffff30;color:#00ffff;width:40px;height:40px;">
+                        ${u.avatar ? `<img src="${u.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : '🎮'}
+                    </div>
+                    <div class="friend-info">
+                        <div class="friend-name">${escapeHtml(u.tag || u.nome)}</div>
+                    </div>
+                    ${jaAmigos.includes(u.id)
+                        ? '<span style="font-size:0.7rem;color:#00ff66;">✓ Amigo</span>'
+                        : `<button class="friend-btn add" onclick="enviarPedidoAmizade('${u.id}', this)">Adicionar</button>`}
+                </div>`).join('');
+        } catch(e) {
+            resultsDiv.innerHTML = '<div style="font-size:0.8rem;color:#ff6680;padding:8px;">Erro na busca: ' + e.message + '</div>';
+        }
+    }, 400);
+}
+
+async function enviarPedidoAmizade(amigoId, btn) {
+    btn.disabled = true;
+    btn.textContent = '...';
+    try {
+        await apiCall('/amigos/solicitar', 'POST', { amigoId });
+        btn.textContent = 'Enviado ✓';
+        showToast('✅ Pedido de amizade enviado!');
+    } catch(e) {
+        btn.disabled = false;
+        btn.textContent = 'Adicionar';
+        showToast('❌ ' + e.message);
+    }
+}
+
+async function aceitarPedido(pedidoId) {
+    try {
+        await apiCall('/amigos/' + pedidoId + '/aceitar', 'POST');
+        showToast('✅ Agora vocês são amigos!');
+        if(state.friends.length + 1 >= 5) unlockAchievement('social');
+        renderFriendsModal();
+        renderChatList();
+    } catch(e) {
+        showToast('❌ ' + e.message);
+    }
+}
+
+async function recusarPedido(pedidoId) {
+    try {
+        await apiCall('/amigos/' + pedidoId + '/recusar', 'POST');
+        showToast('Pedido removido');
+        renderFriendsModal();
+    } catch(e) {
+        showToast('❌ ' + e.message);
+    }
 }
 
 function addFriend(name) {
@@ -2149,6 +2433,10 @@ function saveNewGroup() {
 
 function showChatMenu() {
     if(!state.currentChat) return;
+    if(state.currentChatType === 'realuser') {
+        openFormModal('Opções', `<div class="profile-menu-item"><div class="profile-menu-icon" style="background:#00ff6615;color:#00ff66">✓</div><div class="profile-menu-text"><div class="profile-menu-title">Vocês já são amigos</div></div></div>`);
+        return;
+    }
     const isFriend = state.friends.includes(state.currentChat.name);
     openFormModal('Opções', `${state.currentChatType === 'user' ? `<div class="profile-menu-item" onclick="closeFormModal();addFriend('${state.currentChat.name}')"><div class="profile-menu-icon" style="background:#00ff6615;color:#00ff66">👥</div><div class="profile-menu-text"><div class="profile-menu-title">${isFriend ? 'Amigo ✓' : 'Adicionar como Amigo'}</div></div></div>` : ''}<div class="profile-menu-item" onclick="closeFormModal();deleteContact()"><div class="profile-menu-icon" style="background:#ff335515;color:#ff3355">🗑️</div><div class="profile-menu-text"><div class="profile-menu-title">${state.currentChatType === 'group' ? 'Excluir Grupo' : 'Excluir Contato'}</div></div></div><div class="profile-menu-item" onclick="closeFormModal();clearChat()"><div class="profile-menu-icon" style="background:#ffcc0015;color:#ffcc00">🧹</div><div class="profile-menu-text"><div class="profile-menu-title">Limpar Conversa</div></div></div>`);
 }
@@ -2175,6 +2463,10 @@ function deleteContact() {
 
 function clearChat() {
     if(!state.currentChat) return;
+    if(state.currentChatType === 'realuser') {
+        showToast('🔒 Conversas com amigos reais ficam salvas no servidor e não podem ser apagadas por aqui.');
+        return;
+    }
     if(!confirm('Apagar todas as mensagens?')) return;
     const chatId = state.currentChatType === 'user' ? 'user_'+state.currentChat.name : 'group_'+state.currentChat.id;
     state.chatMessages[chatId] = [];
@@ -2215,27 +2507,27 @@ async function startRecording() {
             audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
             mediaRecorder = new MediaRecorder(audioStream);
             audioChunks = [];
-            
+
             mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-            
+
             mediaRecorder.onstop = async () => {
                 const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                 const file = new File([audioBlob], "audio.webm", { type: 'audio/webm' });
-                
+
                 showToast("⏳ Enviando áudio...");
                 try {
                     const mediaUrl = await uploadFileToBackend(file);
-                    
+
                     const time = new Date().getHours().toString().padStart(2, '0') + ':' + new Date().getMinutes().toString().padStart(2, '0');
                     const chatId = state.currentChatType === 'user' ? 'user_'+state.currentChat.name : 'group_'+state.currentChat.id;
                     if(!state.chatMessages[chatId]) state.chatMessages[chatId] = [];
-                    
+
                     // Envia mensagem com o player de áudio clicável
-                    state.chatMessages[chatId].push({ 
-                        text: `<audio controls src="${mediaUrl}" style="max-width:200px;"></audio>`, 
-                        sent: true, time, sender: state.currentUser.tag 
+                    state.chatMessages[chatId].push({
+                        text: `<audio controls src="${mediaUrl}" style="max-width:200px;"></audio>`,
+                        sent: true, time, sender: state.currentUser.tag
                     });
-                    
+
                     saveLocalPreferences();
                     renderMessages();
                     renderChatList();
@@ -2244,14 +2536,14 @@ async function startRecording() {
                     showToast('❌ Erro ao enviar áudio');
                 }
             };
-            
+
             mediaRecorder.start();
 
             state.recording = true;
             state.recSeconds = 0;
             document.getElementById('recIndicator').classList.add('active');
             document.getElementById('chatInputArea').style.display = 'none';
-            
+
             state.recTimer = setInterval(() => {
                 state.recSeconds++;
                 const m = Math.floor(state.recSeconds/60).toString().padStart(2,'0');
@@ -2270,10 +2562,10 @@ function cancelRecording() {
     clearInterval(state.recTimer);
     document.getElementById('recIndicator').classList.remove('active');
     document.getElementById('chatInputArea').style.display = 'flex';
-    
+
     if(mediaRecorder && mediaRecorder.state === "recording") {
         mediaRecorder.stop();
-        audioChunks = []; 
+        audioChunks = [];
         if(audioStream) audioStream.getTracks().forEach(track => track.stop());
     }
     showToast('❌ Cancelado');
@@ -2284,7 +2576,7 @@ function stopRecording() {
     clearInterval(state.recTimer);
     document.getElementById('recIndicator').classList.remove('active');
     document.getElementById('chatInputArea').style.display = 'flex';
-    
+
     if(mediaRecorder && mediaRecorder.state === "recording") {
         mediaRecorder.stop(); // Isso dispara o onstop que criamos acima para subir pro Cloudinary
         if(audioStream) audioStream.getTracks().forEach(track => track.stop());
